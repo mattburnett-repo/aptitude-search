@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aptitude-search.local/schemas/constraints.schema.json",
+  "title": "UserConstraints",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "location": { "type": "string", "default": "" },
+    "remote_preference": {
+      "type": "string",
+      "enum": ["remote", "hybrid", "onsite", "any"],
+      "default": "any"
+    },
+    "salary_min": { "type": ["number", "null"], "default": null },
+    "industries_include": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "industries_exclude": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    }
+  }
+}

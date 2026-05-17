@@ -1,0 +1,25 @@
+Sam Rivera
+Chicago, IL | sam.rivera@email.example
+
+SUMMARY
+Marketing operations leader with 10 years connecting CRM, analytics, and campaign execution. Strong at translating business goals into measurable programs.
+
+EXPERIENCE
+
+Director, Marketing Operations — BrightPath Health (2020–Present)
+- Unified HubSpot and Salesforce reporting; cut manual reporting time 60%
+- Built lead scoring model adopted by sales leadership
+- Managed $1.2M martech budget and vendor relationships
+
+Marketing Operations Manager — LearnWell EdTech (2016–2020)
+- Launched lifecycle email programs (onboarding, renewal, win-back)
+- Partnered with product on in-app messaging experiments
+
+Marketing Coordinator — Regional Agency Collective (2014–2016)
+- Executed multi-channel campaigns for healthcare and education clients
+
+EDUCATION
+B.B.A. Marketing — DePaul University (2014)
+
+SKILLS
+HubSpot, Salesforce, Google Analytics, SQL (basic), campaign ops, A/B testing, cross-functional leadership, healthcare compliance awareness

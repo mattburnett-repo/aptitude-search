@@ -1,0 +1,62 @@
+{
+  "boolean_queries": [
+    {
+      "label": "Modernization full stack",
+      "query": "(\"software engineer\" OR \"full stack\") AND (Django OR Vue OR \"legacy migration\" OR modernization) AND (SaaS OR logistics OR supply chain) NOT (intern OR junior)"
+    },
+    {
+      "label": "Integration platform senior",
+      "query": "(\"senior software engineer\" OR \"platform engineer\") AND (API OR integration OR PostgreSQL) AND (modernization OR \"technical debt\") NOT ML"
+    }
+  ],
+  "linkedin_queries": [
+    {
+      "label": "Senior modernization engineer",
+      "query": "Senior Software Engineer Django Vue modernization logistics"
+    },
+    {
+      "label": "Solutions engineer integration",
+      "query": "Solutions Engineer API integration B2B SaaS supply chain"
+    }
+  ],
+  "indeed_queries": [
+    {
+      "label": "Django senior logistics",
+      "query": "senior django engineer logistics"
+    },
+    {
+      "label": "full stack modernization",
+      "query": "full stack software engineer legacy modernization remote"
+    }
+  ],
+  "search_variants": [
+    {
+      "variant": "broad",
+      "description": "Widen to adjacent titles and industries",
+      "focus": "full stack OR solutions engineer OR platform engineer; logistics OR SaaS OR nonprofit tech"
+    },
+    {
+      "variant": "balanced",
+      "description": "Primary roles with modernization keywords",
+      "focus": "senior software engineer + Django/Vue + modernization + B2B"
+    },
+    {
+      "variant": "narrow",
+      "description": "Tight match to logistics modernization profile",
+      "focus": "senior django vue supply chain API integration Portland OR remote"
+    }
+  ],
+  "recommended_next_actions": [
+    "Run the balanced LinkedIn query first; scan for companies mentioning legacy migration or replatforming.",
+    "Use the narrow Indeed query if you want local or remote logistics tech roles only.",
+    "When a job post lists ColdFusion, .NET monolith, or PHP legacy stack, prioritize outreach—strong fit signal.",
+    "After 10 results, note which company_types appear often and refine industries_to_explore in Prompt 4 if needed.",
+    "Do not apply to ML-heavy or embedded roles flagged in roles_to_avoid."
+  ],
+  "rationale": [
+    "Boolean strings combine keyword_clusters modernization_stack and ownership_mentoring.",
+    "LinkedIn queries favor title + keyword patterns the platform handles well.",
+    "Indeed queries stay short and keyword-dense per platform behavior.",
+    "Variants map to broad exploration vs tight logistics-modernization focus."
+  ]
+}

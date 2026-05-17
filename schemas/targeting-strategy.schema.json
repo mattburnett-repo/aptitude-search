@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aptitude-search.local/schemas/targeting-strategy.schema.json",
+  "title": "TargetingStrategy",
+  "type": "object",
+  "required": [
+    "primary_roles",
+    "adjacent_roles",
+    "roles_to_avoid",
+    "company_types",
+    "environment_fit",
+    "industries_to_explore",
+    "industries_to_avoid",
+    "keyword_clusters",
+    "seniority_bands",
+    "constraints_applied",
+    "rationale"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "primary_roles": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/strategyItem" },
+      "minItems": 1
+    },
+    "adjacent_roles": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/strategyItem" }
+    },
+    "roles_to_avoid": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/strategyItem" }
+    },
+    "company_types": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/strategyItem" },
+      "minItems": 1
+    },
+    "environment_fit": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/strategyItem" },
+      "minItems": 1
+    },
+    "industries_to_explore": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "industries_to_avoid": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "keyword_clusters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["cluster_name", "keywords"],
+        "additionalProperties": false,
+        "properties": {
+          "cluster_name": { "type": "string" },
+          "keywords": {
+            "type": "array",
+            "items": { "type": "string" },
+            "minItems": 1
+          }
+        }
+      },
+      "minItems": 1
+    },
+    "seniority_bands": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "constraints_applied": {
+      "$ref": "https://aptitude-search.local/schemas/constraints.schema.json"
+    },
+    "rationale": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    }
+  },
+  "$defs": {
+    "strategyItem": {
+      "type": "object",
+      "required": ["label", "confidence", "why"],
+      "additionalProperties": false,
+      "properties": {
+        "label": { "type": "string" },
+        "confidence": { "type": "string", "enum": ["high", "medium", "low"] },
+        "why": { "type": "string" }
+      }
+    }
+  }
+}

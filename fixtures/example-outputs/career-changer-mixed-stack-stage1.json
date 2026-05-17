@@ -1,0 +1,112 @@
+{
+  "core_skills": [
+    {
+      "name": "Python",
+      "confidence": "high",
+      "evidence_from_resume": "Django stack at Riverbend; Python on internal tools at Pine State"
+    },
+    {
+      "name": "Django",
+      "confidence": "high",
+      "evidence_from_resume": "ColdFusion to Django migration at Riverbend Logistics"
+    },
+    {
+      "name": "Vue",
+      "confidence": "high",
+      "evidence_from_resume": "Django + Vue portal migration"
+    },
+    {
+      "name": "Legacy modernization",
+      "confidence": "high",
+      "evidence_from_resume": "ColdFusion to Django migration; CI/CD introduction at CivicWorks"
+    }
+  ],
+  "secondary_skills": [
+    {
+      "name": "PostgreSQL",
+      "confidence": "high",
+      "evidence_from_resume": "Warehouse scanner APIs with PostgreSQL backends"
+    },
+    {
+      "name": "Mentoring",
+      "confidence": "medium",
+      "evidence_from_resume": "Mentored two junior developers at Riverbend"
+    },
+    {
+      "name": "ColdFusion",
+      "confidence": "high",
+      "evidence_from_resume": "Listed in skills; migration source at Riverbend"
+    }
+  ],
+  "domains": [
+    {
+      "label": "Logistics / supply chain software",
+      "confidence": "high",
+      "evidence_from_resume": "Riverbend Logistics customer portal and warehouse integrations"
+    },
+    {
+      "label": "Nonprofit / mission-driven organizations",
+      "confidence": "high",
+      "evidence_from_resume": "CivicWorks Nonprofit 2017–2021"
+    }
+  ],
+  "strengths": [
+    {
+      "label": "Thrives in transitional technical environments",
+      "confidence": "high",
+      "evidence_from_resume": "Legacy migration, CI/CD from scratch, shifting nonprofit requirements"
+    },
+    {
+      "label": "End-to-end ownership under ambiguity",
+      "confidence": "medium",
+      "evidence_from_resume": "Summary claims ambiguous problems; multiple greenfield-ish initiatives"
+    },
+    {
+      "label": "Cross-functional communication",
+      "confidence": "medium",
+      "evidence_from_resume": "Listed in skills; nonprofit and logistics contexts imply stakeholder variety"
+    }
+  ],
+  "adjacent_roles": [
+    {
+      "label": "Solutions Engineer (integration-heavy products)",
+      "confidence": "medium",
+      "evidence_from_resume": "API integrations, warehouse systems, client-facing portal work"
+    },
+    {
+      "label": "Technical Program Manager (modernization programs)",
+      "confidence": "low",
+      "evidence_from_resume": "Inferred from migration leadership and mentoring; not explicit TPM title"
+    },
+    {
+      "label": "Platform Engineer (internal tools / developer experience)",
+      "confidence": "medium",
+      "evidence_from_resume": "CI/CD introduction, internal APIs, mentoring"
+    }
+  ],
+  "seniority_band": "senior",
+  "working_style_signals": [
+    {
+      "label": "High tolerance for ambiguity",
+      "confidence": "medium",
+      "evidence_from_resume": "Nonprofit shifting requirements; modernization projects"
+    },
+    {
+      "label": "Pragmatic builder over specialist researcher",
+      "confidence": "medium",
+      "evidence_from_resume": "Breadth across stacks and ops basics vs deep specialization"
+    }
+  ],
+  "aptitude_summary": "Adaptable full-stack engineer who repeatedly succeeds where systems are being replaced or formalized for the first time. Unusual value in modernization, integration-heavy teams, and resource-constrained organizations—not in narrow algorithmic specialization.",
+  "confidence_map": {
+    "seniority_band": "medium",
+    "adjacent_roles": "medium",
+    "working_style_signals": "medium"
+  },
+  "rationale": [
+    "Core stack is explicitly Python/Django/Vue with a flagship legacy migration.",
+    "Domain experience skews logistics and nonprofit rather than generic SaaS.",
+    "Adjacent roles emphasize integration and modernization, not only 'Senior Full Stack Engineer'.",
+    "Seniority inferred from 8 years experience and mentoring; title on resume is Software Engineer."
+  ]
+}

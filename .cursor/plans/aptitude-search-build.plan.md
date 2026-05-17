@@ -4,37 +4,37 @@ overview: "Two-phase build: first ship a validated prompt workflow pack (4 promp
 todos:
   - id: repo-layout
     content: Create prompts/, schemas/, fixtures/, docs/ layout and update README
-    status: pending
+    status: completed
   - id: schemas
     content: Define JSON schemas for aptitude-profile, targeting-strategy, search-queries + constraints object
-    status: pending
+    status: completed
   - id: prompt-contract
     content: Write docs/PROMPT-CONTRACT.md (ROLE/OBJECTIVE/INPUT/OUTPUT/RULES)
-    status: pending
+    status: completed
   - id: prompt-1
     content: "Author and test Prompt 1: resume → aptitude profile"
-    status: pending
+    status: completed
   - id: prompt-2
     content: "Author and test Prompt 2: profile → targeting strategy (company/environment fit)"
-    status: pending
+    status: completed
   - id: prompt-3
     content: "Author and test Prompt 3: strategy → search queries (Boolean/LinkedIn/Indeed)"
-    status: pending
+    status: completed
   - id: prompt-4
     content: "Author and test Prompt 4: iteration/refinement loop"
-    status: pending
+    status: completed
   - id: fixtures-testing
     content: Add 2–3 sample resumes, golden outputs, docs/TESTING.md checklist
-    status: pending
+    status: completed
   - id: workflow-pack
     content: Write buyer-facing docs/WORKFLOW.md and pack v1.0.0 deliverables
-    status: pending
+    status: completed
   - id: phase1-gate
     content: Verify Phase 1 exit criteria before starting API/MVP
-    status: pending
+    status: completed
   - id: api-mvp
     content: "Phase 2: orchestration API + BYO-key MVP frontend (after gate)"
-    status: pending
+    status: completed
 isProject: true
 ---
 

@@ -1,0 +1,25 @@
+Alex Morgan
+Portland, OR | alex.morgan@email.example | github.com/alexmorgan
+
+SUMMARY
+Full-stack developer with 8 years building web applications across legacy modernization and greenfield products. Comfortable owning ambiguous technical problems from discovery through deployment.
+
+EXPERIENCE
+
+Software Engineer — Riverbend Logistics (2021–Present)
+- Migrated customer portal from ColdFusion to Django + Vue; reduced page load time 40%
+- Built internal APIs integrating warehouse scanners with PostgreSQL backends
+- Mentored two junior developers on code review and testing practices
+
+Web Developer — CivicWorks Nonprofit (2017–2021)
+- Delivered donation and volunteer scheduling tools under tight budgets and shifting requirements
+- Introduced CI/CD and basic observability (logging, error alerts) where none existed
+
+Junior Developer — Pine State Digital (2015–2017)
+- Maintained PHP/MySQL client sites; learned Python and Django on internal tools
+
+EDUCATION
+B.A. Information Systems — Oregon State University (2015)
+
+SKILLS
+Python, Django, Vue, JavaScript, PostgreSQL, REST APIs, Docker (basic), legacy ColdFusion maintenance, requirements gathering, cross-functional communication

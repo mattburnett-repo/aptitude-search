@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aptitude-search.local/schemas/aptitude-profile.schema.json",
+  "title": "AptitudeProfile",
+  "type": "object",
+  "required": [
+    "core_skills",
+    "secondary_skills",
+    "domains",
+    "strengths",
+    "adjacent_roles",
+    "seniority_band",
+    "working_style_signals",
+    "aptitude_summary",
+    "confidence_map",
+    "rationale"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "core_skills": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/skillItem" },
+      "minItems": 1
+    },
+    "secondary_skills": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/skillItem" }
+    },
+    "domains": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/labeledItem" }
+    },
+    "strengths": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/labeledItem" },
+      "minItems": 1
+    },
+    "adjacent_roles": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/labeledItem" }
+    },
+    "seniority_band": {
+      "type": "string",
+      "enum": ["entry", "mid", "senior", "staff", "principal", "executive", "unknown"]
+    },
+    "working_style_signals": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/labeledItem" }
+    },
+    "aptitude_summary": { "type": "string", "minLength": 20 },
+    "confidence_map": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "enum": ["high", "medium", "low"]
+      }
+    },
+    "rationale": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    }
+  },
+  "$defs": {
+    "skillItem": {
+      "type": "object",
+      "required": ["name", "confidence"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "confidence": { "type": "string", "enum": ["high", "medium", "low"] },
+        "evidence_from_resume": { "type": "string" }
+      }
+    },
+    "labeledItem": {
+      "type": "object",
+      "required": ["label", "confidence"],
+      "additionalProperties": false,
+      "properties": {
+        "label": { "type": "string" },
+        "confidence": { "type": "string", "enum": ["high", "medium", "low"] },
+        "evidence_from_resume": { "type": "string" }
+      }
+    }
+  }
+}

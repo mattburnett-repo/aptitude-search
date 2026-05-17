@@ -1,0 +1,118 @@
+{
+  "primary_roles": [
+    {
+      "label": "Senior Software Engineer (modernization / platform)",
+      "confidence": "high",
+      "why": "Direct match to migration, APIs, and mentoring pattern at Riverbend"
+    },
+    {
+      "label": "Full Stack Engineer (integration-heavy SaaS)",
+      "confidence": "high",
+      "why": "Django/Vue plus warehouse and portal integrations"
+    }
+  ],
+  "adjacent_roles": [
+    {
+      "label": "Solutions Engineer",
+      "confidence": "medium",
+      "why": "Customer-facing systems and API integration experience"
+    },
+    {
+      "label": "Internal Tools / Developer Productivity Engineer",
+      "confidence": "medium",
+      "why": "CI/CD introduction and internal API work at prior roles"
+    }
+  ],
+  "roles_to_avoid": [
+    {
+      "label": "ML Research Engineer",
+      "confidence": "high",
+      "why": "No ML, data science, or modeling experience on profile"
+    },
+    {
+      "label": "Embedded / firmware engineer",
+      "confidence": "high",
+      "why": "Web and backend focus only; no hardware or low-level systems"
+    }
+  ],
+  "company_types": [
+    {
+      "label": "Mid-size B2B SaaS undergoing product or stack modernization",
+      "confidence": "high",
+      "why": "ColdFusion→Django migration maps to similar technical debt transitions"
+    },
+    {
+      "label": "Logistics / supply chain technology vendors",
+      "confidence": "high",
+      "why": "Recent domain at Riverbend Logistics"
+    },
+    {
+      "label": "Mission-driven organizations investing in digital infrastructure",
+      "confidence": "medium",
+      "why": "CivicWorks tenure and comfort with constrained environments"
+    }
+  ],
+  "environment_fit": [
+    {
+      "label": "Teams with legacy systems and a mandate to modernize without big-bang rewrites",
+      "confidence": "high",
+      "why": "Repeated incremental modernization and CI/CD adoption"
+    },
+    {
+      "label": "Cross-functional squads (eng + ops + business stakeholders)",
+      "confidence": "medium",
+      "why": "Logistics and nonprofit contexts imply operational partners"
+    },
+    {
+      "label": "Low ceremony, high ownership cultures",
+      "confidence": "medium",
+      "why": "Ambiguity tolerance and end-to-end delivery signals"
+    }
+  ],
+  "industries_to_explore": [
+    "Supply chain and logistics software",
+    "Healthcare operations tech (scheduling, portals)",
+    "Education technology",
+    "B2B SaaS (workflow / operations)"
+  ],
+  "industries_to_avoid": [
+    "Quantitative finance / HFT",
+    "Pure gaming studios (unless tools/platform teams)"
+  ],
+  "keyword_clusters": [
+    {
+      "cluster_name": "modernization_stack",
+      "keywords": [
+        "Django",
+        "Vue",
+        "legacy migration",
+        "API integration",
+        "PostgreSQL"
+      ]
+    },
+    {
+      "cluster_name": "ownership_mentoring",
+      "keywords": [
+        "full stack",
+        "mentor",
+        "CI/CD",
+        "internal tools",
+        "technical lead"
+      ]
+    }
+  ],
+  "seniority_bands": ["senior", "staff (stretch)"],
+  "constraints_applied": {
+    "location": "",
+    "remote_preference": "any",
+    "salary_min": null,
+    "industries_include": [],
+    "industries_exclude": []
+  },
+  "rationale": [
+    "Targeting emphasizes modernization and integration over generic 'full stack' titles alone.",
+    "Company types favor transitional B2B and logistics—not consumer social or ML-first labs.",
+    "Avoid list filters roles with no evidentiary support on the profile.",
+    "Keyword clusters split technical stack from ownership signals for Stage 3 query building."
+  ]
+}

@@ -1,0 +1,26 @@
+Jordan Lee
+Austin, TX | jordan.lee@email.example
+
+SUMMARY
+Senior backend engineer specializing in distributed systems, data pipelines, and platform reliability. 12+ years in fintech and B2B SaaS.
+
+EXPERIENCE
+
+Staff Software Engineer — Paylane (2019–Present)
+- Led migration from monolith to event-driven services (Kafka, Go, Kubernetes)
+- Owned SLOs for payment authorization path (99.95% availability)
+- Designed idempotency and reconciliation patterns for ledger services
+
+Senior Backend Engineer — DataMesh Inc (2014–2019)
+- Built ETL pipelines processing 2B events/day (Spark, Airflow)
+- Reduced infra cost 30% via partitioning and compaction strategy
+
+Software Engineer — First National Tech (2011–2014)
+- Java/Spring services for online banking features
+
+EDUCATION
+M.S. Computer Science — UT Austin (2011)
+B.S. Mathematics — Texas A&M (2009)
+
+SKILLS
+Go, Java, Kafka, Kubernetes, PostgreSQL, Spark, system design, incident response, mentoring
