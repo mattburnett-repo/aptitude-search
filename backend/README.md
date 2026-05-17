@@ -1,6 +1,6 @@
 # Aptitude Search API (Python / FastAPI)
 
-Orchestration for **Prompt 1** (aptitude profile JSON) and **Prompt 2** (verified matches text). **BYO OpenAI API key** via `X-OpenAI-Api-Key`. Optional `X-OpenAI-Model` (default `gpt-4o`).
+Orchestration for **Prompt 1** (aptitude profile JSON) and **Prompt 2** (SEARCH PLAN + JSON results + NOTES as text). **BYO OpenAI API key** via `X-OpenAI-Api-Key`. Optional `X-OpenAI-Model` (default `gpt-4o`).
 
 Stage 2 does not perform live web search from the API—use Cursor Agent for verified listings.
 

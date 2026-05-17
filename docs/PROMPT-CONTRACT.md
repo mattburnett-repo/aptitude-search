@@ -9,7 +9,7 @@ Every stage prompt in `prompts/` follows this structure.
 | **ROLE** | Stage identity |
 | **OBJECTIVE** | The single transformation this stage performs |
 | **INPUT FORMAT** | What to paste or attach |
-| **OUTPUT FORMAT** | Strict JSON (stage 1) or TSV in markdown fence (stage 2) |
+| **OUTPUT FORMAT** | Strict JSON (stage 1); SEARCH PLAN + JSON + NOTES (stage 2) |
 | **RULES** | Behavioral constraints |
 
 ## Stages
@@ -17,7 +17,7 @@ Every stage prompt in `prompts/` follows this structure.
 | Stage | Prompt file | Output |
 |-------|-------------|--------|
 | 1 | `01-resume-to-aptitude-profile.md` | `schemas/aptitude-profile.schema.json` |
-| 2 | `02-verified-job-discovery.md` | Tab-delimited rows in a markdown fence |
+| 2 | `02-verified-job-discovery.md` | SEARCH PLAN + `job-discovery-results` JSON + NOTES |
 | Constraints (optional, stage 2) | — | `schemas/constraints.schema.json` |
 
 ## Versioning

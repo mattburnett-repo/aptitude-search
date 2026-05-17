@@ -5,7 +5,7 @@
 | File | Stage |
 |------|--------|
 | `01-resume-to-aptitude-profile.md` | Aptitude profile (JSON) |
-| `02-verified-job-discovery.md` | Verified openings (TSV in markdown fence) |
+| `02-verified-job-discovery.md` | SEARCH PLAN + JSON results + NOTES |
 
 `XX-original-aptitude-prompt.md` is **reference only** (pre-migration spec).
 
@@ -31,7 +31,7 @@ Analyze the attached resume and return only the aptitude profile JSON.
 1. Open the system prompt in `02-verified-job-discovery.md`.
 2. Paste the Prompt 1 JSON into the user template.
 3. Send the user template from that file (with discovery rules filled in).
-4. Copy the SEARCH PLAN and the tab-delimited table from the fenced block.
+4. Use the SEARCH PLAN bullets, the `json` fenced block (for API/spreadsheet export), and the NOTES section.
 
 ---
 

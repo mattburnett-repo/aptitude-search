@@ -22,7 +22,7 @@ See [prompts/README.md](../prompts/README.md). Output: JSON (`schemas/aptitude-p
 
 ## Prompt 2 — Verified job discovery
 
-See [prompts/README.md](../prompts/README.md). Input: Prompt 1 JSON. Output: SEARCH PLAN + tab-delimited rows in a markdown fence.
+See [prompts/README.md](../prompts/README.md). Input: Prompt 1 JSON. Output: SEARCH PLAN + JSON results (`schemas/job-discovery-results.schema.json`) + NOTES.
 
 ---
 

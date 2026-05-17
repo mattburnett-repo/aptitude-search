@@ -1,15 +1,25 @@
-Message 1
+STEP 1
 
-@fixtures/sample-resumes/marketing-operations-lead.txt 
+Note: @fixtures/sample-resumes/* should be rotated each time you run this process, for variety.
+  career-changer-mixed-stack.txt
+  marketing-operations-lead.txt
+  senior-backend-engineer.txt
+
+--- start copy ---
+@fixtures/sample-resumes/senior-backend-engineer.txt
 @prompts/01-resume-to-aptitude-profile.md
 
 Follow the system prompt in 01-resume-to-aptitude-profile.md.
 Analyze the attached resume and return only the aptitude profile JSON.
+--- end copy ---
 
 COPY RESULTING JSON FOR USE AT THE END OF THE NEXT STEP
 
-Message 2
+===
 
+STEP 2
+
+--- start copy ---
 @prompts/02-verified-job-discovery.md
 
 Follow the system prompt in 02-verified-job-discovery.md.
@@ -21,8 +31,12 @@ Discovery rules:
 - Confirm each role is open now before including it.
 
 <aptitude_profile>
+--- end copy ---
+
 PASTE PROMPT 1 JSON HERE
+--- start copy ---
 </aptitude_profile>
 
 <constraints>
 </constraints>
+--- end copy ---

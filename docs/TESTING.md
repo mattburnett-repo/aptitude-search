@@ -9,12 +9,13 @@
 
 ## Stage 2 (Prompt 2)
 
-- [ ] SEARCH PLAN shows multiple angles from aptitude profile (not one ATS/board host)
-- [ ] Rows use diverse employers and industries (≤2 per company, ≤3 per board domain)
-- [ ] Columns: Company | Role title | Apply URL | Match description (no generic "AI broad search" column)
-- [ ] Apply URL is a specific job or that employer's careers page—not a board search results page
-- [ ] Description ties to aptitude profile evidence
-- [ ] At most 20 rows; no padding
+- [ ] `## SEARCH PLAN` has 3–6 bullets from aptitude profile (not one ATS/board host)
+- [ ] JSON block parses against `schemas/job-discovery-results.schema.json`
+- [ ] `search_plan` in JSON matches SEARCH PLAN bullets; `notes` matches NOTES bullets
+- [ ] Results use diverse employers and industries (≤2 per company, ≤3 per board domain)
+- [ ] Each result has a direct apply/posting URL and `match_description` tied to profile evidence
+- [ ] At most 20 results; no padding
+- [ ] NOTES mention meaningful exclusions or limits when applicable
 
 Prompt 2 quality depends on verifying postings with current information, not memory alone.
 

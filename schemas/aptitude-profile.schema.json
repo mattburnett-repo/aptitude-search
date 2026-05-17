@@ -47,12 +47,25 @@
       "type": "array",
       "items": { "$ref": "#/$defs/labeledItem" }
     },
-    "aptitude_summary": { "type": "string", "minLength": 20 },
+    "aptitude_summary": {
+      "type": "string",
+      "minLength": 20
+    },
     "confidence_map": {
       "type": "object",
       "additionalProperties": {
-        "type": "string",
-        "enum": ["high", "medium", "low"]
+        "type": "object",
+        "required": ["confidence", "reason"],
+        "properties": {
+          "confidence": {
+            "type": "string",
+            "enum": ["high", "medium", "low"]
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
       }
     },
     "rationale": {
@@ -67,9 +80,16 @@
       "required": ["name", "confidence"],
       "additionalProperties": false,
       "properties": {
-        "name": { "type": "string" },
-        "confidence": { "type": "string", "enum": ["high", "medium", "low"] },
-        "evidence_from_resume": { "type": "string" }
+        "name": {
+          "type": "string"
+        },
+        "confidence": {
+          "type": "string",
+          "enum": ["high", "medium", "low"]
+        },
+        "evidence_from_resume": {
+          "type": "string"
+        }
       }
     },
     "labeledItem": {
@@ -77,9 +97,16 @@
       "required": ["label", "confidence"],
       "additionalProperties": false,
       "properties": {
-        "label": { "type": "string" },
-        "confidence": { "type": "string", "enum": ["high", "medium", "low"] },
-        "evidence_from_resume": { "type": "string" }
+        "label": {
+          "type": "string"
+        },
+        "confidence": {
+          "type": "string",
+          "enum": ["high", "medium", "low"]
+        },
+        "evidence_from_resume": {
+          "type": "string"
+        }
       }
     }
   }
