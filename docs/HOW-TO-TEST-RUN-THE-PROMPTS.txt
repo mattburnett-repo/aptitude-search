@@ -19,6 +19,8 @@ COPY RESULTING JSON FOR USE AT THE END OF THE NEXT STEP
 
 STEP 2
 
+Run in Cursor Agent with web search enabled for live posting verification.
+
 --- start copy ---
 @prompts/02-verified-job-discovery.md
 
@@ -38,5 +40,8 @@ PASTE PROMPT 1 JSON HERE
 </aptitude_profile>
 
 <constraints>
+{}
 </constraints>
+
+Return only one json fenced code block conforming to schemas/job-discovery-results.schema.json.
 --- end copy ---

@@ -4,8 +4,8 @@
 
 | File | Stage |
 |------|--------|
-| `01-resume-to-aptitude-profile.md` | Aptitude profile (JSON) |
-| `02-verified-job-discovery.md` | SEARCH PLAN + JSON results + NOTES |
+| `01-resume-to-aptitude-profile.md` | Aptitude profile (JSON only) |
+| `02-verified-job-discovery.md` | Verified job discovery (single JSON fenced block) |
 
 `XX-original-aptitude-prompt.md` is **reference only** (pre-migration spec).
 
@@ -13,8 +13,8 @@
 
 ## Prompt 1 — Aptitude profile
 
-1. Open the system prompt in `01-resume-to-aptitude-profile.md` (text inside the code fence).
-2. Provide the resume (paste into the user template or attach `fixtures/sample-resumes/career-changer-mixed-stack.txt`).
+1. Open `01-resume-to-aptitude-profile.md` (the file body is the system prompt).
+2. Provide the resume (paste into the user template or attach a file under `fixtures/sample-resumes/`).
 3. Send:
 
 ```
@@ -28,10 +28,13 @@ Analyze the attached resume and return only the aptitude profile JSON.
 
 ## Prompt 2 — Verified openings
 
-1. Open the system prompt in `02-verified-job-discovery.md`.
-2. Paste the Prompt 1 JSON into the user template.
-3. Send the user template from that file (with discovery rules filled in).
-4. Use the SEARCH PLAN bullets, the `json` fenced block (for API/spreadsheet export), and the NOTES section.
+1. Open `02-verified-job-discovery.md`.
+2. Paste the Prompt 1 JSON into `<aptitude_profile>` in the user message (see [docs/HOW-TO-TEST-RUN-THE-PROMPTS.txt](../docs/HOW-TO-TEST-RUN-THE-PROMPTS.txt)).
+3. Optionally fill `<constraints>` with JSON matching `schemas/constraints.schema.json`.
+4. Send with discovery rules (employers first, diversify industries, confirm each posting is open).
+5. Parse the single `json` fenced block: `search_plan` (3–6 strings), `results` (up to 20 verified postings), `notes` (verification caveats).
+
+Use **Cursor Agent with web search** for live verification. The API runs the same prompt but does not browse.
 
 ---
 

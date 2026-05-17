@@ -12,18 +12,24 @@ Reference (do not run): [`prompts/XX-original-aptitude-prompt.md`](prompts/XX-or
 
 ## Quick start
 
-See **[prompts/README.md](prompts/README.md)** — Prompt 1 (resume → JSON), then Prompt 2 (JSON → verified openings).
+See **[prompts/README.md](prompts/README.md)** — Prompt 1 (resume → JSON), then Prompt 2 (profile → verified job discovery JSON). For live verification, use Cursor Agent with web search; see **[docs/HOW-TO-TEST-RUN-THE-PROMPTS.txt](docs/HOW-TO-TEST-RUN-THE-PROMPTS.txt)**.
 
 ## Repository layout
 
 ```
-prompts/          # 01 aptitude, 02 verified discovery; XX = reference
-schemas/          # aptitude-profile, constraints
+prompts/          # 01 aptitude profile, 02 verified discovery; XX = reference
+schemas/          # aptitude-profile, job-discovery-results, constraints
 fixtures/         # sample resumes + stage-1 golden output
 docs/             # WORKFLOW, TESTING, PROMPT-CONTRACT
+design-docs/      # original concept (historical); see design-docs/README.md
 backend/          # FastAPI — stages 1 and 2
-frontend/         # MVP UI
+frontend/         # MVP UI (Vite + React)
 ```
+
+## API + UI (optional)
+
+- **[backend/README.md](backend/README.md)** — `POST /v1/pipeline`, BYO OpenAI key
+- **[frontend/README.md](frontend/README.md)** — local dev on port 5173
 
 ## Plan
 

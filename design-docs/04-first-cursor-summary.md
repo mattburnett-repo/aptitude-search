@@ -1,3 +1,5 @@
+> **Outdated snapshot (2026-05).** This file describes the repo before implementation. For the current product, see [README.md](../README.md) and [design-docs/README.md](README.md).
+
 Exploring the workspace structure and key files.
 
 ## Workspace summary: aptitude-search
