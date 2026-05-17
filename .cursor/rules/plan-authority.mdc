@@ -1,0 +1,28 @@
+---
+description: Plans in .cursor/plans are the only authoritative plan sources for this project
+alwaysApply: true
+---
+
+# Plan authority (aptitude-search)
+
+Plans for this project are authoritative **only** when they live in:
+
+**`.cursor/plans/`**
+
+## Authoritative
+
+- Any `*.plan.md` or other plan document under `.cursor/plans/`
+- Current build plan: `.cursor/plans/aptitude-search-build.plan.md`
+
+## Not authoritative
+
+- `~/.cursor/plans/` (user-global Cursor plans directory)
+- Plans created outside the repo by CreatePlan or similar tools
+- Duplicate or stale copies anywhere else on disk
+
+## Agent instructions
+
+1. When creating or updating a plan for this project, write **only** to `.cursor/plans/`.
+2. When multiple plan paths exist, use **only** files in `.cursor/plans/`. Ignore or delete external duplicates; do not merge from them unless the user explicitly provides content to adopt.
+3. When citing "the plan," link to a file under `.cursor/plans/`, not a home-directory or session path.
+4. This rule file (`.cursor/rules/plan-authority.mdc`) defines plan authority policy; do not duplicate it under `.cursor/plans/`.
