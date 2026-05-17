@@ -12,8 +12,6 @@ from app.validate import validate_stage
 
 FILES = [
     ("career-changer-mixed-stack-stage1.json", "aptitudeProfile"),
-    ("career-changer-mixed-stack-stage2.json", "targetingStrategy"),
-    ("career-changer-mixed-stack-stage3.json", "searchQueries"),
 ]
 
 

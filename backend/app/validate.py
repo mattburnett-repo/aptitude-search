@@ -15,23 +15,13 @@ def _load_schema(name: str) -> dict:
 def _build_validators() -> dict[str, Draft202012Validator]:
     constraints = _load_schema("constraints.schema.json")
     aptitude = _load_schema("aptitude-profile.schema.json")
-    targeting = _load_schema("targeting-strategy.schema.json")
-    search = _load_schema("search-queries.schema.json")
     store = {
         constraints["$id"]: constraints,
         aptitude["$id"]: aptitude,
-        targeting["$id"]: targeting,
-        search["$id"]: search,
     }
     return {
         "aptitudeProfile": Draft202012Validator(
             aptitude, resolver=RefResolver.from_schema(aptitude, store=store)
-        ),
-        "targetingStrategy": Draft202012Validator(
-            targeting, resolver=RefResolver.from_schema(targeting, store=store)
-        ),
-        "searchQueries": Draft202012Validator(
-            search, resolver=RefResolver.from_schema(search, store=store)
         ),
         "constraints": Draft202012Validator(
             constraints, resolver=RefResolver.from_schema(constraints, store=store)

@@ -16,12 +16,4 @@ def system_prompt_stage1() -> str:
 
 
 def system_prompt_stage2() -> str:
-    return load_system_prompt("02-aptitude-to-targeting-strategy.md")
-
-
-def system_prompt_stage3() -> str:
-    return load_system_prompt("03-targeting-to-search-queries.md")
-
-
-def system_prompt_stage4() -> str:
-    return load_system_prompt("04-iteration-refinement.md")
+    return load_system_prompt("02-verified-job-discovery.md")

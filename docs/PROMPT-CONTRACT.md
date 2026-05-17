@@ -6,39 +6,19 @@ Every stage prompt in `prompts/` follows this structure.
 
 | Section | Purpose |
 |---------|---------|
-| **ROLE** | Stage identity (profiler, strategist, query optimizer, refinement editor) |
+| **ROLE** | Stage identity |
 | **OBJECTIVE** | The single transformation this stage performs |
-| **INPUT FORMAT** | What to paste or attach (raw text or prior-stage JSON) |
-| **OUTPUT FORMAT** | Strict JSON matching the stage schema in `schemas/` |
-| **RULES** | Behavioral constraints (no preamble, evidence vs inference, etc.) |
+| **INPUT FORMAT** | What to paste or attach |
+| **OUTPUT FORMAT** | Strict JSON (stage 1) or TSV in markdown fence (stage 2) |
+| **RULES** | Behavioral constraints |
 
-## Cross-cutting requirements
+## Stages
 
-### Explainability
-
-- Include a `rationale` array: 2–5 short, user-facing bullets.
-- Do **not** output chain-of-thought or hidden reasoning.
-
-### Confidence signaling
-
-- Use `confidence`: `high` | `medium` | `low` on inferred items.
-- Prefer `evidence_from_resume` when the resume supports a claim.
-- Distinguish explicit evidence from inference in rationale text.
-
-### Downstream safety
-
-- Output **only** valid JSON (no markdown fences in production use; fences OK in docs examples).
-- Do not invent skills, roles, or industries absent from the aptitude profile (Stages 2–3).
-- Stage 2 must include `company_types`, `environment_fit`, and `roles_to_avoid` — not titles alone.
-
-## Schema references
-
-| Stage | Output schema |
-|-------|----------------|
-| 1 | `schemas/aptitude-profile.schema.json` |
-| 2 | `schemas/targeting-strategy.schema.json` |
-| 3 | `schemas/search-queries.schema.json` |
-| Constraints (optional input) | `schemas/constraints.schema.json` |
+| Stage | Prompt file | Output |
+|-------|-------------|--------|
+| 1 | `01-resume-to-aptitude-profile.md` | `schemas/aptitude-profile.schema.json` |
+| 2 | `02-verified-job-discovery.md` | Tab-delimited rows in a markdown fence |
+| Constraints (optional, stage 2) | — | `schemas/constraints.schema.json` |
 
 ## Versioning
 

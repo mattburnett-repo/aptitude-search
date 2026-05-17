@@ -6,8 +6,7 @@ const MODEL_KEY = "aptitude-search-openai-model";
 
 type PipelineResult = {
   aptitude_profile: unknown;
-  targeting_strategy: unknown;
-  search_queries: unknown;
+  verified_matches: string;
 };
 
 type Constraints = {
@@ -26,7 +25,7 @@ const defaultConstraints: Constraints = {
   industries_exclude: "",
 };
 
-function StagePanel({ title, data }: { title: string; data: unknown }) {
+function StageJsonPanel({ title, data }: { title: string; data: unknown }) {
   if (!data) return null;
   return (
     <details className="stage" open>
@@ -44,8 +43,6 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<PipelineResult | null>(null);
-  const [corrections, setCorrections] = useState("");
-  const [regenStage, setRegenStage] = useState<"2" | "3">("2");
 
   useEffect(() => {
     setApiKey(localStorage.getItem(STORAGE_KEY) ?? "");
@@ -87,7 +84,13 @@ export default function App() {
       body: JSON.stringify(body),
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error ?? res.statusText);
+    if (!res.ok) {
+      const msg =
+        typeof data.detail === "string"
+          ? data.detail
+          : (data.error ?? res.statusText);
+      throw new Error(msg);
+    }
     return data;
   }
 
@@ -99,41 +102,7 @@ export default function App() {
         resume,
         constraints: buildConstraintsBody(),
       });
-      setResult(data);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Request failed");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function runIterate() {
-    if (!result) return;
-    setError(null);
-    setLoading(true);
-    try {
-      const data = await apiFetch("/v1/iterate", {
-        regenerate_from_stage: Number(regenStage),
-        current_artifacts: {
-          aptitude_profile: result.aptitude_profile,
-          targeting_strategy: result.targeting_strategy,
-          search_queries: result.search_queries,
-        },
-        user_corrections: corrections,
-        constraints: buildConstraintsBody(),
-      });
-      setResult((prev) =>
-        prev
-          ? {
-              aptitude_profile: prev.aptitude_profile,
-              targeting_strategy:
-                (data.targeting_strategy as unknown) ?? prev.targeting_strategy,
-              search_queries:
-                (data.search_queries as unknown) ?? prev.search_queries,
-            }
-          : null
-      );
-      setCorrections("");
+      setResult(data as PipelineResult);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Request failed");
     } finally {
@@ -154,11 +123,18 @@ export default function App() {
     URL.revokeObjectURL(url);
   }
 
+  function copyVerified() {
+    if (!result?.verified_matches) return;
+    void navigator.clipboard.writeText(result.verified_matches);
+  }
+
   return (
     <>
       <h1>Aptitude Search</h1>
       <p className="subtitle">
-        Career inference before search. API key stays in your browser only.
+        Prompt 1 → aptitude profile, Prompt 2 → verified openings. API key stays
+        in your browser only. For best verification, run Prompt 2 in Cursor
+        Agent with web search.
       </p>
 
       <section className="grid grid-2">
@@ -196,7 +172,7 @@ export default function App() {
 
       <section>
         <h2 style={{ fontSize: "1rem", marginBottom: "0.75rem" }}>
-          Optional constraints
+          Optional constraints (Prompt 2)
         </h2>
         <div className="grid grid-2">
           <div>
@@ -273,12 +249,19 @@ export default function App() {
           disabled={loading || !apiKey || !resume.trim()}
           onClick={runPipeline}
         >
-          {loading ? "Running pipeline…" : "Run pipeline"}
+          {loading ? "Running pipeline…" : "Run pipeline (1 → 2)"}
         </button>
         {result && (
-          <button type="button" className="secondary" onClick={exportJson}>
-            Export JSON
-          </button>
+          <>
+            <button type="button" className="secondary" onClick={exportJson}>
+              Export JSON
+            </button>
+            {result.verified_matches && (
+              <button type="button" className="secondary" onClick={copyVerified}>
+                Copy verified matches
+              </button>
+            )}
+          </>
         )}
       </div>
 
@@ -286,40 +269,16 @@ export default function App() {
 
       {result && (
         <>
-          <StagePanel title="Stage 1 — Aptitude profile" data={result.aptitude_profile} />
-          <StagePanel title="Stage 2 — Targeting strategy" data={result.targeting_strategy} />
-          <StagePanel title="Stage 3 — Search queries" data={result.search_queries} />
-
-          <section className="refine">
-            <h2 style={{ fontSize: "1rem" }}>Refine (Prompt 4)</h2>
-            <label htmlFor="regen">Regenerate from stage</label>
-            <select
-              id="regen"
-              value={regenStage}
-              onChange={(e) => setRegenStage(e.target.value as "2" | "3")}
-            >
-              <option value="2">2 — strategy + queries</option>
-              <option value="3">3 — queries only</option>
-            </select>
-            <label htmlFor="corrections" style={{ marginTop: "0.75rem" }}>
-              Your corrections
-            </label>
-            <textarea
-              id="corrections"
-              value={corrections}
-              onChange={(e) => setCorrections(e.target.value)}
-              placeholder="e.g. Target staff platform roles, remote only, add healthcare SaaS…"
-            />
-            <div className="actions">
-              <button
-                type="button"
-                disabled={loading || !corrections.trim()}
-                onClick={runIterate}
-              >
-                Apply corrections
-              </button>
-            </div>
-          </section>
+          <StageJsonPanel
+            title="Stage 1 — Aptitude profile"
+            data={result.aptitude_profile}
+          />
+          {result.verified_matches && (
+            <details className="stage" open>
+              <summary>Stage 2 — Verified matches</summary>
+              <pre className="verified-matches">{result.verified_matches}</pre>
+            </details>
+          )}
         </>
       )}
     </>

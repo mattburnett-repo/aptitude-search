@@ -1,85 +1,30 @@
 # aptitude-search
 
-A multi-stage LLM pipeline for aptitude-driven job search, career targeting, and search strategy generation.
+Aptitude-driven job search: resume → aptitude profile → **verified openings only**.
 
-## Status
+## Product workflow
 
-**Phase 1:** Prompt workflow pack — run manually in ChatGPT, Claude, or similar ([docs/WORKFLOW.md](docs/WORKFLOW.md)).
+**[Prompt 1](prompts/01-resume-to-aptitude-profile.md)** → **[Prompt 2](prompts/02-verified-job-discovery.md)**
 
-**Phase 2:** Python/FastAPI orchestration API + Vite/React web UI (BYO OpenAI API key).
+Steps: **[prompts/README.md](prompts/README.md)**
 
-## Quick start (prompt pack only)
+Reference (do not run): [`prompts/XX-original-aptitude-prompt.md`](prompts/XX-original-aptitude-prompt.md)
 
-1. Read [docs/WORKFLOW.md](docs/WORKFLOW.md) for the 10-minute walkthrough.
-2. Run prompts in order under `prompts/` (1 → 2 → 3; use 4 to refine).
-3. Validate outputs against `schemas/`.
+## Quick start
 
-## Running the API and web app
-
-Use **two terminals**. The web UI proxies API requests to port **3001**.
-
-### 1. API (Python / FastAPI)
-
-First-time setup:
-
-```bash
-cd backend
-python3 -m venv .venv
-source .venv/bin/activate          # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-```
-
-Start the server (from `backend/` — use the venv’s Python, not global `uvicorn`):
-
-```bash
-.venv/bin/python -m uvicorn app.main:app --reload --port 3001
-```
-
-Health check: http://localhost:3001/health
-
-Optional — validate golden fixtures:
-
-```bash
-.venv/bin/python scripts/validate_fixtures.py
-```
-
-More detail: [backend/README.md](backend/README.md)
-
-### 2. Web (Vite + React)
-
-First-time setup:
-
-```bash
-cd frontend
-npm install
-```
-
-Start the dev server:
-
-```bash
-npm run dev
-```
-
-Open http://localhost:5173 — paste your **OpenAI API key** in the UI (stored in the browser only). The app sends it to the local API as `X-OpenAI-Api-Key`.
-
-More detail: [frontend/README.md](frontend/README.md)
+See **[prompts/README.md](prompts/README.md)** — Prompt 1 (resume → JSON), then Prompt 2 (JSON → verified openings).
 
 ## Repository layout
 
 ```
-prompts/          # Stage prompts (copy-paste ready)
-schemas/          # JSON Schema for each stage output
-fixtures/         # Sample resumes and golden example outputs
-docs/             # WORKFLOW, PROMPT-CONTRACT, TESTING
-design-docs/      # Product thesis and architecture notes
-backend/          # Orchestration API — Python/FastAPI (Phase 2)
-frontend/         # MVP frontend (Phase 2)
+prompts/          # 01 aptitude, 02 verified discovery; XX = reference
+schemas/          # aptitude-profile, constraints
+fixtures/         # sample resumes + stage-1 golden output
+docs/             # WORKFLOW, TESTING, PROMPT-CONTRACT
+backend/          # FastAPI — stages 1 and 2
+frontend/         # MVP UI
 ```
-
-## Design docs
-
-See [design-docs/](design-docs/) for concept, thesis, and monetization notes.
 
 ## Plan
 
-Authoritative build plan: [.cursor/plans/aptitude-search-build.plan.md](.cursor/plans/aptitude-search-build.plan.md)
+[.cursor/plans/aptitude-search-build.plan.md](.cursor/plans/aptitude-search-build.plan.md)

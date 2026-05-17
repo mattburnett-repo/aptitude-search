@@ -6,6 +6,9 @@ dist/
 .env
 .env.local
 
+# Candidate resume at repo root (optional; use fixtures/sample-resumes/ for demos)
+resume-text.txt
+
 # Python
 __pycache__/
 *.py[cod]

@@ -23,14 +23,3 @@ class Stage1Request(BaseModel):
 class Stage2Request(BaseModel):
     aptitude_profile: Any
     constraints: Constraints | None = None
-
-
-class Stage3Request(BaseModel):
-    targeting_strategy: Any
-
-
-class IterateRequest(BaseModel):
-    regenerate_from_stage: Literal[2, 3]
-    current_artifacts: dict[str, Any]
-    user_corrections: str
-    constraints: Constraints | None = None

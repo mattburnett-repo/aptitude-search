@@ -1,14 +1,8 @@
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.models import (
-    IterateRequest,
-    PipelineRequest,
-    Stage1Request,
-    Stage2Request,
-    Stage3Request,
-)
-from app.pipeline import run_iterate, run_pipeline, run_stage1, run_stage2, run_stage3
+from app.models import PipelineRequest, Stage1Request, Stage2Request
+from app.pipeline import run_pipeline, run_stage1, run_stage2
 
 app = FastAPI(title="aptitude-search-api", version="1.0.0")
 
@@ -74,48 +68,9 @@ def stage2(
     key = require_api_key(x_openai_api_key)
     try:
         return {
-            "targeting_strategy": run_stage2(
+            "verified_matches": run_stage2(
                 key, body.aptitude_profile, body.constraints, x_openai_model
             )
         }
-    except (ValueError, RuntimeError) as e:
-        raise HTTPException(status_code=500, detail=str(e)) from e
-
-
-@app.post("/v1/stages/3")
-def stage3(
-    body: Stage3Request,
-    x_openai_api_key: str | None = Header(default=None),
-    x_openai_model: str | None = Header(default=None),
-):
-    key = require_api_key(x_openai_api_key)
-    try:
-        return {
-            "search_queries": run_stage3(
-                key, body.targeting_strategy, x_openai_model
-            )
-        }
-    except (ValueError, RuntimeError) as e:
-        raise HTTPException(status_code=500, detail=str(e)) from e
-
-
-@app.post("/v1/iterate")
-def iterate(
-    body: IterateRequest,
-    x_openai_api_key: str | None = Header(default=None),
-    x_openai_model: str | None = Header(default=None),
-):
-    if not body.user_corrections.strip():
-        raise HTTPException(status_code=400, detail="user_corrections is required")
-    key = require_api_key(x_openai_api_key)
-    try:
-        return run_iterate(
-            key,
-            body.regenerate_from_stage,
-            body.current_artifacts,
-            body.user_corrections,
-            body.constraints,
-            x_openai_model,
-        )
     except (ValueError, RuntimeError) as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
