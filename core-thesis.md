@@ -1,3 +1,5 @@
+(the usp (unique selling point), or df (differentiating feature) is that this 'thing' looks at your resume and figures out what types of companies to apply for, based on aptitude. It's not a 'keyword search' thing like LinkedIn, or a lot of the other job sites)
+
 Yes — and that distinction is much bigger than it sounds at first.
 
 What you are describing is not:
