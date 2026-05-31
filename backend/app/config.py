@@ -1,7 +1,8 @@
+import sys
 import tomllib
 from pathlib import Path
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, ValidationError, field_validator
 
 _CONFIG_PATH = Path(__file__).resolve().parent.parent / "config.toml"
 
@@ -75,4 +76,8 @@ class Config(BaseModel):
         return cls.model_validate(data)
 
 
-config = Config.load()
+try:
+    config = Config.load()
+except ValidationError as e:
+    print(e)
+    sys.exit(1)

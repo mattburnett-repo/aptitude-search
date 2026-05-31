@@ -2,7 +2,7 @@
 
 Orchestration for **Prompt 1** (aptitude profile JSON, schema-validated) and **Prompt 2** (verified job discovery as **plain text**—typically one `json` fenced block per the prompt; not schema-validated by the API).
 
-**OpenAI API key** in `config.toml` under `[llm].api_key` (see `config.example.toml`). Model defaults from `[llm].default_model`.
+**OpenAI API key** in `config.toml` under `[llm].api_key`. Model defaults from `[llm].default_model`.
 
 Stage 2 does not perform live web search from the API—the user message asks the model to verify when possible, but only Cursor Agent (or similar) can browse. Use the API for stage 1 and drafts; use Agent for production-quality verification.
 
