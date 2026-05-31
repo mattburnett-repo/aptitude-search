@@ -8,16 +8,12 @@ def _client() -> OpenAI:
     return OpenAI(api_key=config.llm.api_key)
 
 
-def call_stage(
+def complete_chat_json(
     system_prompt: str,
     user_message: str,
     model: str | None = None,
 ) -> object:
-    """Pipeline stage 1: LLM call that must return JSON (aptitude profile).
-
-    "Stage" means a step in the two-prompt flow (see run_stage1 / run_stage2),
-    not a parameter. Stage 2 uses call_stage_text instead.
-    """
+    """OpenAI chat completion with JSON response mode; returns parsed JSON."""
     completion = _client().chat.completions.create(
         model=model or config.llm.default_model,
         temperature=config.llm.temperature,
@@ -33,12 +29,12 @@ def call_stage(
     return parse_json_response(content)
 
 
-def call_stage_text(
+def complete_chat_text(
     system_prompt: str,
     user_message: str,
     model: str | None = None,
 ) -> str:
-    """Pipeline stage 2: LLM call returning plain text (verified job discovery)."""
+    """OpenAI chat completion returning plain text (no JSON response mode)."""
     completion = _client().chat.completions.create(
         model=model or config.llm.default_model,
         temperature=config.llm.temperature,
