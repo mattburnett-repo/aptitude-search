@@ -2,9 +2,7 @@
 
 Single-page UI for the two-stage pipeline (resume → aptitude profile → verified matches).
 
-**API key** is stored in `localStorage` only (`aptitude-search-openai-key`). It is sent to your API instance as `X-OpenAI-Api-Key` on each request—not to any third-party server beyond OpenAI via your backend.
-
-**Model** is also stored in `localStorage` (`aptitude-search-openai-model`, default `gpt-4o`).
+OpenAI credentials are configured on the API server in `backend/config.toml` (`[llm].api_key`, `default_model`). The browser does not send an API key.
 
 ## Run
 
@@ -13,6 +11,7 @@ Terminal 1 — API:
 ```bash
 cd backend && python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
+cp config.example.toml config.toml   # if needed; set [llm].api_key
 .venv/bin/python -m uvicorn app.main:app --reload --port 3001
 ```
 

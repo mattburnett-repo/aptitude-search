@@ -39,8 +39,9 @@ Test stage 1 on GPT-4o or 4.1 and Claude 3.5+ for reliable JSON. Stage 2 require
 # Stage 1 only
 curl -s -X POST http://localhost:3001/v1/stages/1 \
   -H "Content-Type: application/json" \
-  -H "X-OpenAI-Api-Key: $OPENAI_API_KEY" \
   -d "$(jq -n --rawfile r ../fixtures/sample-resumes/career-changer-mixed-stack.txt '{resume: $r}')"
 ```
+
+Requires `llm.api_key` in `backend/config.toml`.
 
 Full pipeline: `POST /v1/pipeline` with `{ "resume", "constraints"? }` — see [backend/README.md](../backend/README.md).

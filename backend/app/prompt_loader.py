@@ -1,5 +1,6 @@
 import re
 
+from app.config import config
 from app.paths import PROMPTS_DIR
 
 
@@ -16,8 +17,8 @@ def load_system_prompt(filename: str) -> str:
 
 
 def system_prompt_stage1() -> str:
-    return load_system_prompt("01-resume-to-aptitude-profile.md")
+    return load_system_prompt(config.prompts.stage1_file)
 
 
 def system_prompt_stage2() -> str:
-    return load_system_prompt("02-verified-job-discovery.md")
+    return load_system_prompt(config.prompts.stage2_file)

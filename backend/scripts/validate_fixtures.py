@@ -7,17 +7,15 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from app.config import config
 from app.paths import FIXTURES_DIR
 from app.validate import validate_stage
-
-FILES = [
-    ("career-changer-mixed-stack-stage1.json", "aptitudeProfile"),
-]
 
 
 def main() -> int:
     failed = 0
-    for name, stage in FILES:
+    for entry in config.fixtures.files:
+        name, stage = entry.name, entry.stage
         data = json.loads((FIXTURES_DIR / name).read_text(encoding="utf-8"))
         try:
             validate_stage(stage, data)

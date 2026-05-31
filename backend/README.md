@@ -2,7 +2,7 @@
 
 Orchestration for **Prompt 1** (aptitude profile JSON, schema-validated) and **Prompt 2** (verified job discovery as **plain text**—typically one `json` fenced block per the prompt; not schema-validated by the API).
 
-**BYO OpenAI API key** via `X-OpenAI-Api-Key`. Optional `X-OpenAI-Model` (default `gpt-4o`).
+**OpenAI API key** in `config.toml` under `[llm].api_key` (see `config.example.toml`). Model defaults from `[llm].default_model`.
 
 Stage 2 does not perform live web search from the API—the user message asks the model to verify when possible, but only Cursor Agent (or similar) can browse. Use the API for stage 1 and drafts; use Agent for production-quality verification.
 
@@ -13,7 +13,11 @@ cd backend
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+cp config.example.toml config.toml   # if config.toml is missing
+# Edit config.toml: set [llm].api_key
 ```
+
+App settings live in `config.toml` (see `config.example.toml`). Loaded once via `app.config.config`.
 
 ## Run
 
@@ -38,7 +42,7 @@ Validates stage-1 golden output only (`career-changer-mixed-stack-stage1.json`).
 | POST | `/v1/stages/1` | `{ "resume" }` | `{ "aptitude_profile" }` |
 | POST | `/v1/stages/2` | `{ "aptitude_profile", "constraints"? }` | `{ "verified_matches" }` |
 
-All POST routes require header `X-OpenAI-Api-Key`. Optional `X-OpenAI-Model`.
+POST routes use the server-configured OpenAI key and model from `config.toml`.
 
 `constraints` matches `schemas/constraints.schema.json` (location, remote_preference, salary_min, industries_include/exclude).
 
@@ -49,7 +53,6 @@ There is no `/v1/iterate` endpoint.
 ```bash
 curl -s -X POST http://localhost:3001/v1/pipeline \
   -H "Content-Type: application/json" \
-  -H "X-OpenAI-Api-Key: $OPENAI_API_KEY" \
   -d "$(jq -n --rawfile r ../fixtures/sample-resumes/career-changer-mixed-stack.txt '{resume: $r}')"
 ```
 

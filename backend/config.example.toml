@@ -1,0 +1,33 @@
+[app]
+title = "aptitude-search-api"
+version = "1.0.0"
+service = "aptitude-search-api"
+
+[cors]
+allow_origins = ["http://localhost:5173", "http://127.0.0.1:5173"]
+allow_credentials = true
+allow_methods = ["*"]
+allow_headers = ["*"]
+
+[llm]
+api_key = ""  # required: set your OpenAI API key
+default_model = "gpt-4o"
+temperature = 0.3
+json_response_type = "json_object"
+
+[prompts]
+stage1_file = "01-resume-to-aptitude-profile.md"
+stage2_file = "02-verified-job-discovery.md"
+
+[schemas]
+constraints = "constraints.schema.json"
+aptitude_profile = "aptitude-profile.schema.json"
+
+[paths]
+prompts_dir = "prompts"
+schemas_dir = "schemas"
+fixtures_example_outputs_dir = "fixtures/example-outputs"
+
+[[fixtures.files]]
+name = "career-changer-mixed-stack-stage1.json"
+stage = "aptitudeProfile"

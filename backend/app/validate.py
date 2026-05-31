@@ -5,6 +5,7 @@ from typing import Any
 from jsonschema import Draft202012Validator
 from jsonschema import RefResolver
 
+from app.config import config
 from app.paths import SCHEMAS_DIR
 
 
@@ -13,8 +14,8 @@ def _load_schema(name: str) -> dict:
 
 
 def _build_validators() -> dict[str, Draft202012Validator]:
-    constraints = _load_schema("constraints.schema.json")
-    aptitude = _load_schema("aptitude-profile.schema.json")
+    constraints = _load_schema(config.schemas.constraints)
+    aptitude = _load_schema(config.schemas.aptitude_profile)
     store = {
         constraints["$id"]: constraints,
         aptitude["$id"]: aptitude,

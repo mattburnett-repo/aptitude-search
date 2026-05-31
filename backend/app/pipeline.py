@@ -9,17 +9,18 @@ from app.validate import validate_stage
 DEFAULT_CONSTRAINTS = Constraints()
 
 
-def run_stage1(api_key: str, resume: str, model: str | None = None) -> Any:
+def run_stage1(resume: str, model: str | None = None) -> Any:
     user = f"Analyze this resume and return the aptitude profile JSON.\n\n<resume>\n{resume}\n</resume>"
     result = call_stage(
-        api_key, prompt_loader.system_prompt_stage1(), user, model or "gpt-4o"
+        prompt_loader.system_prompt_stage1(),
+        user,
+        model,
     )
     validate_stage("aptitudeProfile", result)
     return result
 
 
 def run_stage2(
-    api_key: str,
     aptitude_profile: Any,
     constraints: Constraints | None = None,
     model: str | None = None,
@@ -32,19 +33,16 @@ def run_stage2(
         f"<aptitude_profile>\n{json.dumps(aptitude_profile, indent=2)}\n</aptitude_profile>\n\n"
         f"<constraints>\n{c.model_dump_json(indent=2)}\n</constraints>"
     )
-    return call_stage_text(
-        api_key, prompt_loader.system_prompt_stage2(), user, model or "gpt-4o"
-    )
+    return call_stage_text(prompt_loader.system_prompt_stage2(), user, model)
 
 
 def run_pipeline(
-    api_key: str,
     resume: str,
     constraints: Constraints | None = None,
     model: str | None = None,
 ) -> dict[str, Any]:
-    aptitude_profile = run_stage1(api_key, resume, model)
-    verified_matches = run_stage2(api_key, aptitude_profile, constraints, model)
+    aptitude_profile = run_stage1(resume, model)
+    verified_matches = run_stage2(aptitude_profile, constraints, model)
     return {
         "aptitude_profile": aptitude_profile,
         "verified_matches": verified_matches,

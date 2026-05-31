@@ -1,8 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const API_BASE = "/api";
-const STORAGE_KEY = "aptitude-search-openai-key";
-const MODEL_KEY = "aptitude-search-openai-model";
 
 type PipelineResult = {
   aptitude_profile: unknown;
@@ -36,26 +34,11 @@ function StageJsonPanel({ title, data }: { title: string; data: unknown }) {
 }
 
 export default function App() {
-  const [apiKey, setApiKey] = useState("");
-  const [model, setModel] = useState("gpt-4o");
   const [resume, setResume] = useState("");
   const [constraints, setConstraints] = useState(defaultConstraints);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<PipelineResult | null>(null);
-
-  useEffect(() => {
-    setApiKey(localStorage.getItem(STORAGE_KEY) ?? "");
-    setModel(localStorage.getItem(MODEL_KEY) ?? "gpt-4o");
-  }, []);
-
-  useEffect(() => {
-    if (apiKey) localStorage.setItem(STORAGE_KEY, apiKey);
-  }, [apiKey]);
-
-  useEffect(() => {
-    localStorage.setItem(MODEL_KEY, model);
-  }, [model]);
 
   function buildConstraintsBody() {
     return {
@@ -76,11 +59,7 @@ export default function App() {
   async function apiFetch(path: string, body: unknown) {
     const res = await fetch(`${API_BASE}${path}`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-OpenAI-Api-Key": apiKey,
-        "X-OpenAI-Model": model,
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
     const data = await res.json();
@@ -132,33 +111,10 @@ export default function App() {
     <>
       <h1>Aptitude Search</h1>
       <p className="subtitle">
-        Prompt 1 → aptitude profile, Prompt 2 → verified openings. API key stays
-        in your browser only. For best verification, run Prompt 2 in Cursor
-        Agent with web search.
+        Prompt 1 → aptitude profile, Prompt 2 → verified openings. OpenAI is
+        configured on the API server (`config.toml`). For best verification, run
+        Prompt 2 in Cursor Agent with web search.
       </p>
-
-      <section className="grid grid-2">
-        <div>
-          <label htmlFor="apiKey">OpenAI API key</label>
-          <input
-            id="apiKey"
-            type="password"
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            placeholder="sk-..."
-            autoComplete="off"
-          />
-        </div>
-        <div>
-          <label htmlFor="model">Model</label>
-          <input
-            id="model"
-            type="text"
-            value={model}
-            onChange={(e) => setModel(e.target.value)}
-          />
-        </div>
-      </section>
 
       <section>
         <label htmlFor="resume">Resume (plain text)</label>
@@ -246,7 +202,7 @@ export default function App() {
       <div className="actions">
         <button
           type="button"
-          disabled={loading || !apiKey || !resume.trim()}
+          disabled={loading || !resume.trim()}
           onClick={runPipeline}
         >
           {loading ? "Running pipeline…" : "Run pipeline (1 → 2)"}

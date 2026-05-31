@@ -1,75 +1,52 @@
-from fastapi import FastAPI, Header, HTTPException
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.config import config
 from app.models import PipelineRequest, Stage1Request, Stage2Request
 from app.pipeline import run_pipeline, run_stage1, run_stage2
 
-app = FastAPI(title="aptitude-search-api", version="1.0.0")
+app = FastAPI(title=config.app.title, version=config.app.version)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=config.cors.allow_origins,
+    allow_credentials=config.cors.allow_credentials,
+    allow_methods=config.cors.allow_methods,
+    allow_headers=config.cors.allow_headers,
 )
-
-
-def require_api_key(x_openai_api_key: str | None) -> str:
-    if not x_openai_api_key:
-        raise HTTPException(
-            status_code=401,
-            detail="Missing X-OpenAI-Api-Key header (BYO API key)",
-        )
-    return x_openai_api_key
 
 
 @app.get("/health")
 def health():
-    return {"ok": True, "service": "aptitude-search-api"}
+    return {"ok": True, "service": config.app.service}
 
 
 @app.post("/v1/pipeline")
-def pipeline(
-    body: PipelineRequest,
-    x_openai_api_key: str | None = Header(default=None),
-    x_openai_model: str | None = Header(default=None),
-):
+def pipeline(body: PipelineRequest):
     if not body.resume.strip():
         raise HTTPException(status_code=400, detail="resume is required")
-    key = require_api_key(x_openai_api_key)
     try:
-        return run_pipeline(key, body.resume, body.constraints, x_openai_model)
+        return run_pipeline(body.resume, body.constraints)
     except (ValueError, RuntimeError) as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @app.post("/v1/stages/1")
-def stage1(
-    body: Stage1Request,
-    x_openai_api_key: str | None = Header(default=None),
-    x_openai_model: str | None = Header(default=None),
-):
+def stage1(body: Stage1Request):
     if not body.resume.strip():
         raise HTTPException(status_code=400, detail="resume is required")
-    key = require_api_key(x_openai_api_key)
     try:
-        return {"aptitude_profile": run_stage1(key, body.resume, x_openai_model)}
+        return {"aptitude_profile": run_stage1(body.resume)}
     except (ValueError, RuntimeError) as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @app.post("/v1/stages/2")
-def stage2(
-    body: Stage2Request,
-    x_openai_api_key: str | None = Header(default=None),
-    x_openai_model: str | None = Header(default=None),
-):
-    key = require_api_key(x_openai_api_key)
+def stage2(body: Stage2Request):
     try:
         return {
             "verified_matches": run_stage2(
-                key, body.aptitude_profile, body.constraints, x_openai_model
+                body.aptitude_profile, body.constraints
             )
         }
     except (ValueError, RuntimeError) as e:
