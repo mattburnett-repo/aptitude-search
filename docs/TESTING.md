@@ -42,6 +42,6 @@ curl -s -X POST http://localhost:3001/v1/stages/1 \
   -d "$(jq -n --rawfile r ../fixtures/sample-resumes/career-changer-mixed-stack.txt '{resume: $r}')"
 ```
 
-Requires `llm.api_key` in `backend/config.toml`.
+Requires `llm.aptitude_model_key` in `backend/config.toml`.
 
 Full pipeline: `POST /v1/pipeline` — copy body from [`fixtures/pipeline-request-example.json`](../fixtures/pipeline-request-example.json) or use the Swagger example on `/docs`. See [backend/README.md](../backend/README.md).

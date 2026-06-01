@@ -2,7 +2,7 @@
 
 Orchestration for **Prompt 1** (aptitude profile JSON, schema-validated) and **Prompt 2** (verified job discovery as **plain text**—typically one `json` fenced block per the prompt; not schema-validated by the API).
 
-**Hugging Face API key** in `config.toml` under `[llm].api_key`. Model defaults from `[llm].default_model`.
+**Hugging Face API key** in `config.toml` under `[llm].aptitude_model_key`. Model defaults from `[llm].aptitude_model`.
 
 Stage 2 runs verified job discovery: the model is prompted to search the web and return currently open postings. The API parses and validates `verified_matches` against `schemas/job-discovery-results.schema.json`.
 
@@ -14,7 +14,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 cp config.example.toml config.toml   # if config.toml is missing
-# Edit config.toml: set [llm].api_key
+# Edit config.toml: set [llm].aptitude_model_key
 ```
 
 App settings live in `config.toml` (see `config.example.toml`). Loaded once via `app.config.config`.

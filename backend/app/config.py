@@ -21,24 +21,24 @@ class CorsConfig(BaseModel):
 
 
 class LlmConfig(BaseModel):
-    api_key: str
-    default_model: str
+    aptitude_model_key: str
+    aptitude_model: str
     temperature: float
 
-    @field_validator("api_key")
+    @field_validator("aptitude_model_key")
     @classmethod
-    def api_key_must_be_set(cls, value: str) -> str:
+    def aptitude_model_key_must_be_set(cls, value: str) -> str:
         key = value.strip()
         if not key:
-            raise ValueError("llm.api_key must be set in config.toml")
+            raise ValueError("llm.aptitude_model_key must be set in config.toml")
         return key
 
-    @field_validator("default_model")
+    @field_validator("aptitude_model")
     @classmethod
-    def default_model_must_be_set(cls, value: str) -> str:
+    def aptitude_model_must_be_set(cls, value: str) -> str:
         model = value.strip()
         if not model:
-            raise ValueError("llm.default_model must be set in config.toml")
+            raise ValueError("llm.aptitude_model must be set in config.toml")
         return model
 
 

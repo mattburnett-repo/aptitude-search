@@ -2,7 +2,7 @@
 
 Single-page UI for the two-stage pipeline (resume → aptitude profile → verified matches).
 
-Hugging Face credentials are configured on the API server in `backend/config.toml` (`[llm].api_key`, `default_model`). The browser does not send an API key.
+Hugging Face credentials are configured on the API server in `backend/config.toml` (`[llm].aptitude_model_key`, `aptitude_model`). The browser does not send an API key.
 
 ## Run
 
@@ -11,7 +11,7 @@ Terminal 1 — API:
 ```bash
 cd backend && python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-cp config.example.toml config.toml   # if needed; set [llm].api_key
+cp config.example.toml config.toml   # if needed; set [llm].aptitude_model_key
 .venv/bin/python -m uvicorn app.main:app --reload --port 3001
 ```
 

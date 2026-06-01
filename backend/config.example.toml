@@ -10,8 +10,8 @@ allow_methods = ["*"]
 allow_headers = ["*"]
 
 [llm]
-api_key = ""  # required: set your API key
-default_model = ""
+aptitude_model_key = ""  # required: set your Hugging Face key for aptitude_model
+aptitude_model = ""
 temperature = 0.3
 
 [prompts]

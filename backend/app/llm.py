@@ -5,7 +5,7 @@ from app.validate import parse_json_response
 
 
 def _client() -> InferenceClient:
-    return InferenceClient(api_key=config.llm.api_key)
+    return InferenceClient(api_key=config.llm.aptitude_model_key)
 
 
 def complete_chat_json(
@@ -19,7 +19,7 @@ def complete_chat_json(
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_message},
         ],
-        model=model or config.llm.default_model,
+        model=model or config.llm.aptitude_model,
         temperature=config.llm.temperature,
     )
     content = completion.choices[0].message.content
@@ -39,7 +39,7 @@ def complete_chat_text(
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_message},
         ],
-        model=model or config.llm.default_model,
+        model=model or config.llm.aptitude_model,
         temperature=config.llm.temperature,
     )
     content = completion.choices[0].message.content
