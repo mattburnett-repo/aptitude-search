@@ -17,7 +17,7 @@
 - [ ] At most 20 results; no padding
 - [ ] `notes` has 1+ meaningful verification caveats (exclusions, limits, sparse results)
 
-Prompt 2 quality depends on verifying postings with current information (web search / live pages), not model memory alone. The API returns stage 2 as plain text and does **not** schema-validate it—use Cursor Agent with browsing for production-quality verification.
+Stage 2 should reflect current postings (web search via the model), not memory alone. The API runs Stage 2 as part of `POST /v1/pipeline` and returns `verified_matches` as plain text (not jsonschema-validated by the API). See [PROMPT-CONTRACT.md](PROMPT-CONTRACT.md).
 
 ## Fixtures
 
@@ -31,7 +31,7 @@ Validates `fixtures/example-outputs/career-changer-mixed-stack-stage1.json` agai
 
 ## Models
 
-Test stage 1 on GPT-4o or 4.1 and Claude 3.5+ for reliable JSON. Stage 2 requires browsing for production-quality verification when run outside the API.
+Test stage 1 on capable models for reliable JSON. Stage 2 via API uses the configured Hugging Face model; quality depends on model and provider. Optional: re-run Prompt 2 in Cursor with web search to compare output.
 
 ## API smoke test (optional)
 
@@ -44,4 +44,4 @@ curl -s -X POST http://localhost:3001/v1/stages/1 \
 
 Requires `llm.api_key` in `backend/config.toml`.
 
-Full pipeline: `POST /v1/pipeline` with `{ "resume", "constraints"? }` — see [backend/README.md](../backend/README.md).
+Full pipeline: `POST /v1/pipeline` — copy body from [`fixtures/pipeline-request-example.json`](../fixtures/pipeline-request-example.json) or use the Swagger example on `/docs`. See [backend/README.md](../backend/README.md).

@@ -1,6 +1,16 @@
+import json
+from pathlib import Path
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
+
+_PIPELINE_EXAMPLE_PATH = (
+    Path(__file__).resolve().parents[2] / "fixtures" / "pipeline-request-example.json"
+)
+
+
+def _load_pipeline_request_example() -> dict:
+    return json.loads(_PIPELINE_EXAMPLE_PATH.read_text(encoding="utf-8"))
 
 
 class Constraints(BaseModel):
@@ -12,6 +22,10 @@ class Constraints(BaseModel):
 
 
 class PipelineRequest(BaseModel):
+    model_config = ConfigDict(
+        json_schema_extra={"examples": [_load_pipeline_request_example()]}
+    )
+
     resume: str
     constraints: Constraints | None = None
 

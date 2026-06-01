@@ -1,0 +1,10 @@
+{
+  "resume": "Product-minded software engineer with 7 years of experience building web applications. Strong in TypeScript, React, Node.js, and PostgreSQL. Built customer-facing SaaS features, improved performance, and partnered with design and product teams. Comfortable owning projects end-to-end, mentoring teammates, and working in agile environments.",
+  "constraints": {
+    "location": "Toronto, ON",
+    "remote_preference": "remote",
+    "salary_min": 110000,
+    "industries_include": ["SaaS", "FinTech"],
+    "industries_exclude": ["Gambling"]
+  }
+}

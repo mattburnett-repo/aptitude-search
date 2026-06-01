@@ -76,7 +76,6 @@ fixtures/
   example-outputs/                  # stage-1 golden only
 docs/
   WORKFLOW.md, TESTING.md, PROMPT-CONTRACT.md, PHASE1-GATE.md
-  HOW-TO-TEST-RUN-THE-PROMPTS.txt
 backend/                            # FastAPI, port 3001
 frontend/                           # Vite + React, port 5173
 design-docs/                        # original exploration (historical)
@@ -113,7 +112,7 @@ Headers: none for API key/model override; key and model are configured server-si
 
 - API validates stage 1 output and constraints via `jsonschema`
 - `backend/scripts/validate_fixtures.py` checks stage-1 golden fixture only
-- Stage 2: manual / Cursor Agent with web search for production quality
+- Stage 2: job search via LLM (API pipeline); optional manual run in Cursor for testing
 
 ### Phase 1 gate
 
@@ -140,6 +139,6 @@ An earlier plan called for four prompts and schemas (`targeting-strategy`, `sear
 
 | Risk | Mitigation |
 |------|------------|
-| Stage 2 hallucinated listings | Prompt requires `verification_status: "verified"`; run in Agent with web search |
-| API stage 2 without browsing | Document as draft; UI copy points users to Agent |
+| Stage 2 hallucinated listings | Prompt requires `verification_status: "verified"`; model instructed to search web; spot-check URLs |
+| Prompt/docs drift on “API vs Agent search” | Canonical model in `docs/PROMPT-CONTRACT.md` |
 | Prompt/schema drift | Validate stage 1 in API; manual checklist in `docs/TESTING.md` |

@@ -32,7 +32,7 @@ Vite proxies `/api/*` → `http://localhost:3001/*` (see `vite.config.ts`). The 
 - **Export JSON** — downloads `{ aptitude_profile, verified_matches }`.
 - **Copy verified matches** — copies stage 2 text to clipboard.
 
-There is no refine/iterate panel. For best stage-2 verification, run Prompt 2 in Cursor Agent with web search (see repo `docs/`).
+There is no refine/iterate panel. Stage 2 (job search) runs automatically with the pipeline; see `docs/PROMPT-CONTRACT.md`.
 
 ## Build
 

@@ -111,9 +111,8 @@ export default function App() {
     <>
       <h1>Aptitude Search</h1>
       <p className="subtitle">
-        Prompt 1 → aptitude profile, Prompt 2 → verified openings. OpenAI is
-        configured on the API server (`config.toml`). For best verification, run
-        Prompt 2 in Cursor Agent with web search.
+        Run pipeline: resume → aptitude profile → job search (verified matches).
+        LLM is configured on the API server (config.toml).
       </p>
 
       <section>

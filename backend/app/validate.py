@@ -32,6 +32,16 @@ def _build_validators() -> dict[str, Draft202012Validator]:
 
 _VALIDATORS = _build_validators()
 _VALID_CONFIDENCE = {"high", "medium", "low"}
+_VALID_SENIORITY = {
+    "entry",
+    "mid",
+    "senior",
+    "staff",
+    "principal",
+    "executive",
+    "unknown",
+}
+_SENIORITY_ALIASES = {"mid-level": "mid"}
 
 
 def validate_stage(stage: str, data: Any) -> None:
@@ -56,9 +66,20 @@ def _normalize_confidence(value: Any) -> str:
     return "low"
 
 
+def _normalize_seniority_band(value: Any) -> str:
+    if not isinstance(value, str):
+        return "unknown"
+    key = value.strip().lower()
+    if key in _VALID_SENIORITY:
+        return key
+    return _SENIORITY_ALIASES.get(key, "unknown")
+
+
 def normalize_aptitude_profile(data: Any) -> Any:
     if not isinstance(data, dict):
         return data
+
+    data["seniority_band"] = _normalize_seniority_band(data.get("seniority_band"))
 
     skill_keys = ("core_skills", "secondary_skills")
     labeled_keys = ("domains", "strengths", "adjacent_roles", "working_style_signals")

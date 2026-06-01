@@ -2,7 +2,7 @@
 
 **Product workflow:** [Prompt 1](../prompts/01-resume-to-aptitude-profile.md) → [Prompt 2](../prompts/02-verified-job-discovery.md)
 
-**Copy-paste steps:** [prompts/README.md](../prompts/README.md)
+**Run pipeline:** [backend/README.md](../backend/README.md) (Swagger at `/docs`)
 
 `XX-original-aptitude-prompt.md` is the reference spec used to build Prompts 1 and 2.
 
@@ -26,7 +26,7 @@ See [prompts/README.md](../prompts/README.md). Input: Prompt 1 JSON plus optiona
 
 Output: one `json`-language fenced code block with `search_plan`, `results`, and `notes` per `schemas/job-discovery-results.schema.json`. No separate markdown headings—the UI and export read these fields from JSON.
 
-For best verification, run Prompt 2 in **Cursor Agent with web search**. The bundled API calls the same prompt text but cannot browse; treat API stage-2 output as a draft unless you verify listings yourself.
+**API:** `POST /v1/pipeline` runs Prompt 1 then Prompt 2; Stage 2 is job search (model instructed to search the web). Use Swagger at `http://localhost:3001/docs`. See [PROMPT-CONTRACT.md](PROMPT-CONTRACT.md).
 
 ---
 

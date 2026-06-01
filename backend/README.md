@@ -4,7 +4,7 @@ Orchestration for **Prompt 1** (aptitude profile JSON, schema-validated) and **P
 
 **Hugging Face API key** in `config.toml` under `[llm].api_key`. Model defaults from `[llm].default_model`.
 
-Stage 2 does not perform live web search from the API—the user message asks the model to verify when possible, but only Cursor Agent (or similar) can browse. Use the API for stage 1 and drafts; use Agent for production-quality verification.
+Stage 2 runs verified job discovery: the model is prompted to search the web and return currently open postings that match the aptitude profile and user constraints. The API returns that output as `verified_matches` (raw LLM text, typically a JSON fenced block).
 
 ## Setup
 
@@ -24,6 +24,8 @@ App settings live in `config.toml` (see `config.example.toml`). Loaded once via 
 ```bash
 .venv/bin/python -m uvicorn app.main:app --reload --port 3001
 ```
+
+**Try it:** Open [http://localhost:3001/docs](http://localhost:3001/docs) (Swagger UI) → `POST /v1/pipeline` → use the pre-filled **example** request body (from [`fixtures/pipeline-request-example.json`](../fixtures/pipeline-request-example.json)).
 
 ## Validate fixtures
 
@@ -49,6 +51,16 @@ POST routes use the server-configured Hugging Face key and model from `config.to
 There is no `/v1/iterate` endpoint.
 
 ## Example
+
+Full pipeline (resume + constraints):
+
+```bash
+curl -s -X POST http://localhost:3001/v1/pipeline \
+  -H "Content-Type: application/json" \
+  -d @../fixtures/pipeline-request-example.json
+```
+
+Resume only:
 
 ```bash
 curl -s -X POST http://localhost:3001/v1/pipeline \

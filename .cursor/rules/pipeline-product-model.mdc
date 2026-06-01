@@ -1,0 +1,23 @@
+---
+description: Canonical product model for the two-stage pipeline and Stage 2 job search
+alwaysApply: true
+---
+
+# Pipeline product model (aptitude-search)
+
+Authoritative detail: `docs/PROMPT-CONTRACT.md` (Product model section).
+
+## Do not misstate
+
+- **Stage 2 is job search.** `POST /v1/pipeline` runs Stage 1 then Stage 2 with no manual step. `verified_matches` is the search result.
+- The model is **instructed to search the web** for open postings (see `backend/app/pipeline.py` user message and `prompts/02-verified-job-discovery.md`).
+- Do **not** tell users the API path is "draft only" or that "only Cursor Agent can browse" as the primary story.
+
+## Optional nuance (implementation, not user-facing)
+
+- Search is via **LLM chat** (Hugging Face), not a separate jobs API wired in Python.
+- The API does not jsonschema-validate `verified_matches` yet; Stage 1 and constraints are validated.
+
+## Testing
+
+Use the running API and Swagger UI at `/docs` ([backend/README.md](../backend/README.md)). Do not describe manual Cursor copy-paste runbooks as the primary test path.

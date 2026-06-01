@@ -9,9 +9,9 @@ Pack version: v1.0.0
 | Criterion | Status | Evidence |
 |-----------|--------|----------|
 | Core prompts produce schema-valid JSON on diverse resumes | Pass (stage 1) | `prompts/01-resume-to-aptitude-profile.md`, `schemas/aptitude-profile.schema.json`, three sample resumes under `fixtures/sample-resumes/` |
-| Stage 2 output matches job-discovery schema when run with verification | Manual | `prompts/02-verified-job-discovery.md`, `schemas/job-discovery-results.schema.json`; requires Agent/web search for production runs |
+| Stage 2 output matches job-discovery schema when run with verification | Manual | `prompts/02-verified-job-discovery.md`, `schemas/job-discovery-results.schema.json`; API Stage 2 + optional manual Agent run |
 | Human review: matches useful vs raw keyword dump | Manual | Review `results[].match_description` and `search_plan` diversity |
-| Buyer doc sufficient for a stranger | Pass | `docs/WORKFLOW.md`, `prompts/README.md`, `docs/HOW-TO-TEST-RUN-THE-PROMPTS.txt` |
+| Buyer doc sufficient for a stranger | Pass | `docs/WORKFLOW.md`, `backend/README.md` (Swagger), `prompts/README.md` |
 
 ## Automated fixture check
 
