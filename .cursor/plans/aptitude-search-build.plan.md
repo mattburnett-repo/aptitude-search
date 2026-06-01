@@ -27,7 +27,7 @@ todos:
     content: docs/PHASE1-GATE.md (two-stage workflow)
     status: completed
   - id: api-mvp
-    content: FastAPI backend + Vite MVP frontend (BYO key)
+    content: FastAPI backend + Vite MVP frontend (server-configured key)
     status: completed
 isProject: true
 ---
@@ -98,7 +98,7 @@ design-docs/                        # original exploration (historical)
 | POST | `/v1/stages/1` | Aptitude profile only |
 | POST | `/v1/stages/2` | Verified matches (text; not schema-validated) |
 
-Headers: `X-OpenAI-Api-Key` (required), `X-OpenAI-Model` (optional, default `gpt-4o`).
+Headers: none for API key/model override; key and model are configured server-side via `backend/config.toml`.
 
 **Not implemented:** `POST /v1/iterate`, single-host job-board scraping, auth, payments.
 

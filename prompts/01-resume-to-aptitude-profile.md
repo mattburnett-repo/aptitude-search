@@ -123,7 +123,31 @@ Include at least one non-obvious but justified role.
 - Output ONLY valid JSON
 - Must conform exactly to AptitudeProfile schema
 - No commentary or markdown
-- Prefer omission over invention
+
+## REQUIRED TOP-LEVEL KEYS (MANDATORY)
+Return all of these keys in every response, even when evidence is weak:
+core_skills, secondary_skills, domains, strengths, adjacent_roles, seniority_band, working_style_signals, aptitude_summary, confidence_map, rationale.
+
+If uncertain, use:
+- empty arrays for list fields
+- "unknown" for seniority_band
+- {} for confidence_map
+Never omit a required key.
+
+## TYPE-SHAPE REQUIREMENTS (MANDATORY)
+core_skills and secondary_skills must be arrays of objects like:
+{"name": string, "confidence": "high"|"medium"|"low", "evidence_from_resume"?: string}
+
+adjacent_roles, domains, strengths, and working_style_signals must be arrays of objects like:
+{"label": string, "confidence": "high"|"medium"|"low", "evidence_from_resume"?: string}
+
+confidence_map must be an object whose values are objects like:
+{"confidence": "high"|"medium"|"low", "reason": string}
+
+Never use "unknown" for confidence. Confidence must be exactly one of: high, medium, low.
+
+rationale must be an array of strings, never a single string.
+Example: "rationale": ["reason 1", "reason 2"]
 
 ---
 

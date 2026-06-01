@@ -28,7 +28,7 @@ frontend/         # MVP UI (Vite + React)
 
 ## API + UI (optional)
 
-- **[backend/README.md](backend/README.md)** — `POST /v1/pipeline`, BYO OpenAI key
+- **[backend/README.md](backend/README.md)** — `POST /v1/pipeline`, server-configured Hugging Face key
 - **[frontend/README.md](frontend/README.md)** — local dev on port 5173
 
 ## Plan

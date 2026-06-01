@@ -29,7 +29,7 @@ The differentiator is **aptitude- and environment-driven targeting** (company ty
 | File | Purpose |
 |------|---------|
 | `README.md` | One-line project description |
-| `01-first-concept-discussion.md` | Monetization paths (prompt pack, Notion, lightweight web app, BYO API key, extension, SaaS) |
+| `01-first-concept-discussion.md` | Monetization paths (prompt pack, Notion, lightweight web app, user-configured API key, extension, SaaS) |
 | `02-initial-concept-documentation.md` | Architecture, pipeline stages, prompt contract, vs Careerflow.ai, naming, status, next steps |
 | `03-core-thesis.md` | USP: inference before search; person-model ↔ environment fit |
 

@@ -2,7 +2,7 @@
 
 Single-page UI for the two-stage pipeline (resume → aptitude profile → verified matches).
 
-OpenAI credentials are configured on the API server in `backend/config.toml` (`[llm].api_key`, `default_model`). The browser does not send an API key.
+Hugging Face credentials are configured on the API server in `backend/config.toml` (`[llm].api_key`, `default_model`). The browser does not send an API key.
 
 ## Run
 

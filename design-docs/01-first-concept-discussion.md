@@ -93,7 +93,7 @@ Flow:
 
 **Key trick to keep it low-friction:**
 
-> BYO API key (user pays OpenAI directly)
+> User-configured API key (user pays provider directly)
 
 This avoids:
 
@@ -175,7 +175,7 @@ If you want the lowest-risk progression:
 
 1. **Gumroad prompt pack** (validate demand)
 2. Turn it into **Notion workflow template** (increase perceived value)
-3. Add **light web version with BYO API key**
+3. Add **light web version with user-configured API key**
 4. Only then consider subscriptions
 
 ---

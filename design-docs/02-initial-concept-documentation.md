@@ -310,7 +310,7 @@ Provide:
 Potential architecture:
 
 * lightweight frontend
-* optional BYO API key model
+* optional user-configured API key model
 * serverless execution
 
 ---

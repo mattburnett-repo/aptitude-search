@@ -32,7 +32,7 @@ For best verification, run Prompt 2 in **Cursor Agent with web search**. The bun
 
 ## Optional: API + web UI
 
-- **API:** [backend/README.md](../backend/README.md) — `POST /v1/pipeline`, stages 1 and 2, BYO OpenAI key
+- **API:** [backend/README.md](../backend/README.md) — `POST /v1/pipeline`, stages 1 and 2, server-configured Hugging Face key
 - **UI:** [frontend/README.md](../frontend/README.md) — Vite app on port 5173, proxies `/api` → API on 3001
 
 ---
