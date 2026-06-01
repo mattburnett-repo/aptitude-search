@@ -4,7 +4,7 @@ from app.config import config
 from app.validate import parse_json_response
 
 
-def _client() -> InferenceClient:
+def _aptitude_client() -> InferenceClient:
     return InferenceClient(api_key=config.llm.aptitude_model_key)
 
 
@@ -14,7 +14,7 @@ def complete_chat_json(
     model: str | None = None,
 ) -> object:
     """Hugging Face chat completion; returns parsed JSON."""
-    completion = _client().chat_completion(
+    completion = _aptitude_client().chat_completion(
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_message},
@@ -34,7 +34,7 @@ def complete_chat_text(
     model: str | None = None,
 ) -> str:
     """Hugging Face chat completion returning plain text."""
-    completion = _client().chat_completion(
+    completion = _aptitude_client().chat_completion(
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_message},

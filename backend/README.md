@@ -2,9 +2,14 @@
 
 Orchestration for **Prompt 1** (aptitude profile JSON, schema-validated) and **Prompt 2** (verified job discovery as **plain text**—typically one `json` fenced block per the prompt; not schema-validated by the API).
 
-**Hugging Face API key** in `config.toml` under `[llm].aptitude_model_key`. Model defaults from `[llm].aptitude_model`.
+**Hugging Face keys** in `config.toml` (separate per stage; values may be the same token):
 
-Stage 2 runs verified job discovery: the model is prompted to search the web and return currently open postings. The API parses and validates `verified_matches` against `schemas/job-discovery-results.schema.json`.
+- **Stage 1:** `[llm].aptitude_model_key` + `[llm].aptitude_model` — resume → aptitude profile (chat JSON).
+- **Stage 2:** `[llm].job_discovery_model_key` + `[llm].job_discovery_model` — job discovery **agent** (`smolagents` with web search + page visits). Config: `job_discovery_max_steps`.
+
+Smoke-test Stage 2 agent: `.venv/bin/python scripts/smoke_job_discovery_agent.py`
+
+Stage 2 output is parsed and validated against `schemas/job-discovery-results.schema.json`.
 
 ## Setup
 
@@ -14,7 +19,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 cp config.example.toml config.toml   # if config.toml is missing
-# Edit config.toml: set [llm].aptitude_model_key
+# Edit config.toml: set [llm].aptitude_model_key and [llm].job_discovery_model_key
 ```
 
 App settings live in `config.toml` (see `config.example.toml`). Loaded once via `app.config.config`.
@@ -44,7 +49,7 @@ Validates stage-1 golden output only (`career-changer-mixed-stack-stage1.json`).
 | POST | `/v1/stages/1` | `{ "resume" }` | `{ "aptitude_profile" }` |
 | POST | `/v1/stages/2` | `{ "aptitude_profile", "constraints"? }` | `{ "verified_matches" }` |
 
-POST routes use the server-configured Hugging Face key and model from `config.toml`.
+POST routes use the server-configured Hugging Face keys and models from `config.toml` (per stage).
 
 `constraints` matches `schemas/constraints.schema.json` (location, remote_preference, salary_min, industries_include/exclude).
 

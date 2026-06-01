@@ -139,6 +139,6 @@ An earlier plan called for four prompts and schemas (`targeting-strategy`, `sear
 
 | Risk | Mitigation |
 |------|------------|
-| Stage 2 hallucinated listings | Prompt requires `verification_status: "verified"`; model instructed to search web; spot-check URLs |
+| Stage 2 low-quality listings | Job discovery agent + web search; spot-check URLs in results |
 | Prompt/docs drift on “API vs Agent search” | Canonical model in `docs/PROMPT-CONTRACT.md` |
 | Prompt/schema drift | Validate stage 1 in API; manual checklist in `docs/TESTING.md` |

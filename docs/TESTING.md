@@ -13,9 +13,9 @@
 - [ ] JSON parses against `schemas/job-discovery-results.schema.json`
 - [ ] `search_plan` has 3–6 strings drawn from the aptitude profile (not one ATS/board host)
 - [ ] `results` use diverse employers and industries (≤2 per company, ≤3 per board domain)
-- [ ] Each result has a direct apply/posting URL, `verification_status: "verified"`, and `match_description` tied to profile evidence
+- [ ] Each result has a direct apply/posting URL and `match_description` tied to profile evidence
 - [ ] At most 20 results; no padding
-- [ ] `notes` has 1+ meaningful verification caveats (exclusions, limits, sparse results)
+- [ ] `notes` has 1+ meaningful search caveats (exclusions, limits, sparse results)
 
 Stage 2 should reflect current postings (web search via the model), not memory alone. The API runs Stage 2 as part of `POST /v1/pipeline` and returns parsed, schema-validated `verified_matches`. See [PROMPT-CONTRACT.md](PROMPT-CONTRACT.md).
 
@@ -42,6 +42,6 @@ curl -s -X POST http://localhost:3001/v1/stages/1 \
   -d "$(jq -n --rawfile r ../fixtures/sample-resumes/career-changer-mixed-stack.txt '{resume: $r}')"
 ```
 
-Requires `llm.aptitude_model_key` in `backend/config.toml`.
+Requires `llm.aptitude_model_key` and `llm.job_discovery_model_key` in `backend/config.toml`.
 
 Full pipeline: `POST /v1/pipeline` — copy body from [`fixtures/pipeline-request-example.json`](../fixtures/pipeline-request-example.json) or use the Swagger example on `/docs`. See [backend/README.md](../backend/README.md).

@@ -103,8 +103,11 @@ If any condition fails → EXCLUDE.
 6. Filter strictly using:
    - skill match to core_skills
    - constraint compliance
-   - verification status
-7. Compose search_plan, results, and notes for output
+7. Run **multiple** web searches (at least 3–4 different queries) before finalizing results
+   - Each query: **3–6 keywords** (e.g. `python backend remote`), not full sentences or quoted phrases
+8. Visit listing pages for candidates you intend to include (not only search snippets)
+   - Prefer **direct posting URLs** over generic board search/list pages when possible
+9. Compose search_plan, results, and notes for output
 
 ---
 
@@ -113,9 +116,9 @@ If any condition fails → EXCLUDE.
 - Never invent job postings
 - Never infer companies without a posting
 - Never reinterpret AptitudeProfile meaning
-- Never include unverified listings
-- Never use job-board search results without verification
-- Never pad results
+- Only include listings you found via search or by visiting a page
+- Do not fabricate companies or URLs
+- Do not add filler rows; include every legitimate match you found (target **8–15+** when available)
 
 ---
 
@@ -137,9 +140,9 @@ Return **only** one `json`-language fenced code block (no preamble, headings, or
 The object must conform to `schemas/job-discovery-results.schema.json` with these top-level keys:
 
 - `search_plan` — string array of **3–6** items. Each item names a discovery angle drawn from the aptitude profile: industries/domains, role families (core + one adjacent when used), and company types. Items must reflect how you actually searched (not generic filler).
-- `results` — verified job postings only (`verification_status` must be `"verified"`). Up to **20** rows; never pad.
-- `notes` — string array of **1 or more** verification caveats, such as:
-  - Strong candidates excluded (closed listing, failed verification, constraint filter)
+- `results` — job postings found via search (direct posting URLs). Target **8–15+** rows when available; up to **20**; omit rows you did not find.
+- `notes` — string array of **1 or more** search caveats, such as:
+  - Strong candidates excluded (closed listing, constraint filter)
   - ATS/job-board domain limits applied (max 3 per domain)
   - Industries or adjacent roles explored but yielding no verified postings
   - Anything the reader should know when interpreting sparse results

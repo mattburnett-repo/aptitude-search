@@ -1,9 +1,15 @@
-import json
 from typing import Any
 
 from app import prompt_loader
+from app.config import config
+from app.job_discovery import build_stage2_user_message, run_job_discovery_agent
+from app.job_discovery.tool_observed_urls import (
+    ToolObservedUrlRegistry,
+    filter_results_to_tool_observed_urls,
+)
 from app.llm import complete_chat_json
 from app.models import Constraints
+from app.validate import parse_json_response
 from app.validate import (
     normalize_aptitude_profile,
     normalize_job_discovery_results,
@@ -29,23 +35,21 @@ def run_stage1(resume: str, model: str | None = None) -> Any:
 def run_stage2(
     aptitude_profile: Any,
     constraints: Constraints | None = None,
-    model: str | None = None,
+    job_discovery_model: str | None = None,
 ) -> Any:
     c = constraints or DEFAULT_CONSTRAINTS
     validate_stage("constraints", c.model_dump())
-    user = (
-        "Find verified job openings for this candidate. "
-        "Use web search to confirm each listing is currently active when possible.\n\n"
-        f"<aptitude_profile>\n{json.dumps(aptitude_profile, indent=2)}\n</aptitude_profile>\n\n"
-        f"<constraints>\n{c.model_dump_json(indent=2)}\n</constraints>"
+    user = build_stage2_user_message(aptitude_profile, c)
+    tool_observed_urls = ToolObservedUrlRegistry()
+    agent_text = run_job_discovery_agent(
+        prompt_loader.system_prompt_stage2(),
+        user,
+        model_id=job_discovery_model,
+        max_steps=config.llm.job_discovery_max_steps,
+        observed_urls=tool_observed_urls,
     )
-    result = normalize_job_discovery_results(
-        complete_chat_json(
-            prompt_loader.system_prompt_stage2(),
-            user,
-            model,
-        )
-    )
+    result = normalize_job_discovery_results(parse_json_response(agent_text))
+    result = filter_results_to_tool_observed_urls(result, tool_observed_urls)
     validate_stage("jobDiscovery", result)
     return result
 
@@ -53,10 +57,13 @@ def run_stage2(
 def run_pipeline(
     resume: str,
     constraints: Constraints | None = None,
-    model: str | None = None,
+    aptitude_model: str | None = None,
+    job_discovery_model: str | None = None,
 ) -> dict[str, Any]:
-    aptitude_profile = run_stage1(resume, model)
-    verified_matches = run_stage2(aptitude_profile, constraints, model)
+    aptitude_profile = run_stage1(resume, aptitude_model)
+    verified_matches = run_stage2(
+        aptitude_profile, constraints, job_discovery_model
+    )
     return {
         "aptitude_profile": aptitude_profile,
         "verified_matches": verified_matches,

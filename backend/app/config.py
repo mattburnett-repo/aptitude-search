@@ -23,6 +23,9 @@ class CorsConfig(BaseModel):
 class LlmConfig(BaseModel):
     aptitude_model_key: str
     aptitude_model: str
+    job_discovery_model_key: str
+    job_discovery_model: str
+    job_discovery_max_steps: int = 18
     temperature: float
 
     @field_validator("aptitude_model_key")
@@ -33,6 +36,14 @@ class LlmConfig(BaseModel):
             raise ValueError("llm.aptitude_model_key must be set in config.toml")
         return key
 
+    @field_validator("job_discovery_model_key")
+    @classmethod
+    def job_discovery_model_key_must_be_set(cls, value: str) -> str:
+        key = value.strip()
+        if not key:
+            raise ValueError("llm.job_discovery_model_key must be set in config.toml")
+        return key
+
     @field_validator("aptitude_model")
     @classmethod
     def aptitude_model_must_be_set(cls, value: str) -> str:
@@ -40,6 +51,21 @@ class LlmConfig(BaseModel):
         if not model:
             raise ValueError("llm.aptitude_model must be set in config.toml")
         return model
+
+    @field_validator("job_discovery_model")
+    @classmethod
+    def job_discovery_model_must_be_set(cls, value: str) -> str:
+        model = value.strip()
+        if not model:
+            raise ValueError("llm.job_discovery_model must be set in config.toml")
+        return model
+
+    @field_validator("job_discovery_max_steps")
+    @classmethod
+    def job_discovery_max_steps_must_be_positive(cls, value: int) -> int:
+        if value < 1:
+            raise ValueError("llm.job_discovery_max_steps must be at least 1")
+        return value
 
 
 class PromptsConfig(BaseModel):

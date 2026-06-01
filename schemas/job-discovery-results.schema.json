@@ -25,7 +25,7 @@
     "notes": {
       "type": "array",
       "minItems": 1,
-      "description": "Verification caveats: exclusions, closed listings checked, ATS/board limits hit, or constraint effects.",
+      "description": "Search caveats: exclusions, closed listings, ATS/board limits hit, or constraint effects.",
       "items": {
         "type": "string"
       }
@@ -35,13 +35,7 @@
     "jobPosting": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "company",
-        "role",
-        "url",
-        "match_description",
-        "verification_status"
-      ],
+      "required": ["company", "role", "url", "match_description"],
       "properties": {
         "company": {
           "type": "string",
@@ -70,11 +64,6 @@
         "seniority_level": {
           "type": "string",
           "enum": ["entry", "mid", "senior", "staff", "principal", "executive", "unknown"]
-        },
-        "verification_status": {
-          "type": "string",
-          "enum": ["verified"],
-          "description": "Must always be 'verified' for included results."
         },
         "match_signals": {
           "type": "array",

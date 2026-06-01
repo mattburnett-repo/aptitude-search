@@ -56,7 +56,6 @@ _JOB_POSTING_KEYS = frozenset(
         "location",
         "employment_type",
         "seniority_level",
-        "verification_status",
         "match_signals",
         "confidence",
     }
@@ -73,10 +72,44 @@ def validate_stage(stage: str, data: Any) -> None:
         raise ValueError(f"Schema validation failed ({stage}): {msg}")
 
 
-def parse_json_response(text: str) -> Any:
+def _json_payload_from_text(text: str) -> str:
     trimmed = text.strip()
-    fence = re.match(r"^```(?:json)?\s*([\s\S]*?)```$", trimmed)
-    return json.loads(fence.group(1).strip() if fence else trimmed)
+    fence = re.search(r"```(?:json)?\s*([\s\S]*?)```", trimmed)
+    if fence:
+        return fence.group(1).strip()
+    start = trimmed.find("{")
+    if start >= 0:
+        return trimmed[start:]
+    return trimmed
+
+
+def _loads_json_lenient(payload: str) -> Any:
+    attempts = (
+        payload,
+        re.sub(r",\s*([\]}])", r"\1", payload),
+    )
+    last_error: json.JSONDecodeError | None = None
+    for candidate in attempts:
+        try:
+            return json.loads(candidate)
+        except json.JSONDecodeError as e:
+            last_error = e
+            try:
+                obj, _end = json.JSONDecoder().raw_decode(candidate.lstrip())
+                return obj
+            except json.JSONDecodeError as e2:
+                last_error = e2
+    assert last_error is not None
+    raise last_error
+
+
+def parse_json_response(text: str) -> Any:
+    """Parse JSON from LLM/agent text (fenced block, embedded fence, or raw object)."""
+    payload = _json_payload_from_text(text)
+    try:
+        return _loads_json_lenient(payload)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Invalid JSON in model response: {e}") from e
 
 
 def _normalize_confidence(value: Any) -> str:
@@ -162,8 +195,6 @@ def normalize_job_discovery_results(data: Any) -> Any:
         if "role" not in item and isinstance(item.get("title"), str):
             item["role"] = item["title"]
         item["match_description"] = _build_match_description(item)
-        if item.get("verification_status") != "verified":
-            item["verification_status"] = "verified"
         if "seniority_level" in item:
             item["seniority_level"] = _normalize_seniority_band(item.get("seniority_level"))
         if isinstance(item.get("confidence"), str):

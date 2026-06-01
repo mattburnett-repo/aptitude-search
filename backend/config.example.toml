@@ -10,8 +10,11 @@ allow_methods = ["*"]
 allow_headers = ["*"]
 
 [llm]
-aptitude_model_key = ""  # required: set your Hugging Face key for aptitude_model
-aptitude_model = ""
+aptitude_model_key = ""  # required: Hugging Face key for Stage 1
+aptitude_model = ""  # Stage 1: resume → aptitude profile
+job_discovery_model_key = ""  # required: Hugging Face key for Stage 2 agent (may match aptitude_model_key)
+job_discovery_model = "meta-llama/Llama-3.1-8B-Instruct"  # Stage 2 agent; must be enabled on your HF account
+job_discovery_max_steps = 14
 temperature = 0.3
 
 [prompts]
