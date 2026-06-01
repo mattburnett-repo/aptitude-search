@@ -31,6 +31,7 @@ def _build_validators() -> dict[str, Draft202012Validator]:
 
 
 _VALIDATORS = _build_validators()
+_VALID_CONFIDENCE = {"high", "medium", "low"}
 
 
 def validate_stage(stage: str, data: Any) -> None:
@@ -47,3 +48,33 @@ def parse_json_response(text: str) -> Any:
     trimmed = text.strip()
     fence = re.match(r"^```(?:json)?\s*([\s\S]*?)```$", trimmed)
     return json.loads(fence.group(1).strip() if fence else trimmed)
+
+
+def _normalize_confidence(value: Any) -> str:
+    if isinstance(value, str) and value in _VALID_CONFIDENCE:
+        return value
+    return "low"
+
+
+def normalize_aptitude_profile(data: Any) -> Any:
+    if not isinstance(data, dict):
+        return data
+
+    skill_keys = ("core_skills", "secondary_skills")
+    labeled_keys = ("domains", "strengths", "adjacent_roles", "working_style_signals")
+
+    for key in skill_keys + labeled_keys:
+        items = data.get(key)
+        if not isinstance(items, list):
+            continue
+        for item in items:
+            if isinstance(item, dict):
+                item["confidence"] = _normalize_confidence(item.get("confidence"))
+
+    confidence_map = data.get("confidence_map")
+    if isinstance(confidence_map, dict):
+        for item in confidence_map.values():
+            if isinstance(item, dict):
+                item["confidence"] = _normalize_confidence(item.get("confidence"))
+
+    return data

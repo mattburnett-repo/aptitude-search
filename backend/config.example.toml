@@ -10,10 +10,9 @@ allow_methods = ["*"]
 allow_headers = ["*"]
 
 [llm]
-api_key = ""  # required: set your OpenAI API key
-default_model = "gpt-4o"
+api_key = ""  # required: set your API key
+default_model = ""
 temperature = 0.3
-json_response_type = "json_object"
 
 [prompts]
 stage1_file = "01-resume-to-aptitude-profile.md"

@@ -1,11 +1,11 @@
-from openai import OpenAI
+from huggingface_hub import InferenceClient
 
 from app.config import config
 from app.validate import parse_json_response
 
 
-def _client() -> OpenAI:
-    return OpenAI(api_key=config.llm.api_key)
+def _client() -> InferenceClient:
+    return InferenceClient(api_key=config.llm.api_key)
 
 
 def complete_chat_json(
@@ -13,15 +13,14 @@ def complete_chat_json(
     user_message: str,
     model: str | None = None,
 ) -> object:
-    """OpenAI chat completion with JSON response mode; returns parsed JSON."""
-    completion = _client().chat.completions.create(
-        model=model or config.llm.default_model,
-        temperature=config.llm.temperature,
-        response_format={"type": config.llm.json_response_type},
+    """Hugging Face chat completion; returns parsed JSON."""
+    completion = _client().chat_completion(
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_message},
         ],
+        model=model or config.llm.default_model,
+        temperature=config.llm.temperature,
     )
     content = completion.choices[0].message.content
     if not content:
@@ -34,14 +33,14 @@ def complete_chat_text(
     user_message: str,
     model: str | None = None,
 ) -> str:
-    """OpenAI chat completion returning plain text (no JSON response mode)."""
-    completion = _client().chat.completions.create(
-        model=model or config.llm.default_model,
-        temperature=config.llm.temperature,
+    """Hugging Face chat completion returning plain text."""
+    completion = _client().chat_completion(
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_message},
         ],
+        model=model or config.llm.default_model,
+        temperature=config.llm.temperature,
     )
     content = completion.choices[0].message.content
     if not content:

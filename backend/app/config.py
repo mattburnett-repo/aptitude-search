@@ -24,7 +24,6 @@ class LlmConfig(BaseModel):
     api_key: str
     default_model: str
     temperature: float
-    json_response_type: str
 
     @field_validator("api_key")
     @classmethod
@@ -33,6 +32,14 @@ class LlmConfig(BaseModel):
         if not key:
             raise ValueError("llm.api_key must be set in config.toml")
         return key
+
+    @field_validator("default_model")
+    @classmethod
+    def default_model_must_be_set(cls, value: str) -> str:
+        model = value.strip()
+        if not model:
+            raise ValueError("llm.default_model must be set in config.toml")
+        return model
 
 
 class PromptsConfig(BaseModel):
