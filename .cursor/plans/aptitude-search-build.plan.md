@@ -95,7 +95,7 @@ design-docs/                        # original exploration (historical)
 | GET | `/health` | Health check |
 | POST | `/v1/pipeline` | Full run |
 | POST | `/v1/stages/1` | Aptitude profile only |
-| POST | `/v1/stages/2` | Verified matches (text; not schema-validated) |
+| POST | `/v1/stages/2` | Verified matches (JSON; schema-validated) |
 
 Headers: none for API key/model override; key and model are configured server-side via `backend/config.toml`.
 
@@ -110,7 +110,7 @@ Headers: none for API key/model override; key and model are configured server-si
 
 ### Validation
 
-- API validates stage 1 output and constraints via `jsonschema`
+- API validates stage 1, stage 2, and constraints via `jsonschema`
 - `backend/scripts/validate_fixtures.py` checks stage-1 golden fixture only
 - Stage 2: job search via LLM (API pipeline); optional manual run in Cursor for testing
 

@@ -16,7 +16,7 @@ Authoritative detail: `docs/PROMPT-CONTRACT.md` (Product model section).
 ## Optional nuance (implementation, not user-facing)
 
 - Search is via **LLM chat** (Hugging Face), not a separate jobs API wired in Python.
-- The API does not jsonschema-validate `verified_matches` yet; Stage 1 and constraints are validated.
+- The API jsonschema-validates `verified_matches` against `job-discovery-results.schema.json`.
 
 ## Testing
 

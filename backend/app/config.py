@@ -50,6 +50,7 @@ class PromptsConfig(BaseModel):
 class SchemasConfig(BaseModel):
     constraints: str
     aptitude_profile: str
+    job_discovery_results: str
 
 
 class PathsConfig(BaseModel):

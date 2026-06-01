@@ -16,9 +16,11 @@ def _load_schema(name: str) -> dict:
 def _build_validators() -> dict[str, Draft202012Validator]:
     constraints = _load_schema(config.schemas.constraints)
     aptitude = _load_schema(config.schemas.aptitude_profile)
+    job_discovery = _load_schema(config.schemas.job_discovery_results)
     store = {
         constraints["$id"]: constraints,
         aptitude["$id"]: aptitude,
+        job_discovery["$id"]: job_discovery,
     }
     return {
         "aptitudeProfile": Draft202012Validator(
@@ -26,6 +28,9 @@ def _build_validators() -> dict[str, Draft202012Validator]:
         ),
         "constraints": Draft202012Validator(
             constraints, resolver=RefResolver.from_schema(constraints, store=store)
+        ),
+        "jobDiscovery": Draft202012Validator(
+            job_discovery, resolver=RefResolver.from_schema(job_discovery, store=store)
         ),
     }
 
@@ -42,6 +47,20 @@ _VALID_SENIORITY = {
     "unknown",
 }
 _SENIORITY_ALIASES = {"mid-level": "mid"}
+_JOB_POSTING_KEYS = frozenset(
+    {
+        "company",
+        "role",
+        "url",
+        "match_description",
+        "location",
+        "employment_type",
+        "seniority_level",
+        "verification_status",
+        "match_signals",
+        "confidence",
+    }
+)
 
 
 def validate_stage(stage: str, data: Any) -> None:
@@ -98,4 +117,58 @@ def normalize_aptitude_profile(data: Any) -> Any:
             if isinstance(item, dict):
                 item["confidence"] = _normalize_confidence(item.get("confidence"))
 
+    return data
+
+
+def _build_match_description(item: dict) -> str:
+    existing = item.get("match_description")
+    if isinstance(existing, str) and existing.strip():
+        return existing.strip()
+
+    parts: list[str] = []
+    for key in (
+        "match_signals",
+        "core_skills_match",
+        "secondary_skills_match",
+        "strengths_match",
+        "adjacent_roles_match",
+    ):
+        val = item.get(key)
+        if isinstance(val, list) and val:
+            parts.append(f"{key.replace('_', ' ')}: {', '.join(str(x) for x in val)}")
+        elif isinstance(val, str) and val.strip():
+            parts.append(val.strip())
+
+    if parts:
+        return " ".join(parts)
+
+    role = item.get("role") or item.get("title") or "role"
+    company = item.get("company") or "employer"
+    return f"Aligned with aptitude profile for {role} at {company}."
+
+
+def normalize_job_discovery_results(data: Any) -> Any:
+    if not isinstance(data, dict):
+        return data
+
+    results = data.get("results")
+    if not isinstance(results, list):
+        return data
+
+    normalized: list[Any] = []
+    for item in results:
+        if not isinstance(item, dict):
+            continue
+        if "role" not in item and isinstance(item.get("title"), str):
+            item["role"] = item["title"]
+        item["match_description"] = _build_match_description(item)
+        if item.get("verification_status") != "verified":
+            item["verification_status"] = "verified"
+        if "seniority_level" in item:
+            item["seniority_level"] = _normalize_seniority_band(item.get("seniority_level"))
+        if isinstance(item.get("confidence"), str):
+            item["confidence"] = _normalize_confidence(item.get("confidence"))
+        normalized.append({k: v for k, v in item.items() if k in _JOB_POSTING_KEYS})
+
+    data["results"] = normalized
     return data

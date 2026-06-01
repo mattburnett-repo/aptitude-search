@@ -4,7 +4,7 @@ const API_BASE = "/api";
 
 type PipelineResult = {
   aptitude_profile: unknown;
-  verified_matches: string;
+  verified_matches: unknown;
 };
 
 type Constraints = {
@@ -104,7 +104,9 @@ export default function App() {
 
   function copyVerified() {
     if (!result?.verified_matches) return;
-    void navigator.clipboard.writeText(result.verified_matches);
+    void navigator.clipboard.writeText(
+      JSON.stringify(result.verified_matches, null, 2)
+    );
   }
 
   return (
@@ -228,12 +230,10 @@ export default function App() {
             title="Stage 1 — Aptitude profile"
             data={result.aptitude_profile}
           />
-          {result.verified_matches && (
-            <details className="stage" open>
-              <summary>Stage 2 — Verified matches</summary>
-              <pre className="verified-matches">{result.verified_matches}</pre>
-            </details>
-          )}
+          <StageJsonPanel
+            title="Stage 2 — Verified matches"
+            data={result.verified_matches}
+          />
         </>
       )}
     </>

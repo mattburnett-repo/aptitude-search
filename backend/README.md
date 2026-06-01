@@ -4,7 +4,7 @@ Orchestration for **Prompt 1** (aptitude profile JSON, schema-validated) and **P
 
 **Hugging Face API key** in `config.toml` under `[llm].api_key`. Model defaults from `[llm].default_model`.
 
-Stage 2 runs verified job discovery: the model is prompted to search the web and return currently open postings that match the aptitude profile and user constraints. The API returns that output as `verified_matches` (raw LLM text, typically a JSON fenced block).
+Stage 2 runs verified job discovery: the model is prompted to search the web and return currently open postings. The API parses and validates `verified_matches` against `schemas/job-discovery-results.schema.json`.
 
 ## Setup
 
@@ -68,7 +68,7 @@ curl -s -X POST http://localhost:3001/v1/pipeline \
   -d "$(jq -n --rawfile r ../fixtures/sample-resumes/career-changer-mixed-stack.txt '{resume: $r}')"
 ```
 
-`verified_matches` is a string (raw LLM text). `aptitude_profile` is parsed JSON validated against `schemas/aptitude-profile.schema.json`.
+`verified_matches` and `aptitude_profile` are parsed JSON validated against their schemas.
 
 ## Implementation notes
 

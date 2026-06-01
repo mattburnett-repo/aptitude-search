@@ -2,9 +2,13 @@ import json
 from typing import Any
 
 from app import prompt_loader
-from app.llm import complete_chat_json, complete_chat_text
+from app.llm import complete_chat_json
 from app.models import Constraints
-from app.validate import normalize_aptitude_profile, validate_stage
+from app.validate import (
+    normalize_aptitude_profile,
+    normalize_job_discovery_results,
+    validate_stage,
+)
 
 DEFAULT_CONSTRAINTS = Constraints()
 
@@ -26,7 +30,7 @@ def run_stage2(
     aptitude_profile: Any,
     constraints: Constraints | None = None,
     model: str | None = None,
-) -> str:
+) -> Any:
     c = constraints or DEFAULT_CONSTRAINTS
     validate_stage("constraints", c.model_dump())
     user = (
@@ -35,7 +39,15 @@ def run_stage2(
         f"<aptitude_profile>\n{json.dumps(aptitude_profile, indent=2)}\n</aptitude_profile>\n\n"
         f"<constraints>\n{c.model_dump_json(indent=2)}\n</constraints>"
     )
-    return complete_chat_text(prompt_loader.system_prompt_stage2(), user, model)
+    result = normalize_job_discovery_results(
+        complete_chat_json(
+            prompt_loader.system_prompt_stage2(),
+            user,
+            model,
+        )
+    )
+    validate_stage("jobDiscovery", result)
+    return result
 
 
 def run_pipeline(

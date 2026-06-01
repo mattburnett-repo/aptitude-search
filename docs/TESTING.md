@@ -17,7 +17,7 @@
 - [ ] At most 20 results; no padding
 - [ ] `notes` has 1+ meaningful verification caveats (exclusions, limits, sparse results)
 
-Stage 2 should reflect current postings (web search via the model), not memory alone. The API runs Stage 2 as part of `POST /v1/pipeline` and returns `verified_matches` as plain text (not jsonschema-validated by the API). See [PROMPT-CONTRACT.md](PROMPT-CONTRACT.md).
+Stage 2 should reflect current postings (web search via the model), not memory alone. The API runs Stage 2 as part of `POST /v1/pipeline` and returns parsed, schema-validated `verified_matches`. See [PROMPT-CONTRACT.md](PROMPT-CONTRACT.md).
 
 ## Fixtures
 

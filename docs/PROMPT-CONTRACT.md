@@ -6,7 +6,7 @@
 - **Stage 2 is job search.** The model is instructed to search the web and return currently open postings in **`verified_matches`**.
 - **Primary path:** API + UI (or Swagger). Same prompt text as `prompts/02-verified-job-discovery.md`.
 - **Testing:** Swagger UI at `/docs` on the running API (see [backend/README.md](../backend/README.md)).
-- **Implementation (not user-facing):** Stage 2 uses an LLM chat call (Hugging Face), not a separate jobs/search API in Python. The API does not jsonschema-validate `verified_matches` yet; Stage 1 and constraints are validated.
+- **Implementation (not user-facing):** Stage 2 uses an LLM chat call (Hugging Face), not a separate jobs/search API in Python. The API jsonschema-validates `verified_matches` against `job-discovery-results.schema.json`.
 
 ---
 
@@ -43,7 +43,7 @@ Reference only (not in the live workflow): `XX-original-aptitude-prompt.md`.
 | Stage | Validated by API? |
 |-------|-------------------|
 | 1 (aptitude profile) | Yes — `jsonschema` after LLM call |
-| 2 (verified matches) | No — returned as raw text; optional manual/schema check per `docs/TESTING.md` |
+| 2 (verified matches) | Yes — `jsonschema` after LLM call |
 | Constraints | Yes — when passed to pipeline/stage 2 |
 
 ## Versioning

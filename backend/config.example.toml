@@ -21,6 +21,7 @@ stage2_file = "02-verified-job-discovery.md"
 [schemas]
 constraints = "constraints.schema.json"
 aptitude_profile = "aptitude-profile.schema.json"
+job_discovery_results = "job-discovery-results.schema.json"
 
 [paths]
 prompts_dir = "prompts"
