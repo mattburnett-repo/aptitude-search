@@ -9,23 +9,23 @@ from app.job_discovery.tool_observed_urls import (
 )
 from app.llm import complete_chat_json
 from app.models import Constraints
-from app.validate import parse_json_response
 from app.validate import (
     normalize_aptitude_profile,
     normalize_job_discovery_results,
+    parse_json_response,
     validate_stage,
 )
 
 DEFAULT_CONSTRAINTS = Constraints()
 
 
-def run_stage1(resume: str, model: str | None = None) -> Any:
-    user = f"Analyze this resume and return the aptitude profile JSON.\n\n<resume>\n{resume}\n</resume>"
+def run_stage1(resume: str) -> Any:
+    task = prompt_loader.user_task_stage1()
+    user = f"{task}\n\n<resume>\n{resume}\n</resume>"
     result = normalize_aptitude_profile(
         complete_chat_json(
             prompt_loader.system_prompt_stage1(),
             user,
-            model,
         )
     )
     validate_stage("aptitudeProfile", result)
@@ -35,7 +35,6 @@ def run_stage1(resume: str, model: str | None = None) -> Any:
 def run_stage2(
     aptitude_profile: Any,
     constraints: Constraints | None = None,
-    job_discovery_model: str | None = None,
 ) -> Any:
     c = constraints or DEFAULT_CONSTRAINTS
     validate_stage("constraints", c.model_dump())
@@ -44,7 +43,6 @@ def run_stage2(
     agent_text = run_job_discovery_agent(
         prompt_loader.system_prompt_stage2(),
         user,
-        model_id=job_discovery_model,
         max_steps=config.llm.job_discovery_max_steps,
         observed_urls=tool_observed_urls,
     )
@@ -57,13 +55,9 @@ def run_stage2(
 def run_pipeline(
     resume: str,
     constraints: Constraints | None = None,
-    aptitude_model: str | None = None,
-    job_discovery_model: str | None = None,
 ) -> dict[str, Any]:
-    aptitude_profile = run_stage1(resume, aptitude_model)
-    verified_matches = run_stage2(
-        aptitude_profile, constraints, job_discovery_model
-    )
+    aptitude_profile = run_stage1(resume)
+    verified_matches = run_stage2(aptitude_profile, constraints)
     return {
         "aptitude_profile": aptitude_profile,
         "verified_matches": verified_matches,

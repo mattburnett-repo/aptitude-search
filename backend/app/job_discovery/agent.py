@@ -23,21 +23,19 @@ def _runtime_with_cause(summary: str, exc: BaseException) -> RuntimeError:
 def run_job_discovery_agent(
     system_prompt: str,
     user_message: str,
-    model_id: str | None = None,
     *,
     max_steps: int = 10,
     observed_urls: ToolObservedUrlRegistry | None = None,
 ) -> str:
     """Run the job-discovery agent; returns final text (expected: JSON fenced block)."""
-    resolved_model = model_id or config.llm.job_discovery_model
-    hf_model = InferenceClientModel(
-        model_id=resolved_model,
+    job_discovery_model = InferenceClientModel(
+        model_id=config.llm.job_discovery_model,
         token=config.llm.job_discovery_model_key,
     )
     url_registry = observed_urls if observed_urls is not None else ToolObservedUrlRegistry()
     agent = ToolCallingAgent(
         tools=build_job_discovery_tools(url_registry),
-        model=hf_model,
+        model=job_discovery_model,
         instructions=system_prompt,
         max_steps=max_steps,
         # Agent console trace (steps, tool calls, page text): set to LogLevel.INFO or LogLevel.DEBUG.

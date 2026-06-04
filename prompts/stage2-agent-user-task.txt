@@ -1,0 +1,7 @@
+Find job openings for this candidate using web_search and visit_webpage.
+Search queries: 3–6 plain keywords (role + skill + remote/location). No long sentences, no nested quotes.
+Run at least 3 different web_search calls, then visit_webpage on promising posting URLs.
+Prefer direct employer/careers URLs over generic job-board search pages.
+Include at least 8 distinct results with direct posting URLs when available.
+Each result url must be copied from web_search or visit_webpage output (invented or edited URLs are removed before the API responds).
+Return only one json fenced code block conforming to the job discovery schema.

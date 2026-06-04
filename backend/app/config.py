@@ -2,7 +2,7 @@ import sys
 import tomllib
 from pathlib import Path
 
-from pydantic import BaseModel, Field, ValidationError, field_validator
+from pydantic import BaseModel, Field, ValidationError, ValidationInfo, field_validator
 
 _CONFIG_PATH = Path(__file__).resolve().parent.parent / "config.toml"
 
@@ -28,37 +28,19 @@ class LlmConfig(BaseModel):
     job_discovery_max_steps: int = 18
     temperature: float
 
-    @field_validator("aptitude_model_key")
+    @field_validator(
+        "aptitude_model_key",
+        "job_discovery_model_key",
+        "aptitude_model",
+        "job_discovery_model",
+    )
     @classmethod
-    def aptitude_model_key_must_be_set(cls, value: str) -> str:
-        key = value.strip()
-        if not key:
-            raise ValueError("llm.aptitude_model_key must be set in config.toml")
-        return key
-
-    @field_validator("job_discovery_model_key")
-    @classmethod
-    def job_discovery_model_key_must_be_set(cls, value: str) -> str:
-        key = value.strip()
-        if not key:
-            raise ValueError("llm.job_discovery_model_key must be set in config.toml")
-        return key
-
-    @field_validator("aptitude_model")
-    @classmethod
-    def aptitude_model_must_be_set(cls, value: str) -> str:
-        model = value.strip()
-        if not model:
-            raise ValueError("llm.aptitude_model must be set in config.toml")
-        return model
-
-    @field_validator("job_discovery_model")
-    @classmethod
-    def job_discovery_model_must_be_set(cls, value: str) -> str:
-        model = value.strip()
-        if not model:
-            raise ValueError("llm.job_discovery_model must be set in config.toml")
-        return model
+    def llm_string_must_be_set(cls, value: str, info: ValidationInfo) -> str:
+        stripped = value.strip()
+        if not stripped:
+            field = info.field_name or "field"
+            raise ValueError(f"llm.{field} must be set in config.toml")
+        return stripped
 
     @field_validator("job_discovery_max_steps")
     @classmethod
@@ -71,6 +53,8 @@ class LlmConfig(BaseModel):
 class PromptsConfig(BaseModel):
     stage1_file: str
     stage2_file: str
+    stage1_user_task_file: str = "stage1-agent-user-task.txt"
+    stage2_user_task_file: str = "stage2-agent-user-task.txt"
 
 
 class SchemasConfig(BaseModel):

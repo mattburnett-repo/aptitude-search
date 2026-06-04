@@ -9,10 +9,8 @@ from app.job_discovery.tool_observed_urls import (
     ToolObservedUrlRegistry,
     filter_results_to_tool_observed_urls,
 )
-from app.job_discovery.tools import ResilientWebSearchTool
 
 __all__ = [
-    "ResilientWebSearchTool",
     "ToolObservedUrlRegistry",
     "build_stage2_user_message",
     "compact_aptitude_profile_summary",

@@ -1,5 +1,6 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from app.config import config
 from app.models import PipelineRequest, Stage1Request, Stage2Request
@@ -16,6 +17,16 @@ app.add_middleware(
 )
 
 
+async def pipeline_exception_handler(
+    _request: Request, exc: ValueError | RuntimeError
+) -> JSONResponse:
+    return JSONResponse(status_code=500, content={"detail": str(exc)})
+
+
+app.add_exception_handler(ValueError, pipeline_exception_handler)
+app.add_exception_handler(RuntimeError, pipeline_exception_handler)
+
+
 @app.get("/health")
 def health():
     return {"ok": True, "service": config.app.service}
@@ -25,29 +36,20 @@ def health():
 def pipeline(body: PipelineRequest):
     if not body.resume.strip():
         raise HTTPException(status_code=400, detail="resume is required")
-    try:
-        return run_pipeline(body.resume, body.constraints)
-    except (ValueError, RuntimeError) as e:
-        raise HTTPException(status_code=500, detail=str(e)) from e
+    return run_pipeline(body.resume, body.constraints)
 
 
 @app.post("/v1/stages/1")
 def stage1(body: Stage1Request):
     if not body.resume.strip():
         raise HTTPException(status_code=400, detail="resume is required")
-    try:
-        return {"aptitude_profile": run_stage1(body.resume)}
-    except (ValueError, RuntimeError) as e:
-        raise HTTPException(status_code=500, detail=str(e)) from e
+    return {"aptitude_profile": run_stage1(body.resume)}
 
 
 @app.post("/v1/stages/2")
 def stage2(body: Stage2Request):
-    try:
-        return {
-            "verified_matches": run_stage2(
-                body.aptitude_profile, body.constraints
-            )
-        }
-    except (ValueError, RuntimeError) as e:
-        raise HTTPException(status_code=500, detail=str(e)) from e
+    return {
+        "verified_matches": run_stage2(
+            body.aptitude_profile, body.constraints
+        )
+    }

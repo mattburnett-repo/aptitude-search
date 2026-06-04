@@ -20,6 +20,8 @@ temperature = 0.3
 [prompts]
 stage1_file = "01-resume-to-aptitude-profile.md"
 stage2_file = "02-verified-job-discovery.md"
+stage1_user_task_file = "stage1-agent-user-task.txt"
+stage2_user_task_file = "stage2-agent-user-task.txt"
 
 [schemas]
 constraints = "constraints.schema.json"

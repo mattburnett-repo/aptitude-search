@@ -2,10 +2,12 @@
 
 from typing import Any
 
+from app import prompt_loader
 from app.models import Constraints
 
 
 def _labeled_names(items: list[Any] | None, *, limit: int = 8) -> str:
+    """Pull names from a profile list and join them (e.g. skills → "Python, Django, Vue")."""
     names: list[str] = []
     for item in items or []:
         if isinstance(item, dict):
@@ -52,16 +54,9 @@ def build_stage2_user_message(
     profile = aptitude_profile if isinstance(aptitude_profile, dict) else {}
     compact = compact_aptitude_profile_summary(profile)
     constraints_json = constraints.model_dump_json()
+    task = prompt_loader.user_task_stage2()
     return (
-        "Find job openings for this candidate using web_search and visit_webpage.\n"
-        "Search queries: 3–6 plain keywords (role + skill + remote/location). "
-        "No long sentences, no nested quotes.\n"
-        "Run at least 3 different web_search calls, then visit_webpage on promising posting URLs.\n"
-        "Prefer direct employer/careers URLs over generic job-board search pages.\n"
-        "Include at least 8 distinct results with direct posting URLs when available.\n"
-        "Each result url must be copied from web_search or visit_webpage output "
-        "(invented or edited URLs are removed before the API responds).\n"
-        "Return only one json fenced code block conforming to the job discovery schema.\n\n"
+        f"{task}\n\n"
         f"<candidate_profile>\n{compact}\n</candidate_profile>\n\n"
         f"<constraints>\n{constraints_json}\n</constraints>"
     )
