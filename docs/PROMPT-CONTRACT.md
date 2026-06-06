@@ -48,4 +48,4 @@ Reference only (not in the live workflow): `XX-original-aptitude-prompt.md`.
 
 ## Versioning
 
-Prompt pack version: **v1.0.0** (see root `CHANGELOG.md`). Product workflow is two stages (1 → 2); earlier four-stage pack designs are superseded.
+Prompt pack version: **v1.0.0**. Product workflow is two stages (1 → 2); earlier four-stage pack designs are superseded.

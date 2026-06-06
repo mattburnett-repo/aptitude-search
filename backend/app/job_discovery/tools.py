@@ -2,6 +2,7 @@
 
 from smolagents import DuckDuckGoSearchTool, VisitWebpageTool
 
+from app.config import config
 from app.job_discovery.tool_observed_urls import ToolObservedUrlRegistry
 
 
@@ -49,7 +50,7 @@ class ToolOutputObservingVisitWebpageTool(VisitWebpageTool):
     def __init__(
         self,
         observed_urls: ToolObservedUrlRegistry,
-        max_output_length: int = 40000,
+        max_output_length: int,
     ) -> None:
         super().__init__(max_output_length=max_output_length)
         self._observed_urls = observed_urls
@@ -66,5 +67,8 @@ def build_job_discovery_tools(
 ) -> list[ResilientWebSearchTool | ToolOutputObservingVisitWebpageTool]:
     return [
         ToolOutputObservingWebSearchTool(observed_urls),
-        ToolOutputObservingVisitWebpageTool(observed_urls),
+        ToolOutputObservingVisitWebpageTool(
+            observed_urls,
+            max_output_length=config.llm.job_discovery_visit_max_output_length,
+        ),
     ]

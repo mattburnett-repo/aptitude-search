@@ -25,7 +25,8 @@ class LlmConfig(BaseModel):
     aptitude_model: str
     job_discovery_model_key: str
     job_discovery_model: str
-    job_discovery_max_steps: int = 18
+    job_discovery_max_steps: int
+    job_discovery_visit_max_output_length: int
     temperature: float
 
     @field_validator(
@@ -42,11 +43,15 @@ class LlmConfig(BaseModel):
             raise ValueError(f"llm.{field} must be set in config.toml")
         return stripped
 
-    @field_validator("job_discovery_max_steps")
+    @field_validator(
+        "job_discovery_max_steps",
+        "job_discovery_visit_max_output_length",
+    )
     @classmethod
-    def job_discovery_max_steps_must_be_positive(cls, value: int) -> int:
+    def job_discovery_positive_int(cls, value: int, info: ValidationInfo) -> int:
         if value < 1:
-            raise ValueError("llm.job_discovery_max_steps must be at least 1")
+            field = info.field_name or "field"
+            raise ValueError(f"llm.{field} must be at least 1")
         return value
 
 
@@ -89,6 +94,7 @@ class Config(BaseModel):
 
     @classmethod
     def load(cls, path: Path = _CONFIG_PATH) -> "Config":
+        """Read config.toml and build the typed Config object (all settings load here)."""
         with path.open("rb") as f:
             data = tomllib.load(f)
         return cls.model_validate(data)
