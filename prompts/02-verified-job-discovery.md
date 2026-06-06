@@ -107,6 +107,7 @@ If any condition fails → EXCLUDE.
    - Each query: **3–6 keywords** (e.g. `python backend remote`), not full sentences or quoted phrases
 8. Visit listing pages for candidates you intend to include (not only search snippets)
    - Prefer **direct posting URLs** over generic board search/list pages when possible
+   - After each search, visit at most **2–3** posting URLs; skip URLs already visited in this run
 9. Compose search_plan, results, and notes for output
 
 ---

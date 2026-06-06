@@ -3,6 +3,7 @@
 from smolagents import DuckDuckGoSearchTool, VisitWebpageTool
 
 from app.config import config
+from app.job_discovery.page_extract import compact_job_page_for_agent
 from app.job_discovery.tool_observed_urls import ToolObservedUrlRegistry
 
 
@@ -59,7 +60,7 @@ class ToolOutputObservingVisitWebpageTool(VisitWebpageTool):
         self._observed_urls.record_url(url)
         output = super().forward(url)
         self._observed_urls.record_tool_output(output)
-        return output
+        return compact_job_page_for_agent(url, output)
 
 
 def build_job_discovery_tools(
