@@ -5,6 +5,7 @@ dist/
 *.log
 .env
 .env.local
+backend/.env
 
 # Candidate resume at repo root (optional; use fixtures/sample-resumes/ for demos)
 resume-text.txt

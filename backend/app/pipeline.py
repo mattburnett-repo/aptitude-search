@@ -1,5 +1,7 @@
 from typing import Any
 
+from langsmith import traceable
+
 from app import prompt_loader
 from app.config import config
 from app.job_discovery import build_stage2_user_message, run_job_discovery_agent
@@ -19,6 +21,7 @@ from app.validate import (
 DEFAULT_CONSTRAINTS = Constraints()
 
 
+@traceable(run_type="chain", name="stage1")
 def run_stage1(resume: str) -> Any:
     task = prompt_loader.user_task_stage1()
     user = f"{task}\n\n<resume>\n{resume}\n</resume>"
@@ -32,6 +35,7 @@ def run_stage1(resume: str) -> Any:
     return result
 
 
+@traceable(run_type="chain", name="stage2")
 def run_stage2(
     aptitude_profile: Any,
     constraints: Constraints | None = None,
@@ -52,6 +56,7 @@ def run_stage2(
     return result
 
 
+@traceable(run_type="chain", name="pipeline")
 def run_pipeline(
     resume: str,
     constraints: Constraints | None = None,

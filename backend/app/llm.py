@@ -1,4 +1,5 @@
 from huggingface_hub import InferenceClient
+from langsmith import traceable
 
 from app.config import config
 from app.validate import parse_json_response
@@ -8,6 +9,7 @@ def _aptitude_client() -> InferenceClient:
     return InferenceClient(api_key=config.llm.aptitude_model_key)
 
 
+@traceable(run_type="llm", name="stage1_aptitude_profile")
 def complete_chat_json(
     system_prompt: str,
     user_message: str,

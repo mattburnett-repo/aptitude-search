@@ -1,10 +1,19 @@
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from openinference.instrumentation.smolagents import SmolagentsInstrumentor
+from opentelemetry import trace
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
 from app.config import config
 from app.models import PipelineRequest, Stage1Request, Stage2Request
 from app.pipeline import run_pipeline, run_stage1, run_stage2
+
+trace.set_tracer_provider(TracerProvider())
+trace.get_tracer_provider().add_span_processor(BatchSpanProcessor(OTLPSpanExporter()))
+SmolagentsInstrumentor().instrument()
 
 app = FastAPI(title=config.app.title, version=config.app.version)
 

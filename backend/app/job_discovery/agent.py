@@ -1,11 +1,12 @@
 """Stage 2 job discovery via smolagents (web search + page visits)."""
 
+from langsmith import traceable
 from smolagents import (
     AgentError,
     AgentGenerationError,
     AgentMaxStepsError,
+    CodeAgent,
     InferenceClientModel,
-    ToolCallingAgent,
 )
 from smolagents.monitoring import LogLevel
 
@@ -20,6 +21,7 @@ def _runtime_with_cause(summary: str, exc: BaseException) -> RuntimeError:
     return RuntimeError(detail)
 
 
+@traceable(run_type="chain", name="job_discovery_agent")
 def run_job_discovery_agent(
     system_prompt: str,
     user_message: str,
@@ -33,11 +35,12 @@ def run_job_discovery_agent(
         token=config.llm.job_discovery_model_key,
     )
     url_registry = observed_urls if observed_urls is not None else ToolObservedUrlRegistry()
-    agent = ToolCallingAgent(
+    agent = CodeAgent(
         tools=build_job_discovery_tools(url_registry),
         model=job_discovery_model,
         instructions=system_prompt,
         max_steps=max_steps,
+        additional_authorized_imports=["json"],
         # Agent console trace (steps, tool calls, page text): set to LogLevel.INFO or LogLevel.DEBUG.
         verbosity_level=LogLevel.OFF,
         name="job_discovery_agent",
