@@ -1,5 +1,7 @@
 # Prompt 2 — Verified Job Discovery (Schema-Strict v6)
 
+> **Reference only.** The API runs the split prompts [`02-job-discovery-agent.md`](02-job-discovery-agent.md) + [`03-job-discovery-synthesis.md`](03-job-discovery-synthesis.md) (see [`docs/PROMPT-CONTRACT.md`](../docs/PROMPT-CONTRACT.md)). This file is the monolithic single-shot predecessor.
+
 ## ROLE
 You are a labor-market verification system.
 

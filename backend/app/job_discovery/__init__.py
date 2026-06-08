@@ -6,7 +6,9 @@ from app.job_discovery.context import (
     build_stage2_user_message,
     compact_aptitude_profile_summary,
 )
-from app.job_discovery.synthesis import synthesize_job_discovery_results
+from app.job_discovery.synthesize_verified_matches import (
+    synthesize_job_discovery_results,
+)
 from app.job_discovery.tool_observed_urls import (
     ToolObservedUrlRegistry,
     filter_results_to_tool_observed_urls,

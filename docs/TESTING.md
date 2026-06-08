@@ -7,17 +7,16 @@
 - [ ] At least one non-obvious `adjacent_roles` entry
 - [ ] `rationale` present and readable
 
-## Stage 2 (Prompt 2)
+## Stage 2 (discovery agent + synthesis)
 
-- [ ] Response is a single `json`-language fenced code block (no preamble or extra markdown sections)
-- [ ] JSON parses against `schemas/job-discovery-results.schema.json`
+- [ ] `verified_matches` parses against `schemas/job-discovery-results.schema.json`
 - [ ] `search_plan` has 3–6 strings drawn from the aptitude profile (not one ATS/board host)
 - [ ] `results` use diverse employers and industries (≤2 per company, ≤3 per board domain)
 - [ ] Each result has a direct apply/posting URL and `match_description` tied to profile evidence
 - [ ] At most 20 results; no padding
 - [ ] `notes` has 1+ meaningful search caveats (exclusions, limits, sparse results)
 
-Stage 2 should reflect current postings (web search via the model), not memory alone. The API runs Stage 2 as part of `POST /v1/pipeline` and returns parsed, schema-validated `verified_matches`. See [PROMPT-CONTRACT.md](PROMPT-CONTRACT.md).
+Stage 2 should reflect current postings (web search via the discovery agent), not memory alone. The API runs Stage 2 as part of `POST /v1/pipeline` and returns parsed, schema-validated `verified_matches`. See [PROMPT-CONTRACT.md](PROMPT-CONTRACT.md).
 
 ## Fixtures
 
@@ -31,7 +30,7 @@ Validates `fixtures/example-outputs/career-changer-mixed-stack-stage1.json` agai
 
 ## Models
 
-Test stage 1 on capable models for reliable JSON. Stage 2 via API uses the configured Hugging Face model; quality depends on model and provider. Optional: re-run Prompt 2 in Cursor with web search to compare output.
+Test stage 1 on capable models for reliable JSON. Stage 2 via API uses the configured Hugging Face models (`aptitude_model` for stage 1, `job_discovery_model` for the agent and synthesis); quality depends on model and provider. Smoke-test the discovery agent: `backend/scripts/smoke_job_discovery_agent.py`.
 
 ## API smoke test (optional)
 

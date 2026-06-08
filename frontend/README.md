@@ -28,9 +28,9 @@ Vite proxies `/api/*` → `http://localhost:3001/*` (see `vite.config.ts`). The 
 ## UI behavior
 
 - Paste resume; optional constraints (location, remote, salary min, industries include/exclude).
-- **Run pipeline (1 → 2)** — single request; shows stage 1 JSON and stage 2 text in expandable panels.
+- **Run pipeline (1 → 2)** — single request; shows stage 1 and stage 2 JSON in expandable panels.
 - **Export JSON** — downloads `{ aptitude_profile, verified_matches }`.
-- **Copy verified matches** — copies stage 2 text to clipboard.
+- **Copy verified matches** — copies `verified_matches` JSON to clipboard.
 
 There is no refine/iterate panel. Stage 2 (job search) runs automatically with the pipeline; see `docs/PROMPT-CONTRACT.md`.
 

@@ -1,6 +1,6 @@
 # Aptitude Search — Workflow Guide
 
-**Product workflow:** [Prompt 1](../prompts/01-resume-to-aptitude-profile.md) → [Prompt 2](../prompts/02-verified-job-discovery.md)
+**Product workflow:** [Stage 1](../prompts/01-resume-to-aptitude-profile.md) → [Stage 2](../prompts/02-job-discovery-agent.md) (discovery agent + [synthesis](../prompts/03-job-discovery-synthesis.md))
 
 **Run pipeline:** [backend/README.md](../backend/README.md) (Swagger at `/docs`)
 
@@ -20,13 +20,16 @@
 
 See [prompts/README.md](../prompts/README.md). Output: JSON only, conforming to `schemas/aptitude-profile.schema.json`.
 
-## Prompt 2 — Verified job discovery
+## Stage 2 — Verified job discovery
 
-See [prompts/README.md](../prompts/README.md). Input: Prompt 1 JSON plus optional constraints (`schemas/constraints.schema.json`).
+See [prompts/README.md](../prompts/README.md). Input: Stage 1 JSON plus optional constraints (`schemas/constraints.schema.json`).
 
-Output: one `json`-language fenced code block with `search_plan`, `results`, and `notes` per `schemas/job-discovery-results.schema.json`. No separate markdown headings—the UI and export read these fields from JSON.
+The API runs two phases:
 
-**API:** `POST /v1/pipeline` runs Prompt 1 then Prompt 2; Stage 2 is job search (model instructed to search the web). Use Swagger at `http://localhost:3001/docs`. See [PROMPT-CONTRACT.md](PROMPT-CONTRACT.md).
+1. **Discovery agent** (`02-job-discovery-agent.md`) — web search and page visits; collects `found_jobs`.
+2. **Synthesis** (`03-job-discovery-synthesis.md`) — maps `found_jobs` into schema-strict JSON with `search_plan`, `results`, and `notes` per `schemas/job-discovery-results.schema.json`.
+
+**API:** `POST /v1/pipeline` runs Stage 1 then Stage 2 with no manual step. Use Swagger at `http://localhost:3001/docs`. See [PROMPT-CONTRACT.md](PROMPT-CONTRACT.md).
 
 ---
 

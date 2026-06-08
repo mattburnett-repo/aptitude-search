@@ -3,49 +3,53 @@
 ## Product model (canonical)
 
 - **`POST /v1/pipeline`** runs Stage 1 (resume → aptitude profile), then Stage 2 (profile + constraints → job search), with no manual step between stages.
-- **Stage 2 is job search.** The model is instructed to search the web and return currently open postings in **`verified_matches`**.
-- **Primary path:** API + UI (or Swagger). Same prompt text as `prompts/02-verified-job-discovery.md`.
+- **Stage 2 is job search.** The API runs a web-search agent, then a synthesis LLM call, and returns currently open postings in **`verified_matches`**.
+- **Primary path:** API + UI (or Swagger). Prompt text lives under `prompts/` (see Stages table); filenames are wired in `backend/config.toml`.
 - **Testing:** Swagger UI at `/docs` on the running API (see [backend/README.md](../backend/README.md)).
-- **Implementation (not user-facing):** Stage 2 uses an LLM chat call (Hugging Face), not a separate jobs/search API in Python. The API jsonschema-validates `verified_matches` against `job-discovery-results.schema.json`.
+- **Implementation (not user-facing):** Stage 2 is two Hugging Face phases: (1) a `smolagents` CodeAgent with DuckDuckGo search and page visits; (2) a single chat completion that maps `found_jobs` into schema-strict JSON. Result URLs are filtered to those observed in agent tool output. The API jsonschema-validates `verified_matches` against `job-discovery-results.schema.json`. There is no separate jobs/search API wired in Python.
 
 ---
 
-Every stage prompt in `prompts/` follows a consistent structure. Stage prompts are schema-strict (v4/v6): the file body (minus the markdown title line) is the system prompt loaded by the API.
+Stage 1 and Stage 2 synthesis prompts are schema-strict: the markdown file body (minus the `#` title line) is the system prompt loaded by the API. The discovery agent also loads `job-discovery-code-agent.yaml` for smolagents prompt templates.
 
 ## Sections (by stage)
 
-| Section | Stage 1 | Stage 2 |
-|---------|---------|---------|
-| **ROLE** | Career signal extraction | Labor-market verification |
-| **OBJECTIVE** | Resume → AptitudeProfile JSON | AptitudeProfile → verified postings |
-| **INPUT** | Resume text | AptitudeProfile JSON + optional constraints |
-| **OUTPUT** | JSON only (`aptitude-profile.schema.json`) | Single `json` fenced block (`job-discovery-results.schema.json`) |
-| **RULES** | Shared vocabulary, processing steps, no invention | Profile is immutable; verification and diversification rules |
+| Section | Stage 1 | Stage 2a (discovery) | Stage 2b (synthesis) |
+|---------|---------|------------------------|----------------------|
+| **ROLE** | Career signal extraction | Labor-market discovery agent | Labor-market verification |
+| **OBJECTIVE** | Resume → AptitudeProfile JSON | Find postings via web search | Map `found_jobs` → verified postings |
+| **INPUT** | Resume text | AptitudeProfile JSON + optional constraints | AptitudeProfile + constraints + `found_jobs` |
+| **OUTPUT** | JSON only (`aptitude-profile.schema.json`) | `found_jobs` via `final_answer` (internal) | JSON only (`job-discovery-results.schema.json`) |
+| **RULES** | Shared vocabulary, processing steps, no invention | Search/visit process; compact rows in `found_jobs` | Profile is immutable; verification and diversification rules |
 
-Cross-cutting (both stages):
+Cross-cutting:
 
 - **Shared vocabulary** for `core_skills`, `secondary_skills`, `strengths`, `adjacent_roles`, `confidence`
 - **Evidence vs inference** — prefer omission over invention
-- **No preamble** — stage 1: JSON only; stage 2: one fenced JSON block only
+- **No preamble** — stage 1 and stage 2b: JSON only (synthesis parses a single JSON object from the model)
 
 ## Stages
 
-| Stage | Prompt file | Output schema |
-|-------|-------------|---------------|
+| Stage | Prompt file(s) | Output schema |
+|-------|----------------|---------------|
 | 1 | `01-resume-to-aptitude-profile.md` | `schemas/aptitude-profile.schema.json` |
-| 2 | `02-verified-job-discovery.md` | `schemas/job-discovery-results.schema.json` |
+| 2a (discovery) | `02-job-discovery-agent.md`, `job-discovery-code-agent.yaml` | `found_jobs` (agent-internal; not the API response) |
+| 2b (synthesis) | `03-job-discovery-synthesis.md` | `schemas/job-discovery-results.schema.json` |
 | Constraints (optional, stage 2) | — | `schemas/constraints.schema.json` |
 
-Reference only (not in the live workflow): `XX-original-aptitude-prompt.md`.
+Reference only (not loaded by the API):
+
+- `02-verified-job-discovery.md` — monolithic single-shot predecessor (search + schema JSON in one prompt)
+- `XX-original-aptitude-prompt.md` — pre-migration spec
 
 ## API validation
 
 | Stage | Validated by API? |
 |-------|-------------------|
 | 1 (aptitude profile) | Yes — `jsonschema` after LLM call |
-| 2 (verified matches) | Yes — `jsonschema` after LLM call |
+| 2 (verified matches) | Yes — `jsonschema` after synthesis; URLs filtered to tool-observed links |
 | Constraints | Yes — when passed to pipeline/stage 2 |
 
 ## Versioning
 
-Prompt pack version: **v1.0.0**. Product workflow is two stages (1 → 2); earlier four-stage pack designs are superseded.
+Prompt pack version: **v1.0.0**. Product workflow is two stages (1 → 2); Stage 2 is implemented as discovery agent + synthesis. Earlier four-stage pack designs are superseded.

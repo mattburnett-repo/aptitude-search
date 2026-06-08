@@ -20,7 +20,7 @@ Aptitude-driven job search: resume → aptitude profile → **verified openings 
 
 ## Product workflow
 
-**[Prompt 1](prompts/01-resume-to-aptitude-profile.md)** → **[Prompt 2](prompts/02-verified-job-discovery.md)**
+**[Stage 1](prompts/01-resume-to-aptitude-profile.md)** → **[Stage 2](prompts/02-job-discovery-agent.md)** (discovery agent + [synthesis](prompts/03-job-discovery-synthesis.md))
 
 Steps: **[prompts/README.md](prompts/README.md)**
 
@@ -60,7 +60,7 @@ Response: `aptitude_profile` (JSON) and `verified_matches` (job search results).
 ## Repository layout
 
 ```
-prompts/          # 01 aptitude profile, 02 verified discovery; XX = reference
+prompts/          # 01 profile, 02a discovery agent, 02b synthesis; XX + 02-verified = reference
 schemas/          # aptitude-profile, job-discovery-results, constraints
 fixtures/         # sample resumes, pipeline-request-example.json, stage-1 golden output
 docs/             # WORKFLOW, TESTING, PROMPT-CONTRACT

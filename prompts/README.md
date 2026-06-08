@@ -4,12 +4,17 @@
 
 | File | Stage |
 |------|--------|
-| `01-resume-to-aptitude-profile.md` | Aptitude profile (JSON) |
-| `02-verified-job-discovery.md` | Verified job discovery (`verified_matches`) |
+| `01-resume-to-aptitude-profile.md` | Stage 1: aptitude profile (JSON) |
+| `02-job-discovery-agent.md` | Stage 2a: discovery agent (web search + page visits) |
+| `job-discovery-code-agent.yaml` | Stage 2a: smolagents prompt templates |
+| `03-job-discovery-synthesis.md` | Stage 2b: map `found_jobs` → `verified_matches` JSON |
 
-`XX-original-aptitude-prompt.md` is **reference only** (pre-migration spec).
+Reference only (not loaded by the API):
 
-Prompt bodies are loaded by the API as system prompts. Edit these files to change behavior; no separate copy-paste runbook is required.
+- `02-verified-job-discovery.md` — monolithic single-shot predecessor
+- `XX-original-aptitude-prompt.md` — pre-migration spec
+
+Prompt bodies (and the YAML templates) are loaded by the API per `backend/config.toml`. Edit these files to change behavior; no separate copy-paste runbook is required.
 
 ## Sample resume
 

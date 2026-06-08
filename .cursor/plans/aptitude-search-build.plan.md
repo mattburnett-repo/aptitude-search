@@ -45,7 +45,7 @@ isProject: true
 
 ---
 
-## Current implementation (as of 2026-05-17)
+## Current implementation (as of 2026-06-08)
 
 **Strategy:** Career inference before search ([design-docs/03-core-thesis.md](../../design-docs/03-core-thesis.md)), implemented as a **two-stage** pipeline ending in **verified job postings**, not a separate Boolean/query-generation stage.
 
@@ -53,11 +53,14 @@ isProject: true
 flowchart LR
   R[ResumeText] --> P1[Prompt1_AptitudeProfile]
   P1 --> AP[AptitudeProfile_JSON]
-  AP --> P2[Prompt2_VerifiedDiscovery]
-  P2 --> JD[JobDiscoveryResults_JSON]
+  AP --> A2[Stage2a_DiscoveryAgent]
+  A2 --> FJ[found_jobs]
+  FJ --> S2[Stage2b_Synthesis]
+  S2 --> JD[JobDiscoveryResults_JSON]
   FE[MVP_Frontend] --> API[FastAPI]
   API --> P1
-  API --> P2
+  API --> A2
+  API --> S2
 ```
 
 ### Repository layout (actual)
@@ -65,7 +68,10 @@ flowchart LR
 ```
 prompts/
   01-resume-to-aptitude-profile.md
-  02-verified-job-discovery.md
+  02-job-discovery-agent.md
+  03-job-discovery-synthesis.md
+  job-discovery-code-agent.yaml
+  02-verified-job-discovery.md    # reference only (monolithic predecessor)
   XX-original-aptitude-prompt.md    # reference only
 schemas/
   aptitude-profile.schema.json
@@ -86,7 +92,8 @@ design-docs/                        # original exploration (historical)
 | # | File | Input | Output |
 |---|------|-------|--------|
 | 1 | `01-resume-to-aptitude-profile.md` | Resume text | `aptitude-profile` JSON |
-| 2 | `02-verified-job-discovery.md` | Stage 1 JSON + optional constraints | Single `json` block: `job-discovery-results` |
+| 2a | `02-job-discovery-agent.md`, `job-discovery-code-agent.yaml` | Stage 1 JSON + optional constraints | `found_jobs` (agent-internal) |
+| 2b | `03-job-discovery-synthesis.md` | Profile + constraints + `found_jobs` | `job-discovery-results` JSON |
 
 ### API (implemented)
 
@@ -112,7 +119,7 @@ Headers: none for API key/model override; key and model are configured server-si
 
 - API validates stage 1, stage 2, and constraints via `jsonschema`
 - `backend/scripts/validate_fixtures.py` checks stage-1 golden fixture only
-- Stage 2: job search via LLM (API pipeline); optional manual run in Cursor for testing
+- Stage 2: smolagents discovery agent + synthesis LLM (API pipeline); smoke script `backend/scripts/smoke_job_discovery_agent.py`
 
 ### Phase 1 gate
 

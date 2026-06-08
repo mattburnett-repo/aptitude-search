@@ -1,6 +1,6 @@
 # Aptitude Search API (Python / FastAPI)
 
-Orchestration for **Prompt 1** (aptitude profile JSON, schema-validated) and **Prompt 2** (verified job discovery as **plain text**—typically one `json` fenced block per the prompt; not schema-validated by the API).
+Orchestration for **Stage 1** (aptitude profile JSON, schema-validated) and **Stage 2** (web-search agent → synthesis LLM call → `verified_matches` JSON, schema-validated).
 
 **Hugging Face keys** in `config.toml` (separate per stage; values may be the same token):
 
@@ -77,6 +77,8 @@ curl -s -X POST http://localhost:3001/v1/pipeline \
 
 ## Implementation notes
 
-- Prompts loaded from `prompts/01-resume-to-aptitude-profile.md` and `prompts/02-verified-job-discovery.md` (file body minus `#` title line).
-- Stage 1 parses JSON from the model output; stage 2 uses plain text completion.
+- Stage 1 system prompt: `prompts/01-resume-to-aptitude-profile.md` (file body minus `#` title line).
+- Stage 2 discovery: `prompts/02-job-discovery-agent.md` + `prompts/job-discovery-code-agent.yaml` (`smolagents` CodeAgent).
+- Stage 2 synthesis: `prompts/03-job-discovery-synthesis.md` (chat JSON → `verified_matches`).
+- Filenames are configured in `config.toml` under `[prompts]`.
 - CORS allows `http://localhost:5173` and `http://127.0.0.1:5173` for the Vite dev server.
