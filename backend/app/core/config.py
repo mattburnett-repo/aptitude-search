@@ -4,7 +4,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field, ValidationError, ValidationInfo, field_validator
 
-_CONFIG_PATH = Path(__file__).resolve().parent.parent / "config.toml"
+_CONFIG_PATH = Path(__file__).resolve().parents[2] / "config.toml"
 
 
 class AppConfig(BaseModel):

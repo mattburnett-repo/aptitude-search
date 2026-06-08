@@ -14,8 +14,8 @@ from smolagents import (
 )
 from smolagents.monitoring import LogLevel
 
-from app import prompt_loader
-from app.config import config
+from app.core import prompt_loader
+from app.core.config import config
 from app.job_discovery.memory_prune import prune_agent_memory
 from app.job_discovery.tool_observed_urls import ToolObservedUrlRegistry
 from app.job_discovery.tools import build_job_discovery_tools

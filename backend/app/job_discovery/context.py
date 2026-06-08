@@ -3,8 +3,8 @@
 import json
 from typing import Any
 
-from app import prompt_loader
-from app.models import Constraints
+from app.core import prompt_loader
+from app.core.models import Constraints
 
 
 def _labeled_names(items: list[Any] | None, *, limit: int = 8) -> str:

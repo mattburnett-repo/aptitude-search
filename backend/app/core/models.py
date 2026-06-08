@@ -5,7 +5,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 _PIPELINE_EXAMPLE_PATH = (
-    Path(__file__).resolve().parents[2] / "fixtures" / "pipeline-request-example.json"
+    Path(__file__).resolve().parents[3] / "fixtures" / "pipeline-request-example.json"
 )
 
 

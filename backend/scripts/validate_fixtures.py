@@ -7,9 +7,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from app.config import config
-from app.paths import FIXTURES_DIR
-from app.validate import validate_stage
+from app.core.config import config
+from app.core.paths import FIXTURES_DIR
+from app.core.validate import validate_stage
 
 
 def main() -> int:

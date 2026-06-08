@@ -2,7 +2,7 @@
 
 from smolagents import DuckDuckGoSearchTool, VisitWebpageTool
 
-from app.config import config
+from app.core.config import config
 from app.job_discovery.page_extract import compact_job_page_for_agent
 from app.job_discovery.tool_observed_urls import ToolObservedUrlRegistry
 

@@ -2,8 +2,8 @@ from typing import Any
 
 from langsmith import traceable
 
-from app import prompt_loader
-from app.config import config
+from app.core import prompt_loader
+from app.core.config import config
 from app.job_discovery import (
     build_stage2_user_message,
     run_job_discovery_agent,
@@ -13,9 +13,9 @@ from app.job_discovery.tool_observed_urls import (
     ToolObservedUrlRegistry,
     filter_results_to_tool_observed_urls,
 )
-from app.llm import complete_chat_json
-from app.models import Constraints
-from app.validate import (
+from app.core.llm import complete_chat_json
+from app.core.models import Constraints
+from app.core.validate import (
     normalize_aptitude_profile,
     parse_json_response,
     validate_stage,

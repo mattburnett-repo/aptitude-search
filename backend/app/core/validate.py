@@ -5,8 +5,8 @@ from typing import Any
 from jsonschema import Draft202012Validator
 from jsonschema import RefResolver
 
-from app.config import config
-from app.paths import SCHEMAS_DIR
+from app.core.config import config
+from app.core.paths import SCHEMAS_DIR
 
 
 def _load_schema(name: str) -> dict:

@@ -6,7 +6,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from app.config import config
+from app.core.config import config
 from app.job_discovery import run_job_discovery_agent
 
 

@@ -22,7 +22,7 @@ cp config.example.toml config.toml   # if config.toml is missing
 # Edit config.toml: set [llm].aptitude_model_key and [llm].job_discovery_model_key
 ```
 
-App settings live in `config.toml` (see `config.example.toml`). Loaded once via `app.config.config`.
+App settings live in `config.toml` (see `config.example.toml`). Loaded once via `app.core.config.config`.
 
 ## Run
 

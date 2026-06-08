@@ -1,8 +1,8 @@
 from huggingface_hub import InferenceClient
 from langsmith import traceable
 
-from app.config import config
-from app.validate import parse_json_response
+from app.core.config import config
+from app.core.validate import parse_json_response
 
 
 def _aptitude_client() -> InferenceClient:

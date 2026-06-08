@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 
-from app.config import config
+from app.core.config import config
 
 _BULLET_MAX_CHARS = 200
 

@@ -1,7 +1,7 @@
 import yaml
 
-from app.config import config
-from app.paths import PROMPTS_DIR
+from app.core.config import config
+from app.core.paths import PROMPTS_DIR
 
 
 def load_system_prompt(filename: str) -> str:

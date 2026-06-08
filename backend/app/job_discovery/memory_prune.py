@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from smolagents.memory import ActionStep
 
-from app.config import config
+from app.core.config import config
 
 
 def _first_line(text: str, *, max_len: int = 120) -> str:

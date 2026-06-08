@@ -7,8 +7,8 @@ from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExport
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
-from app.config import config
-from app.models import PipelineRequest, Stage1Request, Stage2Request
+from app.core.config import config
+from app.core.models import PipelineRequest, Stage1Request, Stage2Request
 from app.pipeline import run_pipeline, run_stage1, run_stage2
 
 trace.set_tracer_provider(TracerProvider())
