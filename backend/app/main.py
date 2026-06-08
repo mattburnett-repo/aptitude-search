@@ -15,7 +15,15 @@ trace.set_tracer_provider(TracerProvider())
 trace.get_tracer_provider().add_span_processor(BatchSpanProcessor(OTLPSpanExporter()))
 SmolagentsInstrumentor().instrument()
 
-app = FastAPI(title=config.app.title, version=config.app.version)
+app = FastAPI(
+    title=config.app.title,
+    version=config.app.version,
+    openapi_tags=[
+        {"name": "Health", "Health check": "Liveness checks"},
+        {"name": "Pipeline", "Full pipeline": "Full resume → aptitude → job search run"},
+        {"name": "Pipeline Stages", "Stagea for pipeline": "Individual pipeline stages"},
+    ],
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -36,26 +44,26 @@ app.add_exception_handler(ValueError, pipeline_exception_handler)
 app.add_exception_handler(RuntimeError, pipeline_exception_handler)
 
 
-@app.get("/health")
+@app.get("/health", tags=["Health"])
 def health():
     return {"ok": True, "service": config.app.service}
 
 
-@app.post("/v1/pipeline")
+@app.post("/v1/pipeline", tags=["Pipeline"])
 def pipeline(body: PipelineRequest):
     if not body.resume.strip():
         raise HTTPException(status_code=400, detail="resume is required")
     return run_pipeline(body.resume, body.constraints)
 
 
-@app.post("/v1/stages/1")
+@app.post("/v1/stages/1", tags=["Pipeline Stages"])
 def stage1(body: Stage1Request):
     if not body.resume.strip():
         raise HTTPException(status_code=400, detail="resume is required")
     return {"aptitude_profile": run_stage1(body.resume)}
 
 
-@app.post("/v1/stages/2")
+@app.post("/v1/stages/2", tags=["Pipeline Stages"])
 def stage2(body: Stage2Request):
     return {
         "verified_matches": run_stage2(
