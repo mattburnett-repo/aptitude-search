@@ -21,7 +21,7 @@ app = FastAPI(
     openapi_tags=[
         {"name": "Health", "Health check": "Liveness checks"},
         {"name": "Pipeline", "Full pipeline": "Full resume → aptitude → job search run"},
-        {"name": "Pipeline Stages", "Stagea for pipeline": "Individual pipeline stages"},
+        {"name": "Pipeline Stages", "Stages for pipeline": "Individual pipeline stages (1 and 2)"},
     ],
 )
 
