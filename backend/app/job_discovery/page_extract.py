@@ -4,9 +4,8 @@ from __future__ import annotations
 
 import re
 
-_AGENT_SUMMARY_MAX_CHARS = 2500
-_SNIPPET_MAX_CHARS = 600
-_BULLET_MAX_COUNT = 12
+from app.config import config
+
 _BULLET_MAX_CHARS = 200
 
 _META_PREFIXES = (
@@ -52,7 +51,7 @@ def compact_job_page_for_agent(url: str, page_text: str) -> str:
     if len(compact) < 200:
         compact = f"URL: {url}\n{text[:1500]}"
 
-    return _truncate(compact, _AGENT_SUMMARY_MAX_CHARS)
+    return _truncate(compact, config.llm.job_discovery_page_summary_max_chars)
 
 
 def _first_heading(lines: list[str]) -> str:
@@ -100,7 +99,7 @@ def _bullet_lines(lines: list[str]) -> list[str]:
         if len(item) < 15 or item in bullets:
             continue
         bullets.append(item[:_BULLET_MAX_CHARS])
-        if len(bullets) >= _BULLET_MAX_COUNT:
+        if len(bullets) >= config.llm.job_discovery_page_bullet_max_count:
             break
     return bullets
 
@@ -121,9 +120,9 @@ def _body_snippet(
             continue
         chunks.append(stripped)
         total += len(stripped)
-        if total >= _SNIPPET_MAX_CHARS:
+        if total >= config.llm.job_discovery_page_snippet_max_chars:
             break
-    return _truncate(" ".join(chunks), _SNIPPET_MAX_CHARS)
+    return _truncate(" ".join(chunks), config.llm.job_discovery_page_snippet_max_chars)
 
 
 def _truncate(text: str, max_chars: int) -> str:

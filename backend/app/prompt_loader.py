@@ -1,3 +1,5 @@
+import yaml
+
 from app.config import config
 from app.paths import PROMPTS_DIR
 
@@ -14,8 +16,22 @@ def system_prompt_stage1() -> str:
     return load_system_prompt(config.prompts.stage1_file)
 
 
+def system_prompt_stage2_discovery() -> str:
+    return load_system_prompt(config.prompts.stage2_discovery_file)
+
+
+def system_prompt_stage2_synthesis() -> str:
+    return load_system_prompt(config.prompts.stage2_synthesis_file)
+
+
 def system_prompt_stage2() -> str:
-    return load_system_prompt(config.prompts.stage2_file)
+    """Alias for synthesis prompt (schema JSON phase)."""
+    return system_prompt_stage2_synthesis()
+
+
+def code_agent_prompt_templates() -> dict:
+    path = PROMPTS_DIR / config.prompts.code_agent_file
+    return yaml.safe_load(path.read_text(encoding="utf-8"))
 
 
 def _load_user_task_file(filename: str) -> str:
@@ -28,5 +44,10 @@ def user_task_stage1() -> str:
 
 
 def user_task_stage2() -> str:
-    """Runtime user message preamble for the Stage 2 agent (tool names, search steps)."""
+    """Runtime user message preamble for the Stage 2 discovery agent."""
     return _load_user_task_file(config.prompts.stage2_user_task_file)
+
+
+def user_task_stage2_synthesis() -> str:
+    """Runtime user message preamble for the Stage 2 synthesis LLM call."""
+    return _load_user_task_file(config.prompts.stage2_synthesis_user_task_file)

@@ -14,15 +14,27 @@ aptitude_model_key = ""  # required: Hugging Face key for Stage 1
 aptitude_model = ""  # Stage 1: resume → aptitude profile
 job_discovery_model_key = ""  # required: Hugging Face key for Stage 2 agent (may match aptitude_model_key)
 job_discovery_model = "meta-llama/Llama-3.1-8B-Instruct"  # Stage 2 agent; must be enabled on your HF account
-job_discovery_max_steps = 10
+job_discovery_max_steps = 10 # smolagents defaults to 20 steps
 job_discovery_visit_max_output_length = 8000  # max chars fetched per page (agent sees compact extract)
+job_discovery_search_max_results = 10  # DuckDuckGo results per search query
+job_discovery_search_snippet_max_chars = 300  # max chars per DuckDuckGo result body in agent context
+job_discovery_search_rate_limit = 1.0  # min seconds between searches; omit or set null to disable
+job_discovery_max_print_outputs_length = 10000  # max chars from print() per agent step (smolagents default 50000)
+job_discovery_page_summary_max_chars = 1500  # max chars returned to agent per visited page
+job_discovery_page_bullet_max_count = 8  # max bullet points extracted per visited page
+job_discovery_page_snippet_max_chars = 400  # max chars in body snippet per visited page
+job_discovery_memory_keep_recent_steps = 2  # full observations kept for this many recent steps
+job_discovery_memory_pruned_observation_max_chars = 200  # max chars for pruned step model_output
 temperature = 0.3
 
 [prompts]
 stage1_file = "01-resume-to-aptitude-profile.md"
-stage2_file = "02-verified-job-discovery.md"
+stage2_discovery_file = "02-job-discovery-agent.md"
+stage2_synthesis_file = "03-job-discovery-synthesis.md"
+code_agent_file = "job-discovery-code-agent.yaml"
 stage1_user_task_file = "stage1-agent-user-task.txt"
 stage2_user_task_file = "stage2-agent-user-task.txt"
+stage2_synthesis_user_task_file = "stage2-synthesis-user-task.txt"
 
 [schemas]
 constraints = "constraints.schema.json"

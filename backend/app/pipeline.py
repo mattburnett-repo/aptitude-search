@@ -4,7 +4,11 @@ from langsmith import traceable
 
 from app import prompt_loader
 from app.config import config
-from app.job_discovery import build_stage2_user_message, run_job_discovery_agent
+from app.job_discovery import (
+    build_stage2_user_message,
+    run_job_discovery_agent,
+    synthesize_job_discovery_results,
+)
 from app.job_discovery.tool_observed_urls import (
     ToolObservedUrlRegistry,
     filter_results_to_tool_observed_urls,
@@ -13,7 +17,6 @@ from app.llm import complete_chat_json
 from app.models import Constraints
 from app.validate import (
     normalize_aptitude_profile,
-    normalize_job_discovery_results,
     parse_json_response,
     validate_stage,
 )
@@ -44,13 +47,13 @@ def run_stage2(
     validate_stage("constraints", c.model_dump())
     user = build_stage2_user_message(aptitude_profile, c)
     tool_observed_urls = ToolObservedUrlRegistry()
-    agent_text = run_job_discovery_agent(
-        prompt_loader.system_prompt_stage2(),
+    found_jobs = run_job_discovery_agent(
+        prompt_loader.system_prompt_stage2_discovery(),
         user,
         max_steps=config.llm.job_discovery_max_steps,
         observed_urls=tool_observed_urls,
     )
-    result = normalize_job_discovery_results(parse_json_response(agent_text))
+    result = synthesize_job_discovery_results(aptitude_profile, c, found_jobs)
     result = filter_results_to_tool_observed_urls(result, tool_observed_urls)
     validate_stage("jobDiscovery", result)
     return result

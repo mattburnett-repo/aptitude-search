@@ -1,8 +1,36 @@
 Find job openings for this candidate using web_search and visit_webpage.
 Search queries: 3–6 plain keywords (role + skill + remote/location). No long sentences, no nested quotes.
-Run at least 3 different web_search calls. After each search, visit_webpage on at most 2–3 direct posting URLs (single job pages only—not board search or list pages).
-Skip URLs you already visited; do not re-fetch the same posting or domain unless a new search surfaced a different role.
+Run at least 2 different web_search calls. After each search, visit_webpage on at most 1–2 direct posting URLs (single job pages only—not board search or list pages).
+Skip URLs in visited_urls; do not re-fetch the same posting unless a new search surfaced a different role.
 Prefer direct employer/careers URLs over generic job-board search pages.
-Include at least 8 distinct results with direct posting URLs when available.
+Include at least 5 distinct results with direct posting URLs when available.
 Each result url must be copied from web_search or visit_webpage output (invented or edited URLs are removed before the API responds).
-Return only one json fenced code block conforming to the job discovery schema.
+
+found_jobs and visited_urls are pre-initialized lists—use them every step.
+
+Step discipline (required):
+- Each code block does ONE kind of work: either one web_search OR up to two visit_webpage calls—never both in the same block.
+- Do not print() raw tool output. Parse tool strings; append compact dicts to found_jobs.
+- After updating found_jobs, print only the entries added this step (not the full list, not prior steps).
+- Track visited URLs in visited_urls before calling visit_webpage.
+
+Code pattern — search step only:
+```python
+import json
+results = web_search(query="role skill location")
+# parse title/url (and company if visible) from results text
+# for each new posting: found_jobs.append({"title": "...", "company": "...", "url": "...", "location": "..."})
+print(json.dumps(found_jobs[-2:], indent=0))
+```
+
+Code pattern — visit step only (separate step from search):
+```python
+import json
+url = "https://..."  # from search; skip if url in visited_urls
+visited_urls.append(url)
+page = visit_webpage(url=url)
+# extract title, company, location from page text; append one dict to found_jobs
+print(json.dumps([found_jobs[-1]], indent=0))
+```
+
+Final step: call final_answer(found_jobs) with the list of dicts only—no schema wrapper, no tool calls.

@@ -1,5 +1,6 @@
 """Compact Stage 2 inputs to keep agent context small."""
 
+import json
 from typing import Any
 
 from app import prompt_loader
@@ -59,4 +60,22 @@ def build_stage2_user_message(
         f"{task}\n\n"
         f"<candidate_profile>\n{compact}\n</candidate_profile>\n\n"
         f"<constraints>\n{constraints_json}\n</constraints>"
+    )
+
+
+def build_stage2_synthesis_user_message(
+    aptitude_profile: Any,
+    constraints: Constraints,
+    found_jobs: list[dict[str, Any]],
+) -> str:
+    profile = aptitude_profile if isinstance(aptitude_profile, dict) else {}
+    compact = compact_aptitude_profile_summary(profile)
+    constraints_json = constraints.model_dump_json()
+    jobs_json = json.dumps(found_jobs, indent=2)
+    task = prompt_loader.user_task_stage2_synthesis()
+    return (
+        f"{task}\n\n"
+        f"<candidate_profile>\n{compact}\n</candidate_profile>\n\n"
+        f"<constraints>\n{constraints_json}\n</constraints>\n\n"
+        f"<found_jobs>\n{jobs_json}\n</found_jobs>"
     )

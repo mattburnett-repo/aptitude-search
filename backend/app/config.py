@@ -27,6 +27,15 @@ class LlmConfig(BaseModel):
     job_discovery_model: str
     job_discovery_max_steps: int
     job_discovery_visit_max_output_length: int
+    job_discovery_search_max_results: int
+    job_discovery_search_snippet_max_chars: int
+    job_discovery_search_rate_limit: float | None
+    job_discovery_max_print_outputs_length: int
+    job_discovery_page_summary_max_chars: int
+    job_discovery_page_bullet_max_count: int
+    job_discovery_page_snippet_max_chars: int
+    job_discovery_memory_keep_recent_steps: int
+    job_discovery_memory_pruned_observation_max_chars: int
     temperature: float
 
     @field_validator(
@@ -46,6 +55,14 @@ class LlmConfig(BaseModel):
     @field_validator(
         "job_discovery_max_steps",
         "job_discovery_visit_max_output_length",
+        "job_discovery_search_max_results",
+        "job_discovery_search_snippet_max_chars",
+        "job_discovery_max_print_outputs_length",
+        "job_discovery_page_summary_max_chars",
+        "job_discovery_page_bullet_max_count",
+        "job_discovery_page_snippet_max_chars",
+        "job_discovery_memory_keep_recent_steps",
+        "job_discovery_memory_pruned_observation_max_chars",
     )
     @classmethod
     def job_discovery_positive_int(cls, value: int, info: ValidationInfo) -> int:
@@ -54,12 +71,25 @@ class LlmConfig(BaseModel):
             raise ValueError(f"llm.{field} must be at least 1")
         return value
 
+    @field_validator("job_discovery_search_rate_limit")
+    @classmethod
+    def job_discovery_search_rate_limit_positive(
+        cls, value: float | None, info: ValidationInfo
+    ) -> float | None:
+        if value is not None and value <= 0:
+            field = info.field_name or "field"
+            raise ValueError(f"llm.{field} must be positive or omitted (null) to disable")
+        return value
+
 
 class PromptsConfig(BaseModel):
     stage1_file: str
-    stage2_file: str
+    stage2_discovery_file: str
+    stage2_synthesis_file: str
+    code_agent_file: str
     stage1_user_task_file: str = "stage1-agent-user-task.txt"
     stage2_user_task_file: str = "stage2-agent-user-task.txt"
+    stage2_synthesis_user_task_file: str = "stage2-synthesis-user-task.txt"
 
 
 class SchemasConfig(BaseModel):

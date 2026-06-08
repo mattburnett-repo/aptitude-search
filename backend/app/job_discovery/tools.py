@@ -19,8 +19,10 @@ class ResilientWebSearchTool(DuckDuckGoSearchTool):
                 f"No results for: {query!r}. "
                 "Use a shorter query (3–6 keywords), drop quotes, or try a different angle."
             )
+        snippet_max = config.llm.job_discovery_search_snippet_max_chars
         postprocessed = [
-            f"[{result['title']}]({result['href']})\n{result['body']}"
+            f"[{result['title']}]({result['href']})\n"
+            f"{(result.get('body') or '')[:snippet_max]}"
             for result in results
         ]
         return "## Search Results\n\n" + "\n\n".join(postprocessed)
@@ -32,8 +34,8 @@ class ToolOutputObservingWebSearchTool(ResilientWebSearchTool):
     def __init__(
         self,
         observed_urls: ToolObservedUrlRegistry,
-        max_results: int = 10,
-        rate_limit: float | None = 1.0,
+        max_results: int,
+        rate_limit: float | None,
         **kwargs: object,
     ) -> None:
         super().__init__(max_results=max_results, rate_limit=rate_limit, **kwargs)
@@ -67,7 +69,11 @@ def build_job_discovery_tools(
     observed_urls: ToolObservedUrlRegistry,
 ) -> list[ResilientWebSearchTool | ToolOutputObservingVisitWebpageTool]:
     return [
-        ToolOutputObservingWebSearchTool(observed_urls),
+        ToolOutputObservingWebSearchTool(
+            observed_urls,
+            max_results=config.llm.job_discovery_search_max_results,
+            rate_limit=config.llm.job_discovery_search_rate_limit,
+        ),
         ToolOutputObservingVisitWebpageTool(
             observed_urls,
             max_output_length=config.llm.job_discovery_visit_max_output_length,

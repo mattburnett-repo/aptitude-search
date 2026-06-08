@@ -12,38 +12,11 @@ You only map it to verified job postings using consistent rules.
 
 ## SHARED VOCABULARY (LOCKED — MUST MATCH PROMPT 1)
 
-These definitions are fixed and must NOT be reinterpreted.
-
-### core_skills
-Primary demonstrated technical capabilities from the AptitudeProfile.
-
-Used ONLY for direct job requirement matching.
-
-Do NOT infer new meanings.
-
----
-
-### secondary_skills
-Supporting capabilities that strengthen match quality but are not central requirements.
-
----
-
-### strengths
-Work patterns (not tools), such as:
-- ownership
-- system thinking
-- debugging ability
-- collaboration
-- scaling systems
-
-Used only to evaluate role suitability, not to redefine skills.
-
----
-
-### adjacent_roles
-Expansion signals only.
-
-They define plausible job families but DO NOT override core_skills.
+Use AptitudeProfile field meanings from Stage 1 without redefining them:
+- **core_skills** — primary requirement matching only
+- **secondary_skills** — supporting match signal
+- **strengths** — work-pattern fit (not tools)
+- **adjacent_roles** — exploration bounds; do not override core_skills
 
 ---
 
@@ -103,12 +76,44 @@ If any condition fails → EXCLUDE.
 6. Filter strictly using:
    - skill match to core_skills
    - constraint compliance
-7. Run **multiple** web searches (at least 3–4 different queries) before finalizing results
+7. Run **at least 2** web searches with different queries before finalizing results
    - Each query: **3–6 keywords** (e.g. `python backend remote`), not full sentences or quoted phrases
-8. Visit listing pages for candidates you intend to include (not only search snippets)
+8. Visit only the **top 1–2** posting URLs per search for roles you intend to include (not only snippets)
    - Prefer **direct posting URLs** over generic board search/list pages when possible
-   - After each search, visit at most **2–3** posting URLs; skip URLs already visited in this run
+   - Skip URLs already visited in this run
 9. Compose search_plan, results, and notes for output
+
+---
+
+## AGENT CODE PATTERN (CONTEXT EFFICIENCY)
+
+`found_jobs` and `visited_urls` are pre-initialized and persist across steps.
+
+**Step discipline**
+- One code block = **either** one `web_search` **or** up to two `visit_webpage` calls—**never both** in the same block.
+- Never `print()` raw tool output. Parse tool strings; append compact dicts to `found_jobs`.
+- After each step, `print()` only entries added this step (e.g. `found_jobs[-2:]`), not the full history.
+- Add each visit URL to `visited_urls` before calling `visit_webpage`; skip URLs already listed.
+- Final step: emit JSON from `found_jobs` via `final_answer`; no more tool calls.
+
+**Search-only step example**
+```python
+import json
+results = web_search(query="python backend remote")
+# parse results; append {"title", "company", "url", "location"} dicts to found_jobs
+print(json.dumps(found_jobs[-2:], indent=0))
+```
+
+**Visit-only step example** (next step, not same block as search)
+```python
+import json
+url = "https://..."
+if url not in visited_urls:
+    visited_urls.append(url)
+    page = visit_webpage(url=url)
+    # parse page; found_jobs.append({...})
+    print(json.dumps([found_jobs[-1]], indent=0))
+```
 
 ---
 
@@ -118,8 +123,10 @@ If any condition fails → EXCLUDE.
 - Never infer companies without a posting
 - Never reinterpret AptitudeProfile meaning
 - Only include listings you found via search or by visiting a page
+- Never call `web_search` and `visit_webpage` in the same code block
+- Never re-print tool output or full `found_jobs` in observations
 - Do not fabricate companies or URLs
-- Do not add filler rows; include every legitimate match you found (target **8–15+** when available)
+- Do not add filler rows; include every legitimate match you found (target **5–6+** when available)
 
 ---
 
@@ -140,8 +147,8 @@ Return **only** one `json`-language fenced code block (no preamble, headings, or
 
 The object must conform to `schemas/job-discovery-results.schema.json` with these top-level keys:
 
-- `search_plan` — string array of **3–6** items. Each item names a discovery angle drawn from the aptitude profile: industries/domains, role families (core + one adjacent when used), and company types. Items must reflect how you actually searched (not generic filler).
-- `results` — job postings found via search (direct posting URLs). Target **8–15+** rows when available; up to **20**; omit rows you did not find.
+- `search_plan` — string array of **3–4** items. Each item names a discovery angle drawn from the aptitude profile: industries/domains, role families (core + one adjacent when used), and company types. Items must reflect how you actually searched (not generic filler).
+- `results` — job postings found via search (direct posting URLs). Target **5–6+** rows when available; up to **20**; omit rows you did not find.
 - `notes` — string array of **1 or more** search caveats, such as:
   - Strong candidates excluded (closed listing, constraint filter)
   - ATS/job-board domain limits applied (max 3 per domain)
