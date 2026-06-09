@@ -10,22 +10,26 @@ allow_methods = ["*"]
 allow_headers = ["*"]
 
 [llm]
-aptitude_model_key = ""  # required: Hugging Face key for Stage 1
-aptitude_model = ""  # Stage 1: resume → aptitude profile
-job_discovery_model_key = ""  # required: Hugging Face key for Stage 2 agent (may match aptitude_model_key)
-job_discovery_model = "meta-llama/Llama-3.1-8B-Instruct"  # Stage 2 agent; must be enabled on your HF account
-job_discovery_max_steps = 10 # smolagents defaults to 20 steps
-job_discovery_visit_max_output_length = 8000  # max chars fetched per page (agent sees compact extract)
-job_discovery_search_max_results = 10  # DuckDuckGo results per search query
-job_discovery_search_snippet_max_chars = 300  # max chars per DuckDuckGo result body in agent context
-job_discovery_search_rate_limit = 1.0  # min seconds between searches; omit or set null to disable
-job_discovery_max_print_outputs_length = 10000  # max chars from print() per agent step (smolagents default 50000)
-job_discovery_page_summary_max_chars = 1500  # max chars returned to agent per visited page
-job_discovery_page_bullet_max_count = 8  # max bullet points extracted per visited page
-job_discovery_page_snippet_max_chars = 400  # max chars in body snippet per visited page
-job_discovery_memory_keep_recent_steps = 2  # full observations kept for this many recent steps
-job_discovery_memory_pruned_observation_max_chars = 200  # max chars for pruned step model_output
 temperature = 0.3
+
+[llm.aptitude]
+model_key = ""  # required: Hugging Face key for Stage 1
+model = ""  # Stage 1: resume → aptitude profile
+
+[llm.job_discovery]
+model_key = ""  # required: Hugging Face key for Stage 2 agent (may match aptitude model_key)
+model = "meta-llama/Llama-3.1-8B-Instruct"  # Stage 2 agent; must be enabled on your HF account
+max_steps = 10  # smolagents defaults to 20 steps
+visit_max_output_length = 8000  # max chars fetched per page (agent sees compact extract)
+search_max_results = 10  # DuckDuckGo results per search query
+search_snippet_max_chars = 300  # max chars per DuckDuckGo result body in agent context
+search_rate_limit = 1.0  # min seconds between searches; omit or set null to disable
+max_print_outputs_length = 10000  # max chars from print() per agent step (smolagents default 50000)
+page_summary_max_chars = 1500  # max chars returned to agent per visited page
+page_bullet_max_count = 8  # max bullet points extracted per visited page
+page_snippet_max_chars = 400  # max chars in body snippet per visited page
+memory_keep_recent_steps = 2  # full observations kept for this many recent steps
+memory_pruned_observation_max_chars = 200  # max chars for pruned step model_output
 
 [prompts]
 stage1_file = "01-resume-to-aptitude-profile.md"

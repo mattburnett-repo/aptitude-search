@@ -4,8 +4,8 @@ Orchestration for **Stage 1** (aptitude profile JSON, schema-validated) and **St
 
 **Hugging Face keys** in `config.toml` (separate per stage; values may be the same token):
 
-- **Stage 1:** `[llm].aptitude_model_key` + `[llm].aptitude_model` — resume → aptitude profile (chat JSON).
-- **Stage 2:** `[llm].job_discovery_model_key` + `[llm].job_discovery_model` — job discovery **agent** (`smolagents` with web search + page visits). Config: `job_discovery_max_steps`.
+- **Stage 1:** `[llm.aptitude].model_key` + `[llm.aptitude].model` — resume → aptitude profile (chat JSON).
+- **Stage 2:** `[llm.job_discovery].model_key` + `[llm.job_discovery].model` — job discovery **agent** (`smolagents` with web search + page visits). Config: `[llm.job_discovery].max_steps`.
 
 Smoke-test Stage 2 agent: `.venv/bin/python scripts/smoke_job_discovery_agent.py`
 
@@ -19,7 +19,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 cp config.example.toml config.toml   # if config.toml is missing
-# Edit config.toml: set [llm].aptitude_model_key and [llm].job_discovery_model_key
+# Edit config.toml: set [llm.aptitude].model_key and [llm.job_discovery].model_key
 ```
 
 App settings live in `config.toml` (see `config.example.toml`). Loaded once via `app.core.config.config`.

@@ -17,7 +17,6 @@ from app.core.llm import complete_chat_json
 from app.core.models import Constraints
 from app.core.validate import (
     normalize_aptitude_profile,
-    parse_json_response,
     validate_stage,
 )
 
@@ -50,7 +49,7 @@ def run_stage2(
     found_jobs = run_job_discovery_agent(
         prompt_loader.system_prompt_stage2_discovery(),
         user,
-        max_steps=config.llm.job_discovery_max_steps,
+        max_steps=config.llm.job_discovery.max_steps,
         observed_urls=tool_observed_urls,
     )
     result = synthesize_job_discovery_results(aptitude_profile, c, found_jobs)

@@ -11,9 +11,9 @@ from app.job_discovery import run_job_discovery_agent
 
 
 def main() -> None:
-    print(f"job_discovery_model: {config.llm.job_discovery_model}")
-    print(f"job_discovery_model_key: {'set' if config.llm.job_discovery_model_key else 'missing'}")
-    print(f"max_steps: {config.llm.job_discovery_max_steps}")
+    print(f"job_discovery_model: {config.llm.job_discovery.model}")
+    print(f"job_discovery_model_key: {'set' if config.llm.job_discovery.model_key else 'missing'}")
+    print(f"max_steps: {config.llm.job_discovery.max_steps}")
     found_jobs = run_job_discovery_agent(
         system_prompt="You are a job search assistant. Use web search, then final_answer(found_jobs).",
         user_message="Search for one remote software engineer job posting in Toronto. Append title and url to found_jobs, then final_answer(found_jobs).",

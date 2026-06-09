@@ -20,66 +20,80 @@ class CorsConfig(BaseModel):
     allow_headers: list[str]
 
 
-class LlmConfig(BaseModel):
-    aptitude_model_key: str
-    aptitude_model: str
-    job_discovery_model_key: str
-    job_discovery_model: str
-    job_discovery_max_steps: int
-    job_discovery_visit_max_output_length: int
-    job_discovery_search_max_results: int
-    job_discovery_search_snippet_max_chars: int
-    job_discovery_search_rate_limit: float | None
-    job_discovery_max_print_outputs_length: int
-    job_discovery_page_summary_max_chars: int
-    job_discovery_page_bullet_max_count: int
-    job_discovery_page_snippet_max_chars: int
-    job_discovery_memory_keep_recent_steps: int
-    job_discovery_memory_pruned_observation_max_chars: int
-    temperature: float
+class AptitudeLlmConfig(BaseModel):
+    model_key: str
+    model: str
 
-    @field_validator(
-        "aptitude_model_key",
-        "job_discovery_model_key",
-        "aptitude_model",
-        "job_discovery_model",
-    )
+    @field_validator("model_key", "model")
     @classmethod
-    def llm_string_must_be_set(cls, value: str, info: ValidationInfo) -> str:
+    def string_must_be_set(cls, value: str, info: ValidationInfo) -> str:
         stripped = value.strip()
         if not stripped:
             field = info.field_name or "field"
-            raise ValueError(f"llm.{field} must be set in config.toml")
+            raise ValueError(f"llm.aptitude.{field} must be set in config.toml")
+        return stripped
+
+
+class JobDiscoveryLlmConfig(BaseModel):
+    model_key: str
+    model: str
+    max_steps: int
+    visit_max_output_length: int
+    search_max_results: int
+    search_snippet_max_chars: int
+    search_rate_limit: float | None
+    max_print_outputs_length: int
+    page_summary_max_chars: int
+    page_bullet_max_count: int
+    page_snippet_max_chars: int
+    memory_keep_recent_steps: int
+    memory_pruned_observation_max_chars: int
+
+    @field_validator("model_key", "model")
+    @classmethod
+    def string_must_be_set(cls, value: str, info: ValidationInfo) -> str:
+        stripped = value.strip()
+        if not stripped:
+            field = info.field_name or "field"
+            raise ValueError(f"llm.job_discovery.{field} must be set in config.toml")
         return stripped
 
     @field_validator(
-        "job_discovery_max_steps",
-        "job_discovery_visit_max_output_length",
-        "job_discovery_search_max_results",
-        "job_discovery_search_snippet_max_chars",
-        "job_discovery_max_print_outputs_length",
-        "job_discovery_page_summary_max_chars",
-        "job_discovery_page_bullet_max_count",
-        "job_discovery_page_snippet_max_chars",
-        "job_discovery_memory_keep_recent_steps",
-        "job_discovery_memory_pruned_observation_max_chars",
+        "max_steps",
+        "visit_max_output_length",
+        "search_max_results",
+        "search_snippet_max_chars",
+        "max_print_outputs_length",
+        "page_summary_max_chars",
+        "page_bullet_max_count",
+        "page_snippet_max_chars",
+        "memory_keep_recent_steps",
+        "memory_pruned_observation_max_chars",
     )
     @classmethod
-    def job_discovery_positive_int(cls, value: int, info: ValidationInfo) -> int:
+    def positive_int(cls, value: int, info: ValidationInfo) -> int:
         if value < 1:
             field = info.field_name or "field"
-            raise ValueError(f"llm.{field} must be at least 1")
+            raise ValueError(f"llm.job_discovery.{field} must be at least 1")
         return value
 
-    @field_validator("job_discovery_search_rate_limit")
+    @field_validator("search_rate_limit")
     @classmethod
-    def job_discovery_search_rate_limit_positive(
+    def search_rate_limit_positive(
         cls, value: float | None, info: ValidationInfo
     ) -> float | None:
         if value is not None and value <= 0:
             field = info.field_name or "field"
-            raise ValueError(f"llm.{field} must be positive or omitted (null) to disable")
+            raise ValueError(
+                f"llm.job_discovery.{field} must be positive or omitted (null) to disable"
+            )
         return value
+
+
+class LlmConfig(BaseModel):
+    aptitude: AptitudeLlmConfig
+    job_discovery: JobDiscoveryLlmConfig
+    temperature: float
 
 
 class PromptsConfig(BaseModel):

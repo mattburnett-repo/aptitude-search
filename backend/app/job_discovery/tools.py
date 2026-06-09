@@ -1,5 +1,6 @@
 """Stage 2 agent tools (resilient wrappers around smolagents defaults)."""
 
+from langsmith import traceable
 from smolagents import DuckDuckGoSearchTool, VisitWebpageTool
 
 from app.core.config import config
@@ -11,21 +12,7 @@ class ResilientWebSearchTool(DuckDuckGoSearchTool):
     """DuckDuckGo search via ddgs; never raises on empty results (keeps the agent loop alive)."""
 
     def forward(self, query: str) -> str:
-        self._enforce_rate_limit()
-        results = list(self.ddgs.text(query, max_results=self.max_results))
-        if not results:
-            return (
-                "## Search Results\n\n"
-                f"No results for: {query!r}. "
-                "Use a shorter query (3–6 keywords), drop quotes, or try a different angle."
-            )
-        snippet_max = config.llm.job_discovery_search_snippet_max_chars
-        postprocessed = [
-            f"[{result['title']}]({result['href']})\n"
-            f"{(result.get('body') or '')[:snippet_max]}"
-            for result in results
-        ]
-        return "## Search Results\n\n" + "\n\n".join(postprocessed)
+        return _run_web_search(self, query)
 
 
 class ToolOutputObservingWebSearchTool(ResilientWebSearchTool):
@@ -59,10 +46,34 @@ class ToolOutputObservingVisitWebpageTool(VisitWebpageTool):
         self._observed_urls = observed_urls
 
     def forward(self, url: str) -> str:
-        self._observed_urls.record_url(url)
-        output = super().forward(url)
-        self._observed_urls.record_tool_output(output)
-        return compact_job_page_for_agent(url, output)
+        return _run_visit_webpage(self, url)
+
+
+@traceable(run_type="tool", name="web_search")
+def _run_web_search(tool: ResilientWebSearchTool, query: str) -> str:
+    tool._enforce_rate_limit()
+    results = list(tool.ddgs.text(query, max_results=tool.max_results))
+    if not results:
+        return (
+            "## Search Results\n\n"
+            f"No results for: {query!r}. "
+            "Use a shorter query (3–6 keywords), drop quotes, or try a different angle."
+        )
+    snippet_max = config.llm.job_discovery.search_snippet_max_chars
+    postprocessed = [
+        f"[{result['title']}]({result['href']})\n"
+        f"{(result.get('body') or '')[:snippet_max]}"
+        for result in results
+    ]
+    return "## Search Results\n\n" + "\n\n".join(postprocessed)
+
+
+@traceable(run_type="tool", name="visit_webpage")
+def _run_visit_webpage(tool: ToolOutputObservingVisitWebpageTool, url: str) -> str:
+    tool._observed_urls.record_url(url)
+    output = VisitWebpageTool.forward(tool, url)
+    tool._observed_urls.record_tool_output(output)
+    return compact_job_page_for_agent(url, output)
 
 
 def build_job_discovery_tools(
@@ -71,11 +82,11 @@ def build_job_discovery_tools(
     return [
         ToolOutputObservingWebSearchTool(
             observed_urls,
-            max_results=config.llm.job_discovery_search_max_results,
-            rate_limit=config.llm.job_discovery_search_rate_limit,
+            max_results=config.llm.job_discovery.search_max_results,
+            rate_limit=config.llm.job_discovery.search_rate_limit,
         ),
         ToolOutputObservingVisitWebpageTool(
             observed_urls,
-            max_output_length=config.llm.job_discovery_visit_max_output_length,
+            max_output_length=config.llm.job_discovery.visit_max_output_length,
         ),
     ]

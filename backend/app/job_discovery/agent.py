@@ -70,10 +70,10 @@ def run_job_discovery_agent(
 ) -> list[dict[str, Any]]:
     """Run discovery agent; returns found_jobs list for synthesis phase."""
     if max_steps is None:
-        max_steps = config.llm.job_discovery_max_steps
+        max_steps = config.llm.job_discovery.max_steps
     job_discovery_model = InferenceClientModel(
-        model_id=config.llm.job_discovery_model,
-        token=config.llm.job_discovery_model_key,
+        model_id=config.llm.job_discovery.model,
+        token=config.llm.job_discovery.model_key,
     )
     url_registry = observed_urls if observed_urls is not None else ToolObservedUrlRegistry()
     agent = CodeAgent(
@@ -82,7 +82,7 @@ def run_job_discovery_agent(
         prompt_templates=prompt_loader.code_agent_prompt_templates(),
         instructions=system_prompt,
         max_steps=max_steps,
-        max_print_outputs_length=config.llm.job_discovery_max_print_outputs_length,
+        max_print_outputs_length=config.llm.job_discovery.max_print_outputs_length,
         additional_authorized_imports=["json"],
         step_callbacks=[prune_agent_memory],
         verbosity_level=LogLevel.OFF,

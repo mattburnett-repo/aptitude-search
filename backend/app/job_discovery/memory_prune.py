@@ -20,8 +20,8 @@ def prune_agent_memory(memory_step: ActionStep, agent) -> None:
 
     Registered as a smolagents step_callback; does not modify smolagents itself.
     """
-    keep_recent = config.llm.job_discovery_memory_keep_recent_steps
-    pruned_max = config.llm.job_discovery_memory_pruned_observation_max_chars
+    keep_recent = config.llm.job_discovery.memory_keep_recent_steps
+    pruned_max = config.llm.job_discovery.memory_pruned_observation_max_chars
     current = memory_step.step_number
 
     for step in agent.memory.steps:
