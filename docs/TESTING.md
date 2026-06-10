@@ -30,7 +30,7 @@ Validates `fixtures/example-outputs/career-changer-mixed-stack-stage1.json` agai
 
 ## Models
 
-Test stage 1 on capable models for reliable JSON. Stage 2 via API uses the configured Hugging Face models (`aptitude_model` for stage 1, `job_discovery_model` for the agent and synthesis); quality depends on model and provider. Smoke-test the discovery agent: `backend/scripts/smoke_job_discovery_agent.py`.
+Test stage 1 on capable models for reliable JSON. Stage 2 via API uses the configured Hugging Face models (`[llm.aptitude].model` for stage 1 and synthesis, `[llm.job_discovery].model` for the agent); quality depends on model and provider. Smoke-test the discovery agent: `backend/scripts/smoke_job_discovery_agent.py`.
 
 ## API smoke test (optional)
 
@@ -41,6 +41,6 @@ curl -s -X POST http://localhost:3001/v1/stages/1 \
   -d "$(jq -n --rawfile r ../fixtures/sample-resumes/career-changer-mixed-stack.txt '{resume: $r}')"
 ```
 
-Requires `llm.aptitude_model_key` and `llm.job_discovery_model_key` in `backend/config.toml`.
+Requires `[llm.aptitude].model_key` and `[llm.job_discovery].model_key` in `backend/config.toml`.
 
 Full pipeline: `POST /v1/pipeline` — copy body from [`fixtures/pipeline-request-example.json`](../fixtures/pipeline-request-example.json) or use the Swagger example on `/docs`. See [backend/README.md](../backend/README.md).

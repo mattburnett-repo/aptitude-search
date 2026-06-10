@@ -6,7 +6,7 @@
 - **Stage 2 is job search.** The API runs a web-search agent, then a synthesis LLM call, and returns currently open postings in **`verified_matches`**.
 - **Primary path:** API + UI (or Swagger). Prompt text lives under `prompts/` (see Stages table); filenames are wired in `backend/config.toml`.
 - **Testing:** Swagger UI at `/docs` on the running API (see [backend/README.md](../backend/README.md)).
-- **Implementation (not user-facing):** Stage 2 is two Hugging Face phases: (1) a `smolagents` CodeAgent with DuckDuckGo search and page visits; (2) a single chat completion that maps `found_jobs` into schema-strict JSON. Result URLs are filtered to those observed in agent tool output. The API jsonschema-validates `verified_matches` against `job-discovery-results.schema.json`. There is no separate jobs/search API wired in Python.
+- **Implementation (not user-facing):** Stage 2 is two Hugging Face phases: (1) a `smolagents` CodeAgent with DuckDuckGo search and page scraping; (2) a single chat completion that maps `found_jobs` into schema-strict JSON. Result URLs are filtered to those observed in agent tool output. The API jsonschema-validates `verified_matches` against `job-discovery-results.schema.json`. There is no separate jobs/search API wired in Python.
 
 ---
 
@@ -20,7 +20,7 @@ Stage 1 and Stage 2 synthesis prompts are schema-strict: the markdown file body 
 | **OBJECTIVE** | Resume → AptitudeProfile JSON | Find postings via web search | Map `found_jobs` → verified postings |
 | **INPUT** | Resume text | AptitudeProfile JSON + optional constraints | AptitudeProfile + constraints + `found_jobs` |
 | **OUTPUT** | JSON only (`aptitude-profile.schema.json`) | `found_jobs` via `final_answer` (internal) | JSON only (`job-discovery-results.schema.json`) |
-| **RULES** | Shared vocabulary, processing steps, no invention | Search/visit process; compact rows in `found_jobs` | Profile is immutable; verification and diversification rules |
+| **RULES** | Shared vocabulary, processing steps, no invention | Search/scrape process; compact rows in `found_jobs` | Profile is immutable; verification and diversification rules |
 
 Cross-cutting:
 

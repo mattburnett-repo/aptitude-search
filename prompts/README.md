@@ -5,7 +5,7 @@
 | File | Stage |
 |------|--------|
 | `01-resume-to-aptitude-profile.md` | Stage 1: aptitude profile (JSON) |
-| `02-job-discovery-agent.md` | Stage 2a: discovery agent (web search + page visits) |
+| `02-job-discovery-agent.md` | Stage 2a: discovery agent (web search + page scraping) |
 | `job-discovery-code-agent.yaml` | Stage 2a: smolagents prompt templates |
 | `03-job-discovery-synthesis.md` | Stage 2b: map `found_jobs` → `verified_matches` JSON |
 

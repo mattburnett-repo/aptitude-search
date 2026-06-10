@@ -1,4 +1,4 @@
-"""Stage 2 job discovery via smolagents (web search + page visits)."""
+"""Stage 2 job discovery via smolagents (web search + page scraping)."""
 
 import json
 import logging

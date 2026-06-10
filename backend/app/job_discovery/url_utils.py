@@ -1,0 +1,115 @@
+"""URL normalization for scraping and post-search SERP filtering."""
+
+from __future__ import annotations
+
+import re
+from urllib.parse import urlparse, urlunparse
+
+from app.job_discovery.url_filters import load_url_filters
+
+_NON_HTTP_SCHEME = re.compile(r"^[a-zA-Z][a-zA-Z0-9+.-]*:")
+_ALLOWED_SCHEMES = frozenset({"http", "https"})
+
+
+def prepare_scrape_url(url: str) -> tuple[str | None, str | None]:
+    """
+    Normalize a scrape target and reject unsupported schemes.
+
+    Returns ``(normalized_url, error_message)``. ``error_message`` is set when
+    the URL cannot be fetched.
+    """
+    cleaned = url.strip().rstrip(".,;)")
+    if not cleaned:
+        return None, "Empty URL."
+
+    if "://" not in cleaned and not cleaned.startswith("//"):
+        scheme_match = _NON_HTTP_SCHEME.match(cleaned)
+        if scheme_match:
+            scheme = scheme_match.group(0)[:-1].lower()
+            return None, (
+                f"Unsupported URL scheme {scheme!r}; only http and https are allowed."
+            )
+        cleaned = f"https://{cleaned}"
+
+    parsed = urlparse(cleaned)
+    scheme = (parsed.scheme or "").lower()
+    if scheme not in _ALLOWED_SCHEMES:
+        return None, (
+            f"Unsupported URL scheme {scheme!r}; only http and https are allowed."
+        )
+
+    netloc = parsed.netloc.lower()
+    if not netloc:
+        return None, f"Invalid URL {url!r}: no hostname."
+
+    if netloc.startswith("www."):
+        netloc = netloc[4:]
+
+    path = parsed.path or ""
+    normalized = urlunparse((scheme, netloc, path, "", parsed.query, ""))
+    return normalized, None
+
+
+def should_skip_search_result(href: str, *, title: str = "") -> bool:
+    """True when a SERP row is unlikely to be a job or careers posting."""
+    filters = load_url_filters()
+    if not href.strip():
+        return True
+
+    prepared, error = prepare_scrape_url(href)
+    if error or not prepared:
+        return True
+
+    parsed = urlparse(prepared)
+    host = parsed.netloc.lower()
+    if host.startswith("www."):
+        host = host[4:]
+
+    path_lower = (parsed.path or "").lower()
+    title_lower = title.lower()
+
+    if host in filters.skip_domains:
+        return True
+
+    if host == "github.com" and not any(
+        marker in path_lower for marker in ("/jobs", "/careers", "/hiring")
+    ):
+        return True
+
+    if host.endswith(".dev") and "/docs" in path_lower:
+        return True
+
+    if any(marker in path_lower for marker in filters.skip_path_markers):
+        return True
+
+    if any(phrase in title_lower for phrase in filters.skip_title_phrases):
+        return True
+
+    return False
+
+
+def looks_like_job_posting_url(url: str) -> bool:
+    """True when URL path/host resembles a careers page or ATS posting."""
+    filters = load_url_filters()
+    prepared, error = prepare_scrape_url(url)
+    if error or not prepared:
+        return False
+    lower = prepared.lower()
+    return any(marker in lower for marker in filters.job_url_markers)
+
+
+def is_verified_job_posting(job: dict[str, object]) -> bool:
+    """Drop blog/tutorial SERP noise and rows with no employer unless URL is job-like."""
+    url = str(job.get("url") or "")
+    title = str(job.get("title") or job.get("role") or "")
+    if should_skip_search_result(url, title=title):
+        return False
+    company = str(job.get("company") or "").strip()
+    if company:
+        return True
+    return looks_like_job_posting_url(url)
+
+
+def filter_found_jobs(jobs: list[dict[str, object]]) -> list[dict[str, object]]:
+    """Keep only rows that look like verified job postings."""
+    return [job for job in jobs if is_verified_job_posting(job)]

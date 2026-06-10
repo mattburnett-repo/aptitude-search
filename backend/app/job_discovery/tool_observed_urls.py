@@ -1,4 +1,4 @@
-"""Track URLs from web_search / visit_webpage and filter final results to those URLs."""
+"""Track URLs from web_search / scrape_webpage and filter final results to those URLs."""
 
 from __future__ import annotations
 
@@ -13,6 +13,8 @@ _PLAIN_HTTP_URL = re.compile(r"https?://[^\s\)\]>\",']+")
 def normalize_url(url: str) -> str:
     """Canonical form for comparing URLs from tools vs model JSON."""
     cleaned = url.strip().rstrip(".,;)")
+    if "://" not in cleaned and not cleaned.startswith("//"):
+        cleaned = f"https://{cleaned}"
     parsed = urlparse(cleaned)
     if not parsed.scheme or not parsed.netloc:
         return cleaned
@@ -34,7 +36,7 @@ def extract_urls_from_tool_output(text: str) -> set[str]:
 
 
 class ToolObservedUrlRegistry:
-    """URLs returned by web_search or visit_webpage during one agent run."""
+    """URLs returned by web_search or scrape_webpage during one agent run."""
 
     def __init__(self) -> None:
         self._urls: set[str] = set()
@@ -83,7 +85,7 @@ def filter_results_to_tool_observed_urls(
             notes = []
         notes.append(
             f"Removed {removed} result(s): URL was not present in web_search or "
-            "visit_webpage tool output."
+            "scrape_webpage tool output."
         )
         data["notes"] = notes
     return data

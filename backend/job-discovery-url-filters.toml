@@ -1,0 +1,57 @@
+# SERP and found_jobs URL filters for Stage 2 job discovery.
+# Edit lists here; loaded via config.toml [job_discovery].url_filters_file.
+
+skip_domains = [
+  "create-react-app.dev",
+  "dev.to",
+  "developer.mozilla.org",
+  "freecodecamp.org",
+  "hashnode.dev",
+  "medium.com",
+  "react.dev",
+  "reddit.com",
+  "stackoverflow.com",
+  "typescriptlang.org",
+  "wikipedia.org",
+  "youtube.com",
+]
+
+skip_path_markers = [
+  "/docs/",
+  "/documentation/",
+  "/tutorial/",
+  "/tutorials/",
+  "/guide/",
+  "/guides/",
+  "/learn/",
+  "/wiki/",
+  "/blog/",
+]
+
+skip_title_phrases = [
+  "documentation",
+  "tutorial",
+  "how to ",
+  "getting started",
+  "what is ",
+  "boilerplate",
+  "dev community",
+  "technical interview -",
+]
+
+job_url_markers = [
+  "boards.greenhouse.io",
+  "jobs.lever.co",
+  "jobs.ashbyhq.com",
+  "apply.workable.com",
+  "myworkdayjobs.com",
+  "icims.com",
+  "smartrecruiters.com",
+  "job-boards.",
+  "javascript.jobs",
+  "/jobs/",
+  "/job/",
+  "/careers/",
+  "/career/",
+  "/hiring/",
+]

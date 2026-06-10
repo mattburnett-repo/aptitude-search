@@ -1,0 +1,50 @@
+"""Load job-discovery URL filter lists from external TOML."""
+
+from __future__ import annotations
+
+import tomllib
+from dataclasses import dataclass
+from functools import lru_cache
+from pathlib import Path
+
+from app.core.config import config
+
+_BACKEND_DIR = Path(__file__).resolve().parents[2]
+
+
+@dataclass(frozen=True)
+class UrlFilters:
+    skip_domains: frozenset[str]
+    skip_path_markers: tuple[str, ...]
+    skip_title_phrases: tuple[str, ...]
+    job_url_markers: tuple[str, ...]
+
+
+def _as_str_list(raw: object, *, field: str) -> list[str]:
+    if not isinstance(raw, list) or not raw:
+        raise ValueError(f"{field} must be a non-empty array of strings")
+    values: list[str] = []
+    for item in raw:
+        if not isinstance(item, str) or not item.strip():
+            raise ValueError(f"{field} must contain only non-empty strings")
+        values.append(item.strip())
+    return values
+
+
+@lru_cache
+def load_url_filters() -> UrlFilters:
+    path = _BACKEND_DIR / config.job_discovery.url_filters_file
+    with path.open("rb") as f:
+        data = tomllib.load(f)
+    return UrlFilters(
+        skip_domains=frozenset(_as_str_list(data.get("skip_domains"), field="skip_domains")),
+        skip_path_markers=tuple(
+            _as_str_list(data.get("skip_path_markers"), field="skip_path_markers")
+        ),
+        skip_title_phrases=tuple(
+            _as_str_list(data.get("skip_title_phrases"), field="skip_title_phrases")
+        ),
+        job_url_markers=tuple(
+            _as_str_list(data.get("job_url_markers"), field="job_url_markers")
+        ),
+    )

@@ -5,7 +5,7 @@ Orchestration for **Stage 1** (aptitude profile JSON, schema-validated) and **St
 **Hugging Face keys** in `config.toml` (separate per stage; values may be the same token):
 
 - **Stage 1:** `[llm.aptitude].model_key` + `[llm.aptitude].model` — resume → aptitude profile (chat JSON).
-- **Stage 2:** `[llm.job_discovery].model_key` + `[llm.job_discovery].model` — job discovery **agent** (`smolagents` with web search + page visits). Config: `[llm.job_discovery].max_steps`.
+- **Stage 2:** `[llm.job_discovery].model_key` + `[llm.job_discovery].model` — job discovery **agent** (`smolagents` with web search + page scraping). Config: `[llm.job_discovery].max_steps`.
 
 Smoke-test Stage 2 agent: `.venv/bin/python scripts/smoke_job_discovery_agent.py`
 
@@ -81,4 +81,5 @@ curl -s -X POST http://localhost:3001/v1/pipeline \
 - Stage 2 discovery: `prompts/02-job-discovery-agent.md` + `prompts/job-discovery-code-agent.yaml` (`smolagents` CodeAgent).
 - Stage 2 synthesis: `prompts/03-job-discovery-synthesis.md` (chat JSON → `verified_matches`).
 - Filenames are configured in `config.toml` under `[prompts]`.
+- **URL filters (Stage 2):** blocked domains, path markers, and related SERP/`found_jobs` rules live in `job-discovery-url-filters.toml` (path set by `[job_discovery].url_filters_file` in `config.toml`). Add or remove entries in that file’s arrays (`skip_domains`, `skip_path_markers`, `skip_title_phrases`, `job_url_markers`); restart the API to pick up changes.
 - CORS allows `http://localhost:5173` and `http://127.0.0.1:5173` for the Vite dev server.

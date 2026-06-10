@@ -34,6 +34,10 @@ class AptitudeLlmConfig(BaseModel):
         return stripped
 
 
+class JobDiscoveryConfig(BaseModel):
+    url_filters_file: str = "job-discovery-url-filters.toml"
+
+
 class JobDiscoveryLlmConfig(BaseModel):
     model_key: str
     model: str
@@ -131,6 +135,7 @@ class Config(BaseModel):
     app: AppConfig
     cors: CorsConfig
     llm: LlmConfig
+    job_discovery: JobDiscoveryConfig = Field(default_factory=JobDiscoveryConfig)
     prompts: PromptsConfig
     schemas: SchemasConfig
     paths: PathsConfig

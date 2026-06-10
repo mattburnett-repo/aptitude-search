@@ -15,7 +15,7 @@ Authoritative detail: `docs/PROMPT-CONTRACT.md` (Product model section).
 
 ## Optional nuance (implementation, not user-facing)
 
-- Stage 2 uses a **smolagents** CodeAgent (Hugging Face) with DuckDuckGo search and page visits, then a synthesis chat call—not a separate jobs API wired in Python.
+- Stage 2 uses a **smolagents** CodeAgent (Hugging Face) with DuckDuckGo search and page scraping, then a synthesis chat call—not a separate jobs API wired in Python.
 - The API jsonschema-validates `verified_matches` against `job-discovery-results.schema.json`.
 
 ## Testing

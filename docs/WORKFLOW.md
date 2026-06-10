@@ -26,7 +26,7 @@ See [prompts/README.md](../prompts/README.md). Input: Stage 1 JSON plus optional
 
 The API runs two phases:
 
-1. **Discovery agent** (`02-job-discovery-agent.md`) — web search and page visits; collects `found_jobs`.
+1. **Discovery agent** (`02-job-discovery-agent.md`) — web search and page scraping; collects `found_jobs`.
 2. **Synthesis** (`03-job-discovery-synthesis.md`) — maps `found_jobs` into schema-strict JSON with `search_plan`, `results`, and `notes` per `schemas/job-discovery-results.schema.json`.
 
 **API:** `POST /v1/pipeline` runs Stage 1 then Stage 2 with no manual step. Use Swagger at `http://localhost:3001/docs`. See [PROMPT-CONTRACT.md](PROMPT-CONTRACT.md).
