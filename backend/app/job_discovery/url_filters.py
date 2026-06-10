@@ -9,7 +9,7 @@ from pathlib import Path
 
 from app.core.config import config
 
-_BACKEND_DIR = Path(__file__).resolve().parents[2]
+_JOB_DISCOVERY_DIR = Path(__file__).resolve().parent
 
 
 @dataclass(frozen=True)
@@ -33,7 +33,7 @@ def _as_str_list(raw: object, *, field: str) -> list[str]:
 
 @lru_cache
 def load_url_filters() -> UrlFilters:
-    path = _BACKEND_DIR / config.job_discovery.url_filters_file
+    path = _JOB_DISCOVERY_DIR / config.job_discovery.url_filters_file
     with path.open("rb") as f:
         data = tomllib.load(f)
     return UrlFilters(

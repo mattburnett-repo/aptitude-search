@@ -35,7 +35,7 @@ class AptitudeLlmConfig(BaseModel):
 
 
 class JobDiscoveryConfig(BaseModel):
-    url_filters_file: str = "job-discovery-url-filters.toml"
+    url_filters_file: str = "url-filters.toml"
 
 
 class JobDiscoveryLlmConfig(BaseModel):

@@ -32,7 +32,7 @@ memory_keep_recent_steps = 2  # full observations kept for this many recent step
 memory_pruned_observation_max_chars = 200  # max chars for pruned step model_output
 
 [job_discovery]
-url_filters_file = "job-discovery-url-filters.toml"  # SERP/found_jobs skip lists (backend/)
+url_filters_file = "url-filters.toml"  # SERP/found_jobs skip lists (app/job_discovery/)
 
 [prompts]
 stage1_file = "01-resume-to-aptitude-profile.md"

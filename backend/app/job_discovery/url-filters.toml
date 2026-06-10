@@ -1,5 +1,5 @@
 # SERP and found_jobs URL filters for Stage 2 job discovery.
-# Edit lists here; loaded via config.toml [job_discovery].url_filters_file.
+# Edit lists here; loaded via config.toml [job_discovery].url_filters_file (relative to this package).
 
 skip_domains = [
   "create-react-app.dev",

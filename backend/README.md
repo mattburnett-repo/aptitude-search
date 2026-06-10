@@ -81,5 +81,5 @@ curl -s -X POST http://localhost:3001/v1/pipeline \
 - Stage 2 discovery: `prompts/02-job-discovery-agent.md` + `prompts/job-discovery-code-agent.yaml` (`smolagents` CodeAgent).
 - Stage 2 synthesis: `prompts/03-job-discovery-synthesis.md` (chat JSON → `verified_matches`).
 - Filenames are configured in `config.toml` under `[prompts]`.
-- **URL filters (Stage 2):** blocked domains, path markers, and related SERP/`found_jobs` rules live in `job-discovery-url-filters.toml` (path set by `[job_discovery].url_filters_file` in `config.toml`). Add or remove entries in that file’s arrays (`skip_domains`, `skip_path_markers`, `skip_title_phrases`, `job_url_markers`); restart the API to pick up changes.
+- **URL filters (Stage 2):** blocked domains, path markers, and related SERP/`found_jobs` rules live in `app/job_discovery/url-filters.toml` (filename set by `[job_discovery].url_filters_file` in `config.toml`, resolved relative to `app/job_discovery/`). Add or remove entries in that file’s arrays (`skip_domains`, `skip_path_markers`, `skip_title_phrases`, `job_url_markers`); restart the API to pick up changes.
 - CORS allows `http://localhost:5173` and `http://127.0.0.1:5173` for the Vite dev server.
