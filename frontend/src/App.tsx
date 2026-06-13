@@ -1,4 +1,11 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { readFileAsBase64 } from "./readFileAsBase64";
+import {
+  isPdfResumeFile,
+  isSupportedResumeFile,
+  isTextResumeFile,
+} from "./resumeUpload";
+import { useTheme } from "./useTheme";
 
 const API_BASE = "/api";
 
@@ -33,8 +40,47 @@ function StageJsonPanel({ title, data }: { title: string; data: unknown }) {
   );
 }
 
+function ThemeToggleIcon({ theme }: { theme: "light" | "dark" }) {
+  if (theme === "light") {
+    return (
+      <svg
+        aria-hidden="true"
+        className="theme-toggle-icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg
+      aria-hidden="true"
+      className="theme-toggle-icon"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+    </svg>
+  );
+}
+
 export default function App() {
+  const { theme, toggleTheme } = useTheme();
+  const resumeFileInputRef = useRef<HTMLInputElement>(null);
   const [resume, setResume] = useState("");
+  const [resumePdfFile, setResumePdfFile] = useState<File | null>(null); // PDF only; not read client-side
+  const [resumeFileName, setResumeFileName] = useState<string | null>(null);
   const [constraints, setConstraints] = useState(defaultConstraints);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -56,20 +102,41 @@ export default function App() {
     };
   }
 
-  async function apiFetch(path: string, body: unknown) {
+  async function apiFetchJson(path: string, body: unknown) {
     const res = await fetch(`${API_BASE}${path}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
-    const data = await res.json();
+    return parseApiResponse(res);
+  }
+
+  async function parseApiResponse(res: Response) {
+    const raw = await res.text();
+    let data: Record<string, unknown> | null = null;
+
+    if (raw) {
+      try {
+        data = JSON.parse(raw) as Record<string, unknown>;
+      } catch {
+        if (!res.ok) {
+          throw new Error(raw || res.statusText);
+        }
+        throw new Error("Invalid JSON response from server.");
+      }
+    }
+
     if (!res.ok) {
+      const detail = data?.detail;
       const msg =
-        typeof data.detail === "string"
-          ? data.detail
-          : (data.error ?? res.statusText);
+        typeof detail === "string"
+          ? detail
+          : typeof data?.error === "string"
+            ? data.error
+            : res.statusText;
       throw new Error(msg);
     }
+
     return data;
   }
 
@@ -77,16 +144,28 @@ export default function App() {
     setError(null);
     setLoading(true);
     try {
-      const data = await apiFetch("/v1/pipeline", {
-        resume,
-        constraints: buildConstraintsBody(),
-      });
+      // PDF: base64 in JSON (resume_pdf_base64). Text: plain resume string.
+      const body = resumePdfFile
+        ? {
+            resume: "",
+            resume_pdf_base64: await readFileAsBase64(resumePdfFile),
+            constraints: buildConstraintsBody(),
+          }
+        : {
+            resume,
+            constraints: buildConstraintsBody(),
+          };
+      const data = await apiFetchJson("/v1/pipeline", body);
       setResult(data as PipelineResult);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Request failed");
     } finally {
       setLoading(false);
     }
+  }
+
+  function hasResumeInput() {
+    return Boolean(resume.trim() || resumePdfFile);
   }
 
   function exportJson() {
@@ -109,29 +188,123 @@ export default function App() {
     );
   }
 
+  async function handleResumeFileSelect(file: File) {
+    if (!isSupportedResumeFile(file)) {
+      setError("Please choose a .txt, .md, or .pdf resume file.");
+      return;
+    }
+
+    if (isPdfResumeFile(file)) {
+      // Keep the File in memory; backend extracts text via pypdf.
+      setResumePdfFile(file);
+      setResume("");
+      setResumeFileName(file.name);
+      setError(null);
+      return;
+    }
+
+    if (!isTextResumeFile(file)) {
+      setError("Please choose a .txt, .md, or .pdf resume file.");
+      return;
+    }
+
+    try {
+      // Plain text: read here and send as resume string.
+      const text = await file.text();
+      setResumePdfFile(null);
+      setResume(text);
+      setResumeFileName(file.name);
+      setError(null);
+    } catch {
+      setError("Could not read the selected file.");
+    }
+  }
+
+  function clearResumeFile() {
+    setResumePdfFile(null);
+    setResumeFileName(null);
+    setResume("");
+  }
+
+  function handleResumeFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (file) void handleResumeFileSelect(file);
+    event.target.value = "";
+  }
+
+  function handleResumeChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
+    setResume(event.target.value);
+    setResumePdfFile(null);
+    setResumeFileName(null);
+  }
+
   return (
     <>
-      <h1>Aptitude Search</h1>
+      <div className="page-header">
+        <h1>Aptitude Search</h1>
+        <button
+          type="button"
+          className="theme-toggle"
+          onClick={toggleTheme}
+          aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+        >
+          <ThemeToggleIcon theme={theme} />
+        </button>
+      </div>
       <p className="subtitle">
         Run pipeline: resume → aptitude profile → job search (verified matches).
         LLM is configured on the API server (config.toml).
       </p>
 
       <section>
-        <label htmlFor="resume">Resume (plain text)</label>
+        <label htmlFor="resume">Resume</label>
+        <div className="resume-toolbar">
+          <input
+            ref={resumeFileInputRef}
+            id="resume-file"
+            type="file"
+            accept=".txt,.md,.text,.pdf,text/plain,application/pdf"
+            className="resume-file-input"
+            onChange={handleResumeFileChange}
+          />
+          <button
+            type="button"
+            className="secondary resume-file-button"
+            onClick={() => resumeFileInputRef.current?.click()}
+          >
+            Choose file
+          </button>
+          {resumeFileName && (
+            <span className="resume-file-name">{resumeFileName}</span>
+          )}
+          {resumePdfFile && (
+            <button
+              type="button"
+              className="secondary resume-file-button"
+              onClick={clearResumeFile}
+            >
+              Clear file
+            </button>
+          )}
+        </div>
         <textarea
           id="resume"
           value={resume}
-          onChange={(e) => setResume(e.target.value)}
-          placeholder="Paste resume text..."
+          onChange={handleResumeChange}
+          readOnly={Boolean(resumePdfFile)}
+          placeholder={
+            resumePdfFile
+              ? "PDF resume attached. Text will be extracted on the server when you run the pipeline."
+              : "Paste resume text or choose a file..."
+          }
         />
       </section>
 
       <section>
         <h2 style={{ fontSize: "1rem", marginBottom: "0.75rem" }}>
-          Optional constraints (Prompt 2)
+          Optional constraints
         </h2>
-        <div className="grid grid-2">
+        <div className="grid grid-3">
           <div>
             <label htmlFor="location">Location</label>
             <input
@@ -164,13 +337,14 @@ export default function App() {
             <label htmlFor="salary">Salary min</label>
             <input
               id="salary"
-              type="text"
               value={constraints.salary_min}
               onChange={(e) =>
                 setConstraints({ ...constraints, salary_min: e.target.value })
               }
             />
           </div>
+        </div>
+        <div className="grid grid-2">
           <div>
             <label htmlFor="include">Industries include (comma-separated)</label>
             <input
@@ -203,7 +377,7 @@ export default function App() {
       <div className="actions">
         <button
           type="button"
-          disabled={loading || !resume.trim()}
+          disabled={loading || !hasResumeInput()}
           onClick={runPipeline}
         >
           {loading ? "Running pipeline…" : "Run pipeline (1 → 2)"}

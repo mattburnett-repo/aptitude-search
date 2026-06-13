@@ -1,8 +1,30 @@
 :root {
   font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
   line-height: 1.5;
-  color: #e8eaed;
-  background: #0f1117;
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+  --color-bg: #f5f6f8;
+  --color-text: #202124;
+  --color-muted: #5f6368;
+  --color-field-bg: #ffffff;
+  --color-field-border: #c4c7c5;
+  --color-field-text: #202124;
+  --color-focus-ring: #4a7cff;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --color-bg: #0f1117;
+  --color-text: #e8eaed;
+  --color-muted: #9aa0a6;
+  --color-field-bg: #252830;
+  --color-field-border: #5f6368;
+  --color-field-text: #e8eaed;
+  --color-focus-ring: #8ab4f8;
 }
 
 * {
@@ -25,8 +47,16 @@ h1 {
   margin: 0 0 0.25rem;
 }
 
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.25rem;
+}
+
 .subtitle {
-  color: #9aa0a6;
+  color: var(--color-muted);
   margin: 0 0 1.5rem;
   font-size: 0.95rem;
 }
@@ -34,7 +64,7 @@ h1 {
 label {
   display: block;
   font-size: 0.85rem;
-  color: #9aa0a6;
+  color: var(--color-muted);
   margin-bottom: 0.35rem;
 }
 
@@ -46,14 +76,28 @@ button {
 }
 
 textarea,
-input[type="text"],
-input[type="password"] {
+input,
+select {
   width: 100%;
   padding: 0.6rem 0.75rem;
-  border: 1px solid #3c4043;
+  border: 1px solid var(--color-field-border);
   border-radius: 6px;
-  background: #1a1d24;
-  color: #e8eaed;
+  background: var(--color-field-bg);
+  color: var(--color-field-text);
+}
+
+textarea:focus,
+input:focus,
+select:focus {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 1px;
+}
+
+textarea:-webkit-autofill,
+input:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px var(--color-field-bg) inset;
+  -webkit-text-fill-color: var(--color-field-text);
 }
 
 textarea {
@@ -61,14 +105,49 @@ textarea {
   resize: vertical;
 }
 
+.resume-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.resume-file-input {
+  display: none;
+}
+
+button.resume-file-button {
+  padding: 0.45rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+.resume-file-name {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+textarea:read-only {
+  cursor: default;
+  color: var(--color-muted);
+}
+
 .grid {
   display: grid;
   gap: 1rem;
 }
 
+.grid + .grid {
+  margin-top: 1rem;
+}
+
 @media (min-width: 640px) {
   .grid-2 {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .grid-3 {
+    grid-template-columns: 1fr 1fr 1fr;
   }
 }
 
@@ -92,6 +171,29 @@ button:disabled {
 
 button.secondary {
   background: #3c4043;
+}
+
+button.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0.4rem;
+  border: 1px solid var(--color-field-border);
+  border-radius: 6px;
+  background: var(--color-field-bg);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.theme-toggle-icon {
+  width: 1.125rem;
+  height: 1.125rem;
+  display: block;
+}
+
+button.theme-toggle:hover {
+  border-color: var(--color-focus-ring);
 }
 
 .actions {

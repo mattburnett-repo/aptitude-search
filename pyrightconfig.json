@@ -1,0 +1,13 @@
+// basedpyright/pyright config for this monorepo.
+// The workspace root is aptitude-search/, but Python backend code lives under backend/.
+// executionEnvironments tells the type checker to resolve `from app...` imports
+// from backend/ (same layout as `uvicorn app.main:app` run from that directory).
+{
+  "executionEnvironments": [
+    {
+      "root": "backend",
+      "pythonVersion": "3.12"
+    }
+  ],
+  "include": ["backend/app", "backend/scripts"]
+}

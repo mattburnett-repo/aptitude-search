@@ -26,7 +26,8 @@ class PipelineRequest(BaseModel):
         json_schema_extra={"examples": [_load_pipeline_request_example()]}
     )
 
-    resume: str
+    resume: str = ""
+    resume_pdf_base64: str | None = None  # Base64 PDF from frontend; decoded and extracted server-side
     constraints: Constraints | None = None
 
 
