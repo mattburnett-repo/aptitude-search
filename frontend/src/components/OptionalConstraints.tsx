@@ -1,3 +1,5 @@
+import { LocationInput } from "./LocationInput";
+
 export type Constraints = {
   location: string;
   remote_preference: string;
@@ -46,11 +48,11 @@ export function OptionalConstraints({
         <div className="grid grid-3">
           <div>
             <label htmlFor="location">Location</label>
-            <input
+            <LocationInput
               id="location"
               value={constraints.location}
-              onChange={(e) =>
-                onChange({ ...constraints, location: e.target.value })
+              onChange={(location) =>
+                onChange({ ...constraints, location })
               }
             />
           </div>
