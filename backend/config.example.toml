@@ -9,16 +9,15 @@ allow_credentials = true
 allow_methods = ["*"]
 allow_headers = ["*"]
 
-[llm]
-temperature = 0.3
-
 [llm.aptitude]
 model_key = ""  # required: Hugging Face key for Stage 1
 model = ""  # Stage 1: resume → aptitude profile
+temperature = 0.3  # modest variation in profile interpretation
 
 [llm.job_discovery]
 model_key = ""  # required: Hugging Face key for Stage 2 agent (may match aptitude model_key)
 model = "meta-llama/Llama-3.1-8B-Instruct"  # Stage 2 agent; must be enabled on your HF account
+temperature = 0.0  # deterministic agent steps and synthesis JSON
 max_steps = 10  # smolagents defaults to 20 steps
 visit_max_output_length = 8000  # max chars fetched per page (agent sees compact extract)
 search_max_results = 10  # DuckDuckGo results per search query

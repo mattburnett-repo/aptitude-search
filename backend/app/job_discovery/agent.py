@@ -74,6 +74,7 @@ def run_job_discovery_agent(
     job_discovery_model = InferenceClientModel(
         model_id=config.llm.job_discovery.model,
         token=config.llm.job_discovery.model_key,
+        temperature=config.llm.job_discovery.temperature,
     )
     url_registry = observed_urls if observed_urls is not None else ToolObservedUrlRegistry()
     agent = CodeAgent(

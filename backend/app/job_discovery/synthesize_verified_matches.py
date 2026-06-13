@@ -18,6 +18,7 @@ from typing import Any
 from langsmith import traceable
 
 from app.core import prompt_loader
+from app.core.config import config
 from app.job_discovery.context import _labeled_names, build_stage2_synthesis_user_message
 from app.core.llm import complete_chat_json
 from app.core.models import Constraints
@@ -105,5 +106,6 @@ def synthesize_job_discovery_results(
         complete_chat_json(
             prompt_loader.system_prompt_stage2_synthesis(),
             user,
+            temperature=config.llm.job_discovery.temperature,
         )
     )

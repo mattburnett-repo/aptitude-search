@@ -23,6 +23,7 @@ class CorsConfig(BaseModel):
 class AptitudeLlmConfig(BaseModel):
     model_key: str
     model: str
+    temperature: float
 
     @field_validator("model_key", "model")
     @classmethod
@@ -41,6 +42,7 @@ class JobDiscoveryConfig(BaseModel):
 class JobDiscoveryLlmConfig(BaseModel):
     model_key: str
     model: str
+    temperature: float
     max_steps: int
     visit_max_output_length: int
     search_max_results: int
@@ -97,7 +99,6 @@ class JobDiscoveryLlmConfig(BaseModel):
 class LlmConfig(BaseModel):
     aptitude: AptitudeLlmConfig
     job_discovery: JobDiscoveryLlmConfig
-    temperature: float
 
 
 class PromptsConfig(BaseModel):

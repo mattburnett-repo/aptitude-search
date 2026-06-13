@@ -13,6 +13,8 @@ def _aptitude_client() -> InferenceClient:
 def complete_chat_json(
     system_prompt: str,
     user_message: str,
+    *,
+    temperature: float,
 ) -> object:
     """Hugging Face chat completion; returns parsed JSON."""
     completion = _aptitude_client().chat_completion(
@@ -21,7 +23,7 @@ def complete_chat_json(
             {"role": "user", "content": user_message},
         ],
         model=config.llm.aptitude.model,
-        temperature=config.llm.temperature,
+        temperature=temperature,
     )
     content = completion.choices[0].message.content
     if not content:

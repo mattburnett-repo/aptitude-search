@@ -36,6 +36,7 @@ def run_stage1(resume: str) -> Any:
         complete_chat_json(
             prompt_loader.system_prompt_stage1(),
             user,
+            temperature=config.llm.aptitude.temperature,
         )
     )
     validate_stage("aptitudeProfile", result)
