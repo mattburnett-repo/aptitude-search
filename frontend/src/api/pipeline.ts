@@ -8,7 +8,12 @@ export type PipelineResult = {
 type StreamEvent =
   | { type: "progress"; message: string }
   | { type: "result"; data: PipelineResult }
-  | { type: "error"; detail: string };
+  | { type: "error"; detail: string; request_id: string };
+
+function formatErrorMessage(detail: string, requestId?: string): string {
+  if (requestId) return `${detail} (ref: ${requestId})`;
+  return detail;
+}
 
 function parseStreamLine(line: string): StreamEvent {
   return JSON.parse(line) as StreamEvent;
@@ -19,8 +24,14 @@ async function readErrorMessage(res: Response): Promise<string> {
   if (!raw) return res.statusText;
   try {
     const data = JSON.parse(raw) as Record<string, unknown>;
-    if (typeof data.detail === "string") return data.detail;
-    if (typeof data.error === "string") return data.error;
+    const requestId =
+      typeof data.request_id === "string" ? data.request_id : undefined;
+    if (typeof data.detail === "string") {
+      return formatErrorMessage(data.detail, requestId);
+    }
+    if (typeof data.error === "string") {
+      return formatErrorMessage(data.error, requestId);
+    }
   } catch {
     return raw;
   }
@@ -59,7 +70,7 @@ export async function runPipelineStream(
       result = event.data;
       return;
     }
-    throw new Error(event.detail);
+    throw new Error(formatErrorMessage(event.detail, event.request_id));
   };
 
   while (true) {

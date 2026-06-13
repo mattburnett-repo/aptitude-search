@@ -4,14 +4,18 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 from typing import Literal, TypedDict
 
 from fastapi import HTTPException
 from fastapi.responses import StreamingResponse
 
 from app.core.models import PipelineRequest
+from app.core.request_context import get_request_id
 from app.core.resume_io import parse_pipeline_body
 from app.pipeline import run_pipeline
+
+logger = logging.getLogger(__name__)
 
 
 class ProgressEvent(TypedDict):
@@ -27,6 +31,7 @@ class ResultEvent(TypedDict):
 class ErrorEvent(TypedDict):
     type: Literal["error"]
     detail: str
+    request_id: str
 
 
 StreamEvent = ProgressEvent | ResultEvent | ErrorEvent
@@ -56,14 +61,24 @@ async def stream_pipeline_response(body: PipelineRequest) -> StreamingResponse:
                 ResultEvent(type="result", data=result),
             )
         except HTTPException as exc:
+            logger.warning("HTTP %s: %s", exc.status_code, exc.detail)
             _ = loop.call_soon_threadsafe(
                 put_event,
-                ErrorEvent(type="error", detail=str(exc.detail)),
+                ErrorEvent(
+                    type="error",
+                    detail=str(exc.detail),
+                    request_id=get_request_id(),
+                ),
             )
         except Exception as exc:
+            logger.exception("Stream pipeline failed")
             _ = loop.call_soon_threadsafe(
                 put_event,
-                ErrorEvent(type="error", detail=str(exc)),
+                ErrorEvent(
+                    type="error",
+                    detail=str(exc),
+                    request_id=get_request_id(),
+                ),
             )
 
     _ = asyncio.create_task(asyncio.to_thread(run_sync))
