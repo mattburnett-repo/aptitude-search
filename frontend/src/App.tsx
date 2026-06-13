@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { runPipelineStream, type PipelineResult } from "./pipelineStream";
 import { readFileAsBase64 } from "./readFileAsBase64";
 import {
   isPdfResumeFile,
@@ -6,13 +7,6 @@ import {
   isTextResumeFile,
 } from "./resumeUpload";
 import { useTheme } from "./useTheme";
-
-const API_BASE = "/api";
-
-type PipelineResult = {
-  aptitude_profile: unknown;
-  verified_matches: unknown;
-};
 
 type Constraints = {
   location: string;
@@ -29,6 +23,20 @@ const defaultConstraints: Constraints = {
   industries_include: "",
   industries_exclude: "",
 };
+
+function ProgressLog({ messages }: { messages: string[] }) {
+  if (messages.length === 0) return null;
+  return (
+    <section className="progress-log" aria-live="polite" aria-busy="true">
+      <h2 className="progress-log-title">Pipeline progress</h2>
+      <ol className="progress-log-list">
+        {messages.map((message, index) => (
+          <li key={`${index}-${message}`}>{message}</li>
+        ))}
+      </ol>
+    </section>
+  );
+}
 
 function StageJsonPanel({ title, data }: { title: string; data: unknown }) {
   if (!data) return null;
@@ -84,6 +92,7 @@ export default function App() {
   const [constraints, setConstraints] = useState(defaultConstraints);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [progressMessages, setProgressMessages] = useState<string[]>([]);
   const [result, setResult] = useState<PipelineResult | null>(null);
 
   function buildConstraintsBody() {
@@ -102,46 +111,10 @@ export default function App() {
     };
   }
 
-  async function apiFetchJson(path: string, body: unknown) {
-    const res = await fetch(`${API_BASE}${path}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    return parseApiResponse(res);
-  }
-
-  async function parseApiResponse(res: Response) {
-    const raw = await res.text();
-    let data: Record<string, unknown> | null = null;
-
-    if (raw) {
-      try {
-        data = JSON.parse(raw) as Record<string, unknown>;
-      } catch {
-        if (!res.ok) {
-          throw new Error(raw || res.statusText);
-        }
-        throw new Error("Invalid JSON response from server.");
-      }
-    }
-
-    if (!res.ok) {
-      const detail = data?.detail;
-      const msg =
-        typeof detail === "string"
-          ? detail
-          : typeof data?.error === "string"
-            ? data.error
-            : res.statusText;
-      throw new Error(msg);
-    }
-
-    return data;
-  }
-
   async function runPipeline() {
     setError(null);
+    setResult(null);
+    setProgressMessages([]);
     setLoading(true);
     try {
       // PDF: base64 in JSON (resume_pdf_base64). Text: plain resume string.
@@ -155,8 +128,10 @@ export default function App() {
             resume,
             constraints: buildConstraintsBody(),
           };
-      const data = await apiFetchJson("/v1/pipeline", body);
-      setResult(data as PipelineResult);
+      const data = await runPipelineStream(body, (message) => {
+        setProgressMessages((prev) => [...prev, message]);
+      });
+      setResult(data);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Request failed");
     } finally {
@@ -397,6 +372,10 @@ export default function App() {
       </div>
 
       {error && <p className="error">{error}</p>}
+
+      {(loading || progressMessages.length > 0) && (
+        <ProgressLog messages={progressMessages} />
+      )}
 
       {result && (
         <>

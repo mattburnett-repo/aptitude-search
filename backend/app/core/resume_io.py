@@ -6,11 +6,20 @@ from fastapi import HTTPException
 from pypdf import PdfReader
 
 from app.core.models import Constraints, PipelineRequest
+from app.core.progress import ProgressCallback, emit_progress
 
 
-def parse_pipeline_body(body: PipelineRequest) -> tuple[str, Constraints | None]:
+def parse_pipeline_body(
+    body: PipelineRequest,
+    *,
+    on_progress: ProgressCallback | None = None,
+) -> tuple[str, Constraints | None]:
     """Return plain resume text. PDF uploads arrive as resume_pdf_base64."""
     if body.resume_pdf_base64:
+        emit_progress(
+            "Extracting text from PDF resume…",
+            on_progress=on_progress,
+        )
         # Frontend sends PDF as base64 JSON; decode and extract text here.
         try:
             data = base64.b64decode(body.resume_pdf_base64, validate=True)
@@ -20,6 +29,7 @@ def parse_pipeline_body(body: PipelineRequest) -> tuple[str, Constraints | None]
                 detail="Invalid PDF upload encoding.",
             ) from exc
         resume = _extract_pdf_text(data)
+        emit_progress("PDF text extracted.", on_progress=on_progress)
     else:
         resume = body.resume
 

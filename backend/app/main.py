@@ -10,6 +10,7 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from app.core.config import config
 from app.core.models import PipelineRequest, Stage1Request, Stage2Request
 from app.core.resume_io import parse_pipeline_body
+from app.core.stream_pipeline import stream_pipeline_response
 from app.pipeline import run_pipeline, run_stage1, run_stage2
 
 trace.set_tracer_provider(TracerProvider())
@@ -51,11 +52,13 @@ def health():
 
 
 @app.post("/v1/pipeline", tags=["Pipeline"])
-def pipeline(body: PipelineRequest):
+async def pipeline(body: PipelineRequest, stream: bool = False):
     # resume may be pasted text or text extracted from resume_pdf_base64
-    resume, constraints = parse_pipeline_body(body)
-    if not resume.strip():
+    if not body.resume.strip() and not body.resume_pdf_base64:
         raise HTTPException(status_code=400, detail="resume is required")
+    if stream:
+        return await stream_pipeline_response(body)
+    resume, constraints = parse_pipeline_body(body)
     return run_pipeline(resume, constraints)
 
 

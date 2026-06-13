@@ -16,6 +16,7 @@ from smolagents.monitoring import LogLevel
 
 from app.core import prompt_loader
 from app.core.config import config
+from app.core.progress import ProgressCallback, emit_progress
 from app.job_discovery.memory_prune import prune_agent_memory
 from app.job_discovery.tool_observed_urls import ToolObservedUrlRegistry
 from app.job_discovery.tools import build_job_discovery_tools
@@ -60,6 +61,24 @@ def _resolve_found_jobs(
     return _normalize_found_jobs(run_output)
 
 
+def _build_step_callbacks(
+    on_progress: ProgressCallback | None,
+) -> list:
+    callbacks = [prune_agent_memory]
+    if on_progress is not None:
+
+        def report_step(memory_step, agent) -> None:
+            step_num = memory_step.step_number
+            if step_num is not None:
+                emit_progress(
+                    f"Searching the web (step {step_num})…",
+                    on_progress=on_progress,
+                )
+
+        callbacks.append(report_step)
+    return callbacks
+
+
 @traceable(run_type="chain", name="job_discovery_agent")
 def run_job_discovery_agent(
     system_prompt: str,
@@ -67,6 +86,7 @@ def run_job_discovery_agent(
     *,
     max_steps: int | None = None,
     observed_urls: ToolObservedUrlRegistry | None = None,
+    on_progress: ProgressCallback | None = None,
 ) -> list[dict[str, Any]]:
     """Run discovery agent; returns found_jobs list for synthesis phase."""
     if max_steps is None:
@@ -85,7 +105,7 @@ def run_job_discovery_agent(
         max_steps=max_steps,
         max_print_outputs_length=config.llm.job_discovery.max_print_outputs_length,
         additional_authorized_imports=["json"],
-        step_callbacks=[prune_agent_memory],
+        step_callbacks=_build_step_callbacks(on_progress),
         verbosity_level=LogLevel.OFF,
         name="job_discovery_agent",
         description="Searches the web for job openings and returns found_jobs.",

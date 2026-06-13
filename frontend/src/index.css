@@ -209,6 +209,35 @@ button.theme-toggle:hover {
   margin: 0.5rem 0;
 }
 
+.progress-log {
+  border: 1px solid var(--color-field-border);
+  border-radius: 8px;
+  margin: 0 0 1rem;
+  overflow: hidden;
+  background: var(--color-field-bg);
+}
+
+.progress-log-title {
+  margin: 0;
+  padding: 0.65rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-bottom: 1px solid var(--color-field-border);
+}
+
+.progress-log-list {
+  margin: 0;
+  padding: 0.75rem 1rem 0.75rem 2rem;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.progress-log-list li + li {
+  margin-top: 0.35rem;
+}
+
 .stage {
   border: 1px solid #3c4043;
   border-radius: 8px;
