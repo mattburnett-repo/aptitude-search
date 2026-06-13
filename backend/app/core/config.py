@@ -24,6 +24,7 @@ class AptitudeLlmConfig(BaseModel):
     model_key: str
     model: str
     temperature: float
+    max_tokens: int = 8192
 
     @field_validator("model_key", "model")
     @classmethod
@@ -33,6 +34,14 @@ class AptitudeLlmConfig(BaseModel):
             field = info.field_name or "field"
             raise ValueError(f"llm.aptitude.{field} must be set in config.toml")
         return stripped
+
+    @field_validator("max_tokens")
+    @classmethod
+    def max_tokens_positive(cls, value: int, info: ValidationInfo) -> int:
+        if value < 256:
+            field = info.field_name or "field"
+            raise ValueError(f"llm.aptitude.{field} must be at least 256")
+        return value
 
 
 class JobDiscoveryConfig(BaseModel):

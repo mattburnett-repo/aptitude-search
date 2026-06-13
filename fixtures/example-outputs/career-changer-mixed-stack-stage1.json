@@ -99,9 +99,18 @@
   ],
   "aptitude_summary": "Adaptable full-stack engineer who repeatedly succeeds where systems are being replaced or formalized for the first time. Unusual value in modernization, integration-heavy teams, and resource-constrained organizations—not in narrow algorithmic specialization.",
   "confidence_map": {
-    "seniority_band": "medium",
-    "adjacent_roles": "medium",
-    "working_style_signals": "medium"
+    "seniority_band": {
+      "confidence": "medium",
+      "reason": "Inferred from 8 years experience and mentoring; title on resume is Software Engineer."
+    },
+    "adjacent_roles": {
+      "confidence": "medium",
+      "reason": "Grounded in skill overlap and career progression paths from resume."
+    },
+    "working_style_signals": {
+      "confidence": "medium",
+      "reason": "Inferred from modernization and greenfield project patterns."
+    }
   },
   "rationale": [
     "Core stack is explicitly Python/Django/Vue with a flagship legacy migration.",

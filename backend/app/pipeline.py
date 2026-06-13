@@ -43,6 +43,8 @@ def run_stage1(
             prompt_loader.system_prompt_stage1(),
             user,
             temperature=config.llm.aptitude.temperature,
+            max_tokens=config.llm.aptitude.max_tokens,
+            json_object=True,
         )
     )
     validate_stage("aptitudeProfile", result)

@@ -1,1 +1,1 @@
-Analyze this resume and return the aptitude profile JSON.
+Analyze this resume and return the aptitude profile JSON. Use name for skills and label for domains, strengths, adjacent_roles, and working_style_signals.

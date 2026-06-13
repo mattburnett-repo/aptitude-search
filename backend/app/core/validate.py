@@ -118,6 +118,71 @@ def _normalize_confidence(value: Any) -> str:
     return "low"
 
 
+def _normalize_confidence_map_entry(item: Any) -> dict[str, str]:
+    """Coerce LLM confidence_map values into {confidence, reason}."""
+    if isinstance(item, str):
+        return {"confidence": _normalize_confidence(item), "reason": ""}
+    if not isinstance(item, dict):
+        return {"confidence": "low", "reason": ""}
+
+    confidence = item.get("confidence")
+    reason = item.get("reason")
+    if isinstance(confidence, str) and confidence in _VALID_CONFIDENCE:
+        return {
+            "confidence": confidence,
+            "reason": reason.strip() if isinstance(reason, str) else "",
+        }
+
+    # Model used level names as keys, e.g. {"high": "because ..."} or {"medium": true}.
+    for level in ("high", "medium", "low"):
+        level_val = item.get(level)
+        if isinstance(level_val, str) and level_val.strip():
+            return {"confidence": level, "reason": level_val.strip()}
+        if level_val is True:
+            return {"confidence": level, "reason": ""}
+
+    if isinstance(reason, str) and reason.strip():
+        return {"confidence": "low", "reason": reason.strip()}
+
+    return {"confidence": "low", "reason": ""}
+
+
+def _normalize_confidence_map(confidence_map: Any) -> dict[str, dict[str, str]]:
+    if not isinstance(confidence_map, dict):
+        return {}
+
+    # Inverted shape: {"high": ["seniority_band", ...], "medium": [...]}.
+    if confidence_map and all(key in _VALID_CONFIDENCE for key in confidence_map):
+        rebuilt: dict[str, dict[str, str]] = {}
+        for level, fields in confidence_map.items():
+            field_names: list[str] = []
+            if isinstance(fields, list):
+                field_names = [str(f) for f in fields if f]
+            elif isinstance(fields, str) and fields.strip():
+                field_names = [fields.strip()]
+            for field in field_names:
+                rebuilt[field] = {
+                    "confidence": _normalize_confidence(str(level)),
+                    "reason": "",
+                }
+        return rebuilt
+
+    return {
+        str(key): _normalize_confidence_map_entry(item)
+        for key, item in confidence_map.items()
+    }
+
+
+def _prune_dict(item: dict[str, Any], allowed: frozenset[str]) -> None:
+    for key in list(item.keys()):
+        if key not in allowed:
+            del item[key]
+
+
+_SKILL_ITEM_KEYS = frozenset({"name", "confidence", "evidence_from_resume"})
+_LABELED_ITEM_KEYS = frozenset({"label", "confidence", "evidence_from_resume"})
+
+
 def _normalize_seniority_band(value: Any) -> str:
     if not isinstance(value, str):
         return "unknown"
@@ -125,6 +190,26 @@ def _normalize_seniority_band(value: Any) -> str:
     if key in _VALID_SENIORITY:
         return key
     return _SENIORITY_ALIASES.get(key, "unknown")
+
+
+def _normalize_skill_item(item: dict[str, Any]) -> None:
+    name = item.get("name")
+    label = item.get("label")
+    if not isinstance(name, str) or not name.strip():
+        if isinstance(label, str) and label.strip():
+            item["name"] = label.strip()
+    _prune_dict(item, _SKILL_ITEM_KEYS)
+    item["confidence"] = _normalize_confidence(item.get("confidence"))
+
+
+def _normalize_labeled_item(item: dict[str, Any]) -> None:
+    label = item.get("label")
+    name = item.get("name")
+    if not isinstance(label, str) or not label.strip():
+        if isinstance(name, str) and name.strip():
+            item["label"] = name.strip()
+    _prune_dict(item, _LABELED_ITEM_KEYS)
+    item["confidence"] = _normalize_confidence(item.get("confidence"))
 
 
 def normalize_aptitude_profile(data: Any) -> Any:
@@ -136,19 +221,23 @@ def normalize_aptitude_profile(data: Any) -> Any:
     skill_keys = ("core_skills", "secondary_skills")
     labeled_keys = ("domains", "strengths", "adjacent_roles", "working_style_signals")
 
-    for key in skill_keys + labeled_keys:
+    for key in skill_keys:
         items = data.get(key)
         if not isinstance(items, list):
             continue
         for item in items:
             if isinstance(item, dict):
-                item["confidence"] = _normalize_confidence(item.get("confidence"))
+                _normalize_skill_item(item)
 
-    confidence_map = data.get("confidence_map")
-    if isinstance(confidence_map, dict):
-        for item in confidence_map.values():
+    for key in labeled_keys:
+        items = data.get(key)
+        if not isinstance(items, list):
+            continue
+        for item in items:
             if isinstance(item, dict):
-                item["confidence"] = _normalize_confidence(item.get("confidence"))
+                _normalize_labeled_item(item)
+
+    data["confidence_map"] = _normalize_confidence_map(data.get("confidence_map"))
 
     return data
 

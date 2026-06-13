@@ -135,19 +135,33 @@ If uncertain, use:
 Never omit a required key.
 
 ## TYPE-SHAPE REQUIREMENTS (MANDATORY)
-core_skills and secondary_skills must be arrays of objects like:
-{"name": string, "confidence": "high"|"medium"|"low", "evidence_from_resume"?: string}
 
-adjacent_roles, domains, strengths, and working_style_signals must be arrays of objects like:
-{"label": string, "confidence": "high"|"medium"|"low", "evidence_from_resume"?: string}
+Use the correct identifier field for each array. Do not swap them.
 
-confidence_map must be an object whose values are objects like:
-{"confidence": "high"|"medium"|"low", "reason": string}
+| Array | Object shape |
+|-------|--------------|
+| core_skills, secondary_skills | `{"name": string, "confidence": "high"\|"medium"\|"low", "evidence_from_resume"?: string}` |
+| domains, strengths, adjacent_roles, working_style_signals | `{"label": string, "confidence": "high"\|"medium"\|"low", "evidence_from_resume"?: string}` |
+
+- Skill arrays use **`name`**. Never use `label` in core_skills or secondary_skills.
+- Domain/strength/role arrays use **`label`**. Never use `name` in those arrays.
+
+confidence_map: keys are profile fields (e.g. seniority_band, core_skills). Each value is `{"confidence": "high"|"medium"|"low", "reason": string}`. Never use high/medium/low as keys inside confidence_map.
+
+rationale: array of strings, never a single string.
+Example: "rationale": ["reason 1", "reason 2"]
 
 Never use "unknown" for confidence. Confidence must be exactly one of: high, medium, low.
 
-rationale must be an array of strings, never a single string.
-Example: "rationale": ["reason 1", "reason 2"]
+---
+
+## EVIDENCE_FROM_RESUME (core_skills and secondary_skills only)
+
+When you include evidence_from_resume on a skill:
+- Copy a **verbatim** phrase from the resume (max 120 characters). Do not paraphrase or invent text.
+- Cite the specific bullet or skills line for that skill. Do not reuse one project sentence with different technologies swapped in.
+- If the skill appears only in a skills list, use exactly: Listed in skills section only — and set confidence to medium or low, never high.
+- If you cannot quote the resume, omit evidence_from_resume rather than fabricating it.
 
 ---
 
