@@ -19,4 +19,14 @@ if pids=$(lsof -ti:"$PORT" 2>/dev/null); then
   sleep 0.5
 fi
 
-exec .venv/bin/python -m uvicorn app.main:app --reload --port "$PORT"
+if [[ ! -d .venv ]]; then
+  echo "Creating virtual environment at .venv..."
+  python3 -m venv .venv
+fi
+
+VENV_DIR="$(pwd)/.venv"
+export VIRTUAL_ENV="$VENV_DIR"
+PATH="$VENV_DIR/bin:$PATH"
+export PATH
+
+exec "$VENV_DIR/bin/python" -m uvicorn app.main:app --reload --port "$PORT"
