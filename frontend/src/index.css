@@ -158,6 +158,61 @@ textarea:read-only {
   color: var(--color-muted);
 }
 
+.field-with-clear {
+  position: relative;
+}
+
+.field-with-clear-active input {
+  padding-right: 2.25rem;
+}
+
+.field-with-clear-active.field-with-clear-select select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 4.5rem;
+}
+
+.field-with-clear-active.field-with-clear-select::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 2.35rem;
+  width: 0.45rem;
+  height: 0.45rem;
+  transform: translateY(-70%) rotate(45deg);
+  border-right: 1.5px solid var(--color-muted);
+  border-bottom: 1.5px solid var(--color-muted);
+  pointer-events: none;
+}
+
+.field-clear {
+  position: absolute;
+  top: 50%;
+  right: 0.45rem;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-muted);
+  cursor: pointer;
+}
+
+.field-clear:hover {
+  color: var(--color-field-text);
+  background: var(--color-secondary-btn-hover-bg);
+}
+
+.field-clear svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
 .grid {
   display: grid;
   gap: 1rem;

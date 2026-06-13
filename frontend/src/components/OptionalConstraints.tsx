@@ -1,3 +1,4 @@
+import { ClearInput, ClearSelect } from "./ClearField";
 import { LocationInput } from "./LocationInput";
 
 export type Constraints = {
@@ -58,29 +59,29 @@ export function OptionalConstraints({
           </div>
           <div>
             <label htmlFor="remote">Remote preference</label>
-            <select
+            <ClearSelect
               id="remote"
               value={constraints.remote_preference}
-              onChange={(e) =>
-                onChange({
-                  ...constraints,
-                  remote_preference: e.target.value,
-                })
+              defaultValue="any"
+              clearLabel="Clear remote preference"
+              onChange={(remote_preference) =>
+                onChange({ ...constraints, remote_preference })
               }
             >
               <option value="any">any</option>
               <option value="remote">remote</option>
               <option value="hybrid">hybrid</option>
               <option value="onsite">onsite</option>
-            </select>
+            </ClearSelect>
           </div>
           <div>
             <label htmlFor="salary">Salary min</label>
-            <input
+            <ClearInput
               id="salary"
               value={constraints.salary_min}
-              onChange={(e) =>
-                onChange({ ...constraints, salary_min: e.target.value })
+              clearLabel="Clear salary min"
+              onChange={(salary_min) =>
+                onChange({ ...constraints, salary_min })
               }
             />
           </div>
@@ -88,27 +89,23 @@ export function OptionalConstraints({
         <div className="grid grid-2">
           <div>
             <label htmlFor="include">Industries include (comma-separated)</label>
-            <input
+            <ClearInput
               id="include"
               value={constraints.industries_include}
-              onChange={(e) =>
-                onChange({
-                  ...constraints,
-                  industries_include: e.target.value,
-                })
+              clearLabel="Clear industries include"
+              onChange={(industries_include) =>
+                onChange({ ...constraints, industries_include })
               }
             />
           </div>
           <div>
             <label htmlFor="exclude">Industries exclude (comma-separated)</label>
-            <input
+            <ClearInput
               id="exclude"
               value={constraints.industries_exclude}
-              onChange={(e) =>
-                onChange({
-                  ...constraints,
-                  industries_exclude: e.target.value,
-                })
+              clearLabel="Clear industries exclude"
+              onChange={(industries_exclude) =>
+                onChange({ ...constraints, industries_exclude })
               }
             />
           </div>

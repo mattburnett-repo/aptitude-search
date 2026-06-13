@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+import { FieldWithClear } from "./ClearField";
 
 const PHOTON = "https://photon.komoot.io/api/";
 
@@ -48,7 +50,9 @@ type LocationInputProps = {
 
 export function LocationInput({ id, value, onChange }: LocationInputProps) {
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const inputRef = useRef<HTMLInputElement>(null);
   const listId = `${id}-suggestions`;
+  const hasValue = value.trim().length > 0;
 
   useEffect(() => {
     const q = value.trim();
@@ -64,9 +68,20 @@ export function LocationInput({ id, value, onChange }: LocationInputProps) {
     return () => window.clearTimeout(timer);
   }, [value]);
 
+  function handleClear() {
+    onChange("");
+    setSuggestions([]);
+    inputRef.current?.focus();
+  }
+
   return (
-    <>
+    <FieldWithClear
+      showClear={hasValue}
+      onClear={handleClear}
+      clearLabel="Clear location"
+    >
       <input
+        ref={inputRef}
         id={id}
         list={listId}
         value={value}
@@ -78,6 +93,6 @@ export function LocationInput({ id, value, onChange }: LocationInputProps) {
           <option key={label} value={label} />
         ))}
       </datalist>
-    </>
+    </FieldWithClear>
   );
 }
