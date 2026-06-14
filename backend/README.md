@@ -40,6 +40,15 @@ App settings live in `config.toml` (see `config.example.toml`). Loaded once via 
 
 Validates stage-1 golden output only (`career-changer-mixed-stack-stage1.json`).
 
+## Tests
+
+```bash
+pip install -r requirements-dev.txt
+pytest
+```
+
+Uses `config.test.toml` (no API keys or network). Also run `scripts/validate_fixtures.py` for golden fixture schema checks.
+
 ## Endpoints
 
 | Method | Path | Body | Response |

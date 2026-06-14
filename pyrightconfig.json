@@ -9,5 +9,5 @@
       "pythonVersion": "3.12"
     }
   ],
-  "include": ["backend/app", "backend/scripts"]
+  "include": ["backend/app", "backend/scripts", "backend/tests"]
 }
