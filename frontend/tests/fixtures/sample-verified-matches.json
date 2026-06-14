@@ -1,0 +1,23 @@
+{
+  "search_plan": [
+    "Logistics software companies",
+    "Django modernization roles",
+    "Integration-heavy SaaS teams"
+  ],
+  "results": [
+    {
+      "company": "Riverbend Logistics",
+      "role": "Senior Software Engineer",
+      "url": "https://example.com/jobs/senior-software-engineer",
+      "match_description": "Matches Python, Django, and legacy modernization experience from the aptitude profile.",
+      "location": "Portland, OR",
+      "employment_type": "Full-time",
+      "seniority_level": "senior",
+      "match_signals": ["Python", "Django", "Legacy modernization"],
+      "confidence": "high"
+    }
+  ],
+  "notes": [
+    "Sample fixture for frontend display tests; not a live search result."
+  ]
+}
