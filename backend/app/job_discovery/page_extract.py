@@ -7,6 +7,7 @@ import re
 from urllib.parse import urlparse
 
 from app.core.config import config
+from app.job_discovery.url_utils import looks_like_job_posting_url
 
 _GENERIC_HOST_LABELS = frozenset(
     {"www", "jobs", "careers", "job", "boards", "apply", "wd5"}
@@ -58,7 +59,7 @@ def job_page_dict_for_agent(url: str, page_text: str) -> dict[str, str]:
     snippet = _body_snippet(lines, title=title, skip=set(meta_lines))
 
     company = _meta_field(meta_lines, "company", "employer", "organization")
-    if not company:
+    if not company and looks_like_job_posting_url(url):
         company = _company_from_url(url)
 
     return {

@@ -110,7 +110,10 @@ def run_job_discovery_agent(
         name="job_discovery_agent",
         description="Searches the web for job openings and returns found_jobs.",
     )
-    agent_state: dict[str, Any] = {"found_jobs": [], "visited_urls": []}
+    agent_state: dict[str, Any] = {
+        "found_jobs": [],
+        "visited_urls": [],
+    }
     try:
         run_result = agent.run(
             user_message,

@@ -10,8 +10,11 @@ system_prompt: |-
   Thought: I will search for remote backend roles and record compact rows in found_jobs.
   {{code_block_opening_tag}}
   import json
-  results = web_search(query="python backend remote")
-  # parse results text; append dicts to found_jobs
+  result = json.loads(search_job_postings(query="python backend remote"))
+  for job in result["jobs"]:
+      if job["url"] not in visited_urls:
+          visited_urls.append(job["url"])
+          found_jobs.append(job)
   print(json.dumps(found_jobs[-2:], indent=0))
   {{code_block_closing_tag}}
 
@@ -26,7 +29,7 @@ system_prompt: |-
   1. Always provide 'Thought:' and a code block ending with '{{code_block_closing_tag}}'.
   2. Use only variables you have defined; state persists between steps.
   3. Pass tool arguments directly (not as a dict).
-  4. One code block = either one web_search OR up to three scrape_webpage calls—never both.
+  4. One code block = one search_job_postings call, then update found_jobs from result["jobs"].
   5. Never print raw tool output; update found_jobs and print only new entries.
   6. Authorized imports: {{authorized_imports}}
   7. Do not re-do identical tool calls.

@@ -2,19 +2,28 @@
 # Edit lists here; loaded via config.toml [job_discovery].url_filters_file (relative to this package).
 
 skip_domains = [
+  "baeldung.com",
   "create-react-app.dev",
   "dev.to",
   "developer.mozilla.org",
   "example.com",
   "example.net",
   "example.org",
+  "fiverr.com",
+  "freelancer.com",
   "freecodecamp.org",
+  "geeksforgeeks.org",
   "hashnode.dev",
   "medium.com",
   "react.dev",
   "reddit.com",
   "stackoverflow.com",
+  "substack.com",
+  "toptal.com",
+  "tutorialspoint.com",
   "typescriptlang.org",
+  "upwork.com",
+  "w3schools.com",
   "wikipedia.org",
   "youtube.com",
 ]
@@ -31,6 +40,19 @@ skip_path_markers = [
   "/blog/",
 ]
 
+# Job-board search/list pages (not individual postings).
+skip_listing_path_markers = [
+  "/q-",
+  "/jobs/search",
+  "/job/search",
+  "/browsejobs",
+]
+
+# Case-sensitive path fragments (e.g. ZipRecruiter /Jobs/ index).
+skip_listing_path_markers_case_sensitive = [
+  "/Jobs/",
+]
+
 skip_title_phrases = [
   "documentation",
   "tutorial",
@@ -40,6 +62,15 @@ skip_title_phrases = [
   "boilerplate",
   "dev community",
   "technical interview -",
+  "interview questions",
+  "complete guide",
+  "ultimate guide",
+  "roadmap",
+  " vs ",
+  "best practices",
+  "top ",
+  "salary guide",
+  "career path",
 ]
 
 job_url_markers = [

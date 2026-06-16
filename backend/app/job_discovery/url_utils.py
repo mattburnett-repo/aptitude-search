@@ -9,6 +9,19 @@ from app.job_discovery.url_filters import load_url_filters
 
 _NON_HTTP_SCHEME = re.compile(r"^[a-zA-Z][a-zA-Z0-9+.-]*:")
 _ALLOWED_SCHEMES = frozenset({"http", "https"})
+_JOB_QUERY_HINTS = frozenset(
+    {"jobs", "job", "careers", "career", "hiring", "openings", "recruit"}
+)
+
+
+def _is_placeholder_scrape_url(url: str) -> bool:
+    """True for documentation placeholders the agent must not pass to scrape_webpage."""
+    lower = url.strip().lower()
+    if "..." in lower or lower.endswith("…"):
+        return True
+    if lower in {"https://", "http://", "https://...", "http://..."}:
+        return True
+    return False
 
 
 def prepare_scrape_url(url: str) -> tuple[str | None, str | None]:
@@ -21,6 +34,11 @@ def prepare_scrape_url(url: str) -> tuple[str | None, str | None]:
     cleaned = url.strip().rstrip(".,;)")
     if not cleaned:
         return None, "Empty URL."
+
+    if _is_placeholder_scrape_url(cleaned):
+        return None, (
+            "Placeholder URL is not allowed; use URLs from search_job_postings JSON."
+        )
 
     if "://" not in cleaned and not cleaned.startswith("//"):
         scheme_match = _NON_HTTP_SCHEME.match(cleaned)
@@ -50,6 +68,24 @@ def prepare_scrape_url(url: str) -> tuple[str | None, str | None]:
     return normalized, None
 
 
+def normalize_job_search_query(query: str) -> str:
+    """Append hiring keywords when the agent passes skill-only queries."""
+    stripped = " ".join(query.split())
+    if not stripped:
+        return "software engineer jobs hiring"
+    lower = stripped.lower()
+    if any(hint in lower for hint in _JOB_QUERY_HINTS):
+        return stripped
+    return f"{stripped} jobs hiring"
+
+
+def should_skip_job_title(title: str) -> bool:
+    """True when a scraped or SERP title looks like an article, not a role."""
+    filters = load_url_filters()
+    title_lower = title.lower()
+    return any(phrase in title_lower for phrase in filters.skip_title_phrases)
+
+
 def should_skip_search_result(href: str, *, title: str = "") -> bool:
     """True when a SERP row is unlikely to be a job or careers posting."""
     filters = load_url_filters()
@@ -66,7 +102,6 @@ def should_skip_search_result(href: str, *, title: str = "") -> bool:
         host = host[4:]
 
     path_lower = (parsed.path or "").lower()
-    title_lower = title.lower()
 
     if host in filters.skip_domains:
         return True
@@ -82,7 +117,17 @@ def should_skip_search_result(href: str, *, title: str = "") -> bool:
     if any(marker in path_lower for marker in filters.skip_path_markers):
         return True
 
-    if any(phrase in title_lower for phrase in filters.skip_title_phrases):
+    if any(marker in path_lower for marker in filters.skip_listing_path_markers):
+        return True
+
+    path_raw = parsed.path or ""
+    if any(
+        marker in path_raw
+        for marker in filters.skip_listing_path_markers_case_sensitive
+    ):
+        return True
+
+    if should_skip_job_title(title):
         return True
 
     return False
@@ -99,14 +144,13 @@ def looks_like_job_posting_url(url: str) -> bool:
 
 
 def is_verified_job_posting(job: dict[str, object]) -> bool:
-    """Drop blog/tutorial SERP noise and rows with no employer unless URL is job-like."""
+    """Keep rows that look like real postings (job-like URL, not article titles)."""
     url = str(job.get("url") or "")
     title = str(job.get("title") or job.get("role") or "")
     if should_skip_search_result(url, title=title):
         return False
-    company = str(job.get("company") or "").strip()
-    if company:
-        return True
+    if should_skip_job_title(title):
+        return False
     return looks_like_job_posting_url(url)
 
 

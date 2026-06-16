@@ -1,4 +1,4 @@
-"""Track URLs from web_search / scrape_webpage and filter final results to those URLs."""
+"""Track URLs from search_job_postings and filter final results to those URLs."""
 
 from __future__ import annotations
 
@@ -36,7 +36,7 @@ def extract_urls_from_tool_output(text: str) -> set[str]:
 
 
 class ToolObservedUrlRegistry:
-    """URLs returned by web_search or scrape_webpage during one agent run."""
+    """URLs returned by search_job_postings during one agent run."""
 
     def __init__(self) -> None:
         self._urls: set[str] = set()
@@ -84,8 +84,8 @@ def filter_results_to_tool_observed_urls(
         if not isinstance(notes, list):
             notes = []
         notes.append(
-            f"Removed {removed} result(s): URL was not present in web_search or "
-            "scrape_webpage tool output."
+            f"Removed {removed} result(s): URL was not present in "
+            "search_job_postings tool output."
         )
         data["notes"] = notes
     return data

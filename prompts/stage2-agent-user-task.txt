@@ -1,46 +1,36 @@
-Find job openings for this candidate using web_search and scrape_webpage.
+Find job openings for this candidate using search_job_postings.
 Search queries: 3–6 plain keywords (role + skill + remote/location). No long sentences, no nested quotes.
-Run at least 4 different web_search calls. After each search, scrape_webpage on 2–3 direct posting URLs (single job pages only—not board search or list pages).
-Skip URLs in visited_urls; do not re-fetch the same posting unless a new search surfaced a different role.
-Prefer direct employer/careers URLs over generic job-board search pages.
-Include at least 8 distinct results with direct posting URLs when available.
-Each result url must come from tool JSON (invented or edited URLs are removed before the API responds).
+Run at least 4 different search_job_postings calls—one per skill angle from core_skills (e.g. React, Python/Django, TypeScript, DevOps).
+Skip URLs already in visited_urls; do not add duplicate postings to found_jobs.
+Prefer diverse roles across core_skills—not only one stack.
+Include at least 8 distinct results when available.
 Do not add dev.to, medium.com, stackoverflow.com, or other blogs/tutorials to found_jobs.
-Append after scrape when page["error"] is empty and page["title"] is non-empty (company may be empty on ATS pages).
 
-web_search and scrape_webpage each return a JSON string. Always parse with json.loads().
+search_job_postings returns a JSON string. Always parse with json.loads().
 
 found_jobs and visited_urls are pre-initialized lists—use them every step.
 
 Step discipline (required):
-- Each code block does ONE kind of work: either one web_search OR up to three scrape_webpage calls—never both in the same block.
+- Each code block calls search_job_postings once, then appends new jobs to found_jobs.
 - Do not print() raw tool output. Append compact dicts to found_jobs.
-- After updating found_jobs, print only the entries added this step (not the full list, not prior steps).
-- Track visited URLs in visited_urls before calling scrape_webpage.
+- After updating found_jobs, print only the entries added this step (not the full list).
 
-Code pattern — search step only:
+Code pattern — one search per step:
 ```python
 import json
-search = json.loads(web_search(query="role skill location"))
-for row in search["results"]:
-    pass  # pick posting URLs from row["url"]; scrape in a later step
-print(json.dumps(found_jobs[-2:], indent=0))
-```
-
-Code pattern — scrape step only (separate step from search):
-```python
-import json
-url = "https://..."  # from search["results"][i]["url"]; skip if url in visited_urls
-visited_urls.append(url)
-page = json.loads(scrape_webpage(url=url))
-if not page["error"] and page["title"].strip():
+result = json.loads(search_job_postings(query="role skill location"))
+for job in result["jobs"]:
+    url = job["url"]
+    if url in visited_urls:
+        continue
+    visited_urls.append(url)
     found_jobs.append({
-        "title": page["title"],
-        "company": page["company"],
-        "url": page["url"],
-        "location": page["location"],
+        "title": job["title"],
+        "company": job["company"],
+        "url": job["url"],
+        "location": job["location"],
     })
-print(json.dumps(found_jobs[-1:], indent=0))
+print(json.dumps(found_jobs[-2:], indent=0))
 ```
 
 Final step: call final_answer(found_jobs) with the list of dicts only—no schema wrapper, no tool calls.

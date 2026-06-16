@@ -17,6 +17,8 @@ _JOB_DISCOVERY_DIR = Path(__file__).resolve().parent
 class UrlFilters:
     skip_domains: frozenset[str]
     skip_path_markers: tuple[str, ...]
+    skip_listing_path_markers: tuple[str, ...]
+    skip_listing_path_markers_case_sensitive: tuple[str, ...]
     skip_title_phrases: tuple[str, ...]
     job_url_markers: tuple[str, ...]
 
@@ -41,6 +43,18 @@ def load_url_filters() -> UrlFilters:
         skip_domains=frozenset(_as_str_list(data.get("skip_domains"), field="skip_domains")),
         skip_path_markers=tuple(
             _as_str_list(data.get("skip_path_markers"), field="skip_path_markers")
+        ),
+        skip_listing_path_markers=tuple(
+            _as_str_list(
+                data.get("skip_listing_path_markers"),
+                field="skip_listing_path_markers",
+            )
+        ),
+        skip_listing_path_markers_case_sensitive=tuple(
+            _as_str_list(
+                data.get("skip_listing_path_markers_case_sensitive"),
+                field="skip_listing_path_markers_case_sensitive",
+            )
         ),
         skip_title_phrases=tuple(
             _as_str_list(data.get("skip_title_phrases"), field="skip_title_phrases")
