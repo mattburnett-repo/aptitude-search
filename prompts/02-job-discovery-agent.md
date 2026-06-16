@@ -27,8 +27,8 @@ Discover verified, currently open job postings that match core_skills, constrain
 ## PROCESS
 
 1. Read AptitudeProfile and UserConstraints
-2. Run **at least 2** web searches (3–6 keywords each)
-3. Scrape **top 1–2** direct posting URLs per search (not board list pages, docs, or tutorials)
+2. Run **at least 4** web searches (3–6 keywords each)
+3. Scrape **top 2–3** direct posting URLs per search (not board list pages, docs, or tutorials)
 4. Append compact dicts to `found_jobs`: `title`, `company`, `url`, `location` (and `role` if distinct from title)
 5. Final step: `final_answer(found_jobs)` — no tools, no schema JSON
 
@@ -38,7 +38,7 @@ Discover verified, currently open job postings that match core_skills, constrain
 
 `found_jobs` and `visited_urls` are pre-initialized and persist across steps.
 
-- One code block = **either** one `web_search` **or** up to two `scrape_webpage` calls—**never both**
+- One code block = **either** one `web_search` **or** up to three `scrape_webpage` calls—**never both**
 - Never `print()` raw tool output; print only new `found_jobs` entries this step
 - Track URLs in `visited_urls` before scraping
 - `web_search` and `scrape_webpage` return **JSON strings** — always `json.loads()` them; use `row["url"]` from search and `page["title"]`, `page["company"]`, `page["url"]`, `page["location"]` from scrape
@@ -52,5 +52,5 @@ Discover verified, currently open job postings that match core_skills, constrain
 - Never scrape documentation, tutorial, or blog pages (e.g. dev.to, medium.com)
 - Append to `found_jobs` after scrape when `page["error"]` is empty and `page["title"]` is non-empty
 - Only add listings seen in tool output
-- Target **5+** distinct postings in `found_jobs` when available
+- Target **8+** distinct postings in `found_jobs` when available
 - Do not re-print full `found_jobs` or prior observations

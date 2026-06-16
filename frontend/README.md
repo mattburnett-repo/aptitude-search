@@ -25,6 +25,8 @@ Open http://localhost:5173
 
 Vite proxies `/api/*` → `http://localhost:3001/*` (see `vite.config.ts`). The app calls `POST /api/v1/pipeline`.
 
+If pipeline progress updates lag in the UI, set `VITE_API_URL=http://localhost:3001` in `frontend/.env.local` to bypass the dev proxy (restart `npm run dev`).
+
 ## UI behavior
 
 - Paste resume; optional constraints (location, remote, salary min, industries include/exclude).

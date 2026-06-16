@@ -41,7 +41,7 @@ Return **only** one `json`-language fenced code block.
 Conform to `schemas/job-discovery-results.schema.json`:
 
 - `search_plan` — string array of **3–4** items reflecting how discovery would have been approached from the profile
-- `results` — rows from `found_jobs` only; map `title`/`role` and `company`; write `match_description` per row; target **5–6+** when available; up to **20**
+- `results` — rows from `found_jobs` only; map `title`/`role` and `company`; write `match_description` per row; target **8+** when available; up to **20**
 - `notes` — **1+** caveats (exclusions, sparse results, constraint effects)
 
 No extra top-level keys.

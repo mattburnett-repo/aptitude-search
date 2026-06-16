@@ -1,5 +1,6 @@
 Build the job discovery results JSON from found_jobs below.
 
 Use only postings listed in found_jobs—do not invent companies or URLs.
+Include every legitimate row from found_jobs (target 8+ results when available).
 Apply diversification rules (max 2 per company, max 3 per board domain).
 Return only one json fenced code block conforming to schemas/job-discovery-results.schema.json.

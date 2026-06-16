@@ -16,6 +16,18 @@ export default defineConfig({
         target: "http://localhost:3001",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
+        configure: (proxy) => {
+          proxy.on("proxyRes", (proxyRes) => {
+            const contentType = proxyRes.headers["content-type"];
+            if (
+              typeof contentType === "string" &&
+              contentType.includes("application/x-ndjson")
+            ) {
+              proxyRes.headers["cache-control"] = "no-cache, no-transform";
+              proxyRes.headers["x-accel-buffering"] = "no";
+            }
+          });
+        },
       },
     },
   },

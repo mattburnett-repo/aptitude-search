@@ -38,6 +38,8 @@ def test_stream_pipeline_emits_progress_and_result(
     ) as response:
         assert response.status_code == 200
         assert response.headers["content-type"].startswith("application/x-ndjson")
+        assert response.headers.get("cache-control") == "no-cache, no-transform"
+        assert response.headers.get("x-accel-buffering") == "no"
 
         events: list[dict[str, object]] = [
             cast(dict[str, object], json.loads(line))

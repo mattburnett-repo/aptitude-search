@@ -87,7 +87,16 @@ async def stream_pipeline_response(body: PipelineRequest) -> StreamingResponse:
         while True:
             event = await queue.get()
             yield json.dumps(event) + "\n"
+            await asyncio.sleep(0)
             if event["type"] in ("result", "error"):
                 break
 
-    return StreamingResponse(generate(), media_type="application/x-ndjson")
+    return StreamingResponse(
+        generate(),
+        media_type="application/x-ndjson",
+        headers={
+            "Cache-Control": "no-cache, no-transform",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )

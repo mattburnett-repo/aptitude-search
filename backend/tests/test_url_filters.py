@@ -16,4 +16,5 @@ def test_load_url_filters_reads_configured_toml():
     filters = load_url_filters()
     assert isinstance(filters, UrlFilters)
     assert "medium.com" in filters.skip_domains
+    assert "example.com" in filters.skip_domains
     assert filters.job_url_markers

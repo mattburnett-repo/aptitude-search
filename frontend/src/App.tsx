@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AptitudeProfileDisplay } from "./components/AptitudeProfileDisplay";
 import {
   defaultConstraints,
@@ -21,11 +21,19 @@ function ProgressLog({
   messages: string[];
   loading: boolean;
 }) {
+  const listRef = useRef<HTMLOListElement>(null);
+
+  useEffect(() => {
+    const lastItem = listRef.current?.lastElementChild;
+    lastItem?.scrollIntoView({ block: "nearest" });
+  }, [messages]);
+
   if (messages.length === 0) return null;
   return (
-    <details className="collapsible-section progress-log" open={loading || undefined}>
+    <details className="collapsible-section progress-log" open>
       <summary>Pipeline progress</summary>
       <ol
+        ref={listRef}
         className="progress-log-list"
         aria-live="polite"
         aria-busy={loading}

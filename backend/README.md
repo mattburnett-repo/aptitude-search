@@ -42,12 +42,14 @@ Validates stage-1 golden output only (`career-changer-mixed-stack-stage1.json`).
 
 ## Tests
 
+Requires a valid `config.toml` (same as [Setup](#setup)); pytest imports app config first and exits if that file is missing or invalid.
+
 ```bash
 pip install -r requirements-dev.txt
 pytest
 ```
 
-Uses `config.test.toml` (no API keys or network). Also run `scripts/validate_fixtures.py` for golden fixture schema checks.
+During tests, `conftest.py` then swaps in `config.test.toml` so runs stay mocked and offline (no network or live API keys). Also run `scripts/validate_fixtures.py` for golden fixture schema checks.
 
 ## Endpoints
 

@@ -6,6 +6,7 @@ import tomllib
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
+from typing import cast
 
 from app.core.config import config
 
@@ -24,7 +25,7 @@ def _as_str_list(raw: object, *, field: str) -> list[str]:
     if not isinstance(raw, list) or not raw:
         raise ValueError(f"{field} must be a non-empty array of strings")
     values: list[str] = []
-    for item in raw:
+    for item in cast(list[object], raw):
         if not isinstance(item, str) or not item.strip():
             raise ValueError(f"{field} must contain only non-empty strings")
         values.append(item.strip())
