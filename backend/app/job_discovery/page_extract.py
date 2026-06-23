@@ -159,21 +159,6 @@ def _meta_lines(lines: list[str]) -> list[str]:
     return found
 
 
-def _bullet_lines(lines: list[str]) -> list[str]:
-    bullets: list[str] = []
-    for line in lines:
-        stripped = line.strip()
-        if not stripped or not _BULLET_LINE.match(stripped):
-            continue
-        item = _BULLET_LINE.sub("", stripped).strip()
-        if len(item) < 15 or item in bullets:
-            continue
-        bullets.append(item[:_BULLET_MAX_CHARS])
-        if len(bullets) >= config.llm.job_discovery.page_bullet_max_count:
-            break
-    return bullets
-
-
 def _body_snippet(
     lines: list[str],
     *,

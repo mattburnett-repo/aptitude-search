@@ -10,6 +10,7 @@ from typing import Literal, TypedDict
 from fastapi import HTTPException
 from fastapi.responses import StreamingResponse
 
+from app.core.json_types import JsonObject
 from app.core.models import PipelineRequest
 from app.core.request_context import get_request_id
 from app.core.resume_io import parse_pipeline_body
@@ -25,7 +26,7 @@ class ProgressEvent(TypedDict):
 
 class ResultEvent(TypedDict):
     type: Literal["result"]
-    data: dict[str, object]
+    data: dict[str, JsonObject]
 
 
 class ErrorEvent(TypedDict):

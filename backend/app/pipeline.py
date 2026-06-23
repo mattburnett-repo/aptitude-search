@@ -1,10 +1,10 @@
 import logging
-from typing import Any
 
-from langsmith import traceable
+from langsmith import traceable  # pyright: ignore[reportUnknownVariableType]
 
 from app.core import prompt_loader
 from app.core.config import config
+from app.core.json_types import JsonObject
 from app.core.llm import complete_chat_json
 from app.core.models import Constraints
 from app.core.validate import (
@@ -12,10 +12,8 @@ from app.core.validate import (
     validate_stage,
 )
 from app.job_discovery import (
-    build_stage2_user_message,
     empty_job_discovery_results,
-    run_job_discovery_agent,
-    run_planned_job_discovery,
+    run_job_discovery,
     synthesize_job_discovery_results,
 )
 from app.job_discovery.tool_observed_urls import (
@@ -35,7 +33,7 @@ def run_stage1(
     resume: str,
     *,
     on_progress: ProgressCallback | None = None,
-) -> Any:
+) -> JsonObject:
     emit_progress("Stage 1: Building aptitude profile…", on_progress=on_progress)
     task = prompt_loader.user_task_stage1()
     user = f"{task}\n\n<resume>\n{resume}\n</resume>"
@@ -55,11 +53,11 @@ def run_stage1(
 
 @traceable(run_type="chain", name="stage2")
 def run_stage2(
-    aptitude_profile: Any,
+    aptitude_profile: JsonObject,
     constraints: Constraints | None = None,
     *,
     on_progress: ProgressCallback | None = None,
-) -> Any:
+) -> JsonObject:
     c = constraints or DEFAULT_CONSTRAINTS
     validate_stage("constraints", c.model_dump())
     tool_observed_urls = ToolObservedUrlRegistry()
@@ -67,22 +65,12 @@ def run_stage2(
         "Stage 2: Searching the web for job postings…",
         on_progress=on_progress,
     )
-    if config.job_discovery.discovery_mode == "agent":
-        user = build_stage2_user_message(aptitude_profile, c)
-        found_jobs = run_job_discovery_agent(
-            prompt_loader.system_prompt_stage2_discovery(),
-            user,
-            max_steps=config.llm.job_discovery.max_steps,
-            observed_urls=tool_observed_urls,
-            on_progress=on_progress,
-        )
-    else:
-        found_jobs = run_planned_job_discovery(
-            aptitude_profile,
-            c,
-            observed_urls=tool_observed_urls,
-            on_progress=on_progress,
-        )
+    found_jobs = run_job_discovery(
+        aptitude_profile,
+        c,
+        observed_urls=tool_observed_urls,
+        on_progress=on_progress,
+    )
     if found_jobs:
         emit_progress("Filtering search results…", on_progress=on_progress)
         kept = filter_found_jobs(found_jobs)
@@ -115,7 +103,7 @@ def run_pipeline(
     constraints: Constraints | None = None,
     *,
     on_progress: ProgressCallback | None = None,
-) -> dict[str, Any]:
+) -> dict[str, JsonObject]:
     emit_progress("Starting pipeline…", on_progress=on_progress)
     aptitude_profile = run_stage1(resume, on_progress=on_progress)
     verified_matches = run_stage2(

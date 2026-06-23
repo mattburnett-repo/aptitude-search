@@ -16,34 +16,24 @@ temperature = 0.3
 max_tokens = 8192
 
 [llm.job_discovery]
-model_key = "test-key"
-model = "test/job-discovery-model"
 temperature = 0.0
-max_steps = 10
 visit_max_output_length = 8000
 search_max_results = 10
 search_scrape_max = 3
 search_snippet_max_chars = 300
 search_rate_limit = 1.0
-max_print_outputs_length = 10000
 page_summary_max_chars = 1500
 page_bullet_max_count = 8
 page_snippet_max_chars = 400
-memory_keep_recent_steps = 2
-memory_pruned_observation_max_chars = 200
 
 [job_discovery]
 url_filters_file = "url-filters.toml"
-discovery_mode = "planned"
 discovery_query_max = 6
 
 [prompts]
 stage1_file = "01-resume-to-aptitude-profile.md"
-stage2_discovery_file = "02-job-discovery-agent.md"
 stage2_synthesis_file = "03-job-discovery-synthesis.md"
-code_agent_file = "job-discovery-code-agent.yaml"
 stage1_user_task_file = "stage1-agent-user-task.txt"
-stage2_user_task_file = "stage2-agent-user-task.txt"
 stage2_synthesis_user_task_file = "stage2-synthesis-user-task.txt"
 
 [schemas]

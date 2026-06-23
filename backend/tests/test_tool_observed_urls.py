@@ -1,5 +1,6 @@
 from typing import cast
 
+from app.core.json_types import JsonObject
 from app.job_discovery.tool_observed_urls import (
     ToolObservedUrlRegistry,
     extract_urls_from_tool_output,
@@ -29,19 +30,19 @@ def test_filter_results_to_tool_observed_urls_keeps_only_observed_links():
     registry = ToolObservedUrlRegistry()
     registry.record_url("https://acme.com/careers/1")
 
-    data: dict[str, object] = {
+    data: JsonObject = {
         "results": [
             {"company": "Acme", "url": "https://acme.com/careers/1"},
             {"company": "Fake", "url": "https://invented.com/jobs/9"},
         ],
         "notes": [],
     }
-    filtered = cast(
-        dict[str, object],
-        filter_results_to_tool_observed_urls(data, registry),
-    )
-    filtered_results = cast(list[dict[str, object]], filtered["results"])
+    filtered = filter_results_to_tool_observed_urls(data, registry)
+    filtered_results = cast(list[object], filtered["results"])
     assert len(filtered_results) == 1
-    assert filtered_results[0]["company"] == "Acme"
-    notes = cast(list[str], filtered["notes"])
-    assert any("Removed 1 result" in note for note in notes)
+    first = cast(JsonObject, filtered_results[0])
+    assert first.get("company") == "Acme"
+    notes = filtered.get("notes")
+    assert isinstance(notes, list)
+    note_texts = [str(note) for note in cast(list[object], notes)]
+    assert any("Removed 1 result" in note for note in note_texts)

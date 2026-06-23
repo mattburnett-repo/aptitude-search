@@ -1,14 +1,15 @@
-"""Deterministic Stage 2 discovery: profile-driven queries + search_job_postings."""
+"""Stage 2a discovery: profile-driven queries + search_job_postings."""
 
 from __future__ import annotations
 
 import json
 import logging
-from typing import Any
+from typing import cast
 
-from langsmith import traceable
+from langsmith import traceable  # pyright: ignore[reportUnknownVariableType]
 
 from app.core.config import config
+from app.core.json_types import FoundJob, JsonObject, JsonValue, as_object_dict, as_object_list
 from app.core.models import Constraints
 from app.core.progress import ProgressCallback, emit_progress
 from app.job_discovery.tool_observed_urls import ToolObservedUrlRegistry
@@ -36,12 +37,14 @@ _SENIORITY_TO_ROLE = {
 
 def _skill_names(items: object, *, limit: int) -> list[str]:
     names: list[str] = []
-    if not isinstance(items, list):
+    item_list = as_object_list(items)
+    if item_list is None:
         return names
-    for item in items:
+    for item in item_list:
         label: str | None = None
-        if isinstance(item, dict):
-            raw = item.get("name") or item.get("label")
+        item_dict = as_object_dict(item)
+        if item_dict is not None:
+            raw = item_dict.get("name") or item_dict.get("label")
             if raw:
                 label = str(raw).strip()
         elif item:
@@ -74,7 +77,7 @@ def _location_tokens(constraints: Constraints) -> list[str]:
 
 
 def build_discovery_queries(
-    aptitude_profile: dict[str, Any],
+    aptitude_profile: JsonObject,
     constraints: Constraints,
     *,
     max_queries: int | None = None,
@@ -104,9 +107,9 @@ def build_discovery_queries(
 
 
 def _merge_jobs(
-    found_jobs: list[dict[str, Any]],
+    found_jobs: list[FoundJob],
     seen_urls: set[str],
-    new_jobs: list[dict[str, Any]],
+    new_jobs: list[FoundJob],
 ) -> int:
     added = 0
     for job in new_jobs:
@@ -119,25 +122,43 @@ def _merge_jobs(
     return added
 
 
-@traceable(run_type="chain", name="planned_job_discovery")
-def run_planned_job_discovery(
-    aptitude_profile: Any,
+def _parse_tool_payload(raw: str) -> JsonObject:
+    payload = cast(JsonValue, json.loads(raw))
+    if not isinstance(payload, dict):
+        return {}
+    return payload
+
+
+def _jobs_from_payload(payload: JsonObject) -> list[FoundJob]:
+    jobs_raw = as_object_list(payload.get("jobs"))
+    if jobs_raw is None:
+        return []
+    jobs: list[FoundJob] = []
+    for job in jobs_raw:
+        job_dict = as_object_dict(job)
+        if job_dict is not None:
+            jobs.append(job_dict)
+    return jobs
+
+
+@traceable(run_type="chain", name="job_discovery")
+def run_job_discovery(
+    aptitude_profile: JsonObject,
     constraints: Constraints,
     *,
     observed_urls: ToolObservedUrlRegistry | None = None,
     on_progress: ProgressCallback | None = None,
-) -> list[dict[str, Any]]:
-    """Run profile-planned searches via search_job_postings; returns found_jobs."""
-    profile = aptitude_profile if isinstance(aptitude_profile, dict) else {}
+) -> list[FoundJob]:
+    """Run profile-driven searches via search_job_postings; returns found_jobs."""
     registry = observed_urls if observed_urls is not None else ToolObservedUrlRegistry()
     tool = build_job_discovery_tools(registry)[0]
 
-    queries = build_discovery_queries(profile, constraints)
+    queries = build_discovery_queries(aptitude_profile, constraints)
     if not queries:
-        logger.warning("planned_discovery built zero queries from profile")
+        logger.warning("job_discovery built zero queries from profile")
         return []
 
-    found_jobs: list[dict[str, Any]] = []
+    found_jobs: list[FoundJob] = []
     seen_urls: set[str] = set()
     total = len(queries)
 
@@ -146,18 +167,17 @@ def run_planned_job_discovery(
             f"Searching the web ({index}/{total}): {query}…",
             on_progress=on_progress,
         )
-        payload = json.loads(tool.run_search_job_postings(query))
-        jobs_raw = payload.get("jobs")
-        new_jobs = jobs_raw if isinstance(jobs_raw, list) else []
-        typed_jobs = [job for job in new_jobs if isinstance(job, dict)]
+        payload = _parse_tool_payload(tool.run_search_job_postings(query))
+        typed_jobs = _jobs_from_payload(payload)
         added = _merge_jobs(found_jobs, seen_urls, typed_jobs)
+        message = payload.get("message")
         logger.info(
-            "planned_discovery query=%r jobs_added=%s total=%s message=%r",
+            "job_discovery query=%r jobs_added=%s total=%s message=%r",
             query,
             added,
             len(found_jobs),
-            payload.get("message"),
+            message,
         )
 
-    logger.info("planned_discovery found_jobs count=%s", len(found_jobs))
+    logger.info("job_discovery found_jobs count=%s", len(found_jobs))
     return found_jobs

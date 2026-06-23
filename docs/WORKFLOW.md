@@ -1,6 +1,6 @@
 # Aptitude Search — Workflow Guide
 
-**Product workflow:** [Stage 1](../prompts/01-resume-to-aptitude-profile.md) → Stage 2 ([planned discovery](../docs/PROMPT-CONTRACT.md#stage-2-discovery-mode-discovery_mode) + [synthesis](../prompts/03-job-discovery-synthesis.md))
+**Product workflow:** [Stage 1](../prompts/01-resume-to-aptitude-profile.md) → Stage 2 ([discovery](../docs/PROMPT-CONTRACT.md) + [synthesis](../prompts/03-job-discovery-synthesis.md))
 
 **Run pipeline:** [backend/README.md](../backend/README.md) (Swagger at `/docs`)
 
@@ -26,10 +26,10 @@ See [prompts/README.md](../prompts/README.md). Input: Stage 1 JSON plus optional
 
 The API runs two phases:
 
-1. **Discovery** (default: **planned** — Python builds queries from profile + constraints, runs `search_job_postings`; optional **`discovery_mode = "agent"`** uses `02-job-discovery-agent.md`) — collects `found_jobs`.
+1. **Discovery** — Python builds queries from profile + constraints, runs `search_job_postings` — collects `found_jobs`.
 2. **Synthesis** (`03-job-discovery-synthesis.md`) — maps `found_jobs` into schema-strict JSON with `search_plan`, `results`, and `notes` per `schemas/job-discovery-results.schema.json`.
 
-Configure discovery via `[job_discovery].discovery_mode` in `backend/config.toml`. Details: [PROMPT-CONTRACT — discovery_mode](PROMPT-CONTRACT.md#stage-2-discovery-mode-discovery_mode).
+Configure **`[job_discovery].discovery_query_max`** in `backend/config.toml`. Details: [PROMPT-CONTRACT](PROMPT-CONTRACT.md).
 
 **API:** `POST /v1/pipeline` runs Stage 1 then Stage 2 with no manual step. Use Swagger at `http://localhost:3001/docs`. See [PROMPT-CONTRACT.md](PROMPT-CONTRACT.md).
 

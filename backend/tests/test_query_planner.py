@@ -1,5 +1,5 @@
 from app.core.models import Constraints
-from app.job_discovery.planned_discovery import build_discovery_queries
+from app.job_discovery.discovery import build_discovery_queries
 
 
 def test_build_discovery_queries_uses_core_skills_and_constraints(

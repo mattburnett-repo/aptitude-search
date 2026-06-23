@@ -3,6 +3,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from app.core.json_types import JsonObject
+
 from app.core.models import Constraints
 from app.core.validate import validate_stage
 from app.job_discovery.tool_observed_urls import ToolObservedUrlRegistry
@@ -28,18 +30,18 @@ def _passthrough_verified_results(
 
 
 @patch("app.pipeline.synthesize_job_discovery_results")
-@patch("app.pipeline.run_planned_job_discovery")
+@patch("app.pipeline.run_job_discovery")
 @patch("app.pipeline.complete_chat_json")
 def test_run_pipeline_wires_stages_and_validates_output(
     mock_complete_chat_json: MagicMock,
-    mock_run_planned_job_discovery: MagicMock,
+    mock_run_job_discovery: MagicMock,
     mock_synthesize: MagicMock,
     stage1_fixture: dict[str, object],
     verified_matches_fixture: dict[str, object],
     found_jobs: list[dict[str, object]],
 ) -> None:
     mock_complete_chat_json.return_value = stage1_fixture
-    mock_run_planned_job_discovery.return_value = found_jobs
+    mock_run_job_discovery.return_value = found_jobs
     mock_synthesize.return_value = verified_matches_fixture
 
     with patch(
@@ -50,13 +52,15 @@ def test_run_pipeline_wires_stages_and_validates_output(
 
     validate_stage("aptitudeProfile", result["aptitude_profile"])
     validate_stage("jobDiscovery", result["verified_matches"])
-    verified_matches = cast(dict[str, object], result["verified_matches"])
-    results = cast(list[dict[str, object]], verified_matches["results"])
-    assert results[0]["company"] == "Acme Corp"
+    verified_matches = result["verified_matches"]
+    results_raw = verified_matches.get("results")
+    assert isinstance(results_raw, list)
+    first = cast(JsonObject, results_raw[0])
+    assert first.get("company") == "Acme Corp"
 
 
 @patch("app.pipeline.empty_job_discovery_results")
-@patch("app.pipeline.run_planned_job_discovery", return_value=[])
+@patch("app.pipeline.run_job_discovery", return_value=[])
 def test_run_stage2_returns_empty_results_when_discovery_finds_nothing(
     _mock_discovery: MagicMock,
     mock_empty_results: MagicMock,
@@ -73,6 +77,6 @@ def test_run_stage2_returns_empty_results_when_discovery_finds_nothing(
     }
     mock_empty_results.return_value = empty
 
-    result = cast(dict[str, object], run_stage2(stage1_fixture, Constraints()))
+    result = run_stage2(stage1_fixture, Constraints())
     validate_stage("jobDiscovery", result)
     assert result["results"] == []

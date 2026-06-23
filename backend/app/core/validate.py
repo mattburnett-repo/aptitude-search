@@ -1,36 +1,53 @@
 import json
 import re
-from typing import Any
+from typing import cast
 
 from jsonschema import Draft202012Validator
-from jsonschema import RefResolver
+from jsonschema import RefResolver  # pyright: ignore[reportDeprecated]
+from jsonschema.exceptions import ValidationError
 
 from app.core.config import config
+from app.core.json_types import (
+    JsonInstance,
+    JsonObject,
+    JsonValue,
+    as_object_dict,
+    as_object_list,
+)
 from app.core.paths import SCHEMAS_DIR
 
 
-def _load_schema(name: str) -> dict:
-    return json.loads((SCHEMAS_DIR / name).read_text(encoding="utf-8"))
+def _load_schema(name: str) -> JsonObject:
+    return cast(JsonObject, json.loads((SCHEMAS_DIR / name).read_text(encoding="utf-8")))
 
 
 def _build_validators() -> dict[str, Draft202012Validator]:
     constraints = _load_schema(config.schemas.constraints)
     aptitude = _load_schema(config.schemas.aptitude_profile)
     job_discovery = _load_schema(config.schemas.job_discovery_results)
-    store = {
-        constraints["$id"]: constraints,
-        aptitude["$id"]: aptitude,
-        job_discovery["$id"]: job_discovery,
+    store: dict[str, JsonObject] = {
+        str(constraints["$id"]): constraints,
+        str(aptitude["$id"]): aptitude,
+        str(job_discovery["$id"]): job_discovery,
     }
     return {
         "aptitudeProfile": Draft202012Validator(
-            aptitude, resolver=RefResolver.from_schema(aptitude, store=store)
+            aptitude,
+            resolver=RefResolver.from_schema(  # pyright: ignore[reportDeprecated, reportUnknownMemberType]
+                aptitude, store=store
+            ),
         ),
         "constraints": Draft202012Validator(
-            constraints, resolver=RefResolver.from_schema(constraints, store=store)
+            constraints,
+            resolver=RefResolver.from_schema(  # pyright: ignore[reportDeprecated, reportUnknownMemberType]
+                constraints, store=store
+            ),
         ),
         "jobDiscovery": Draft202012Validator(
-            job_discovery, resolver=RefResolver.from_schema(job_discovery, store=store)
+            job_discovery,
+            resolver=RefResolver.from_schema(  # pyright: ignore[reportDeprecated, reportUnknownMemberType]
+                job_discovery, store=store
+            ),
         ),
     }
 
@@ -62,13 +79,21 @@ _JOB_POSTING_KEYS = frozenset(
 )
 
 
-def validate_stage(stage: str, data: Any) -> None:
+def validate_stage(stage: str, data: JsonInstance) -> None:
     validator = _VALIDATORS.get(stage)
     if validator is None:
         raise ValueError(f"Unknown stage: {stage}")
-    errors = sorted(validator.iter_errors(data), key=lambda e: list(e.path))
+    errors = sorted(
+        cast(
+            list[ValidationError],
+            list(
+                validator.iter_errors(data)  # pyright: ignore[reportArgumentType, reportUnknownMemberType]
+            ),
+        ),
+        key=lambda error: list(error.path),
+    )
     if errors:
-        msg = "; ".join(e.message for e in errors[:5])
+        msg = "; ".join(error.message for error in errors[:5])
         raise ValueError(f"Schema validation failed ({stage}): {msg}")
 
 
@@ -83,7 +108,7 @@ def _json_payload_from_text(text: str) -> str:
     return trimmed
 
 
-def _loads_json_lenient(payload: str) -> Any:
+def _loads_json_lenient(payload: str) -> JsonValue:
     attempts = (
         payload,
         re.sub(r",\s*([\]}])", r"\1", payload),
@@ -91,19 +116,21 @@ def _loads_json_lenient(payload: str) -> Any:
     last_error: json.JSONDecodeError | None = None
     for candidate in attempts:
         try:
-            return json.loads(candidate)
+            return cast(JsonValue, json.loads(candidate))
         except json.JSONDecodeError as e:
             last_error = e
             try:
-                obj, _end = json.JSONDecoder().raw_decode(candidate.lstrip())
-                return obj
+                return cast(
+                    JsonValue,
+                    json.JSONDecoder().raw_decode(candidate.lstrip())[0],
+                )
             except json.JSONDecodeError as e2:
                 last_error = e2
     assert last_error is not None
     raise last_error
 
 
-def parse_json_response(text: str) -> Any:
+def parse_json_response(text: str) -> JsonValue:
     """Parse JSON from LLM/agent text (fenced block, embedded fence, or raw object)."""
     payload = _json_payload_from_text(text)
     try:
@@ -112,30 +139,30 @@ def parse_json_response(text: str) -> Any:
         raise ValueError(f"Invalid JSON in model response: {e}") from e
 
 
-def _normalize_confidence(value: Any) -> str:
+def _normalize_confidence(value: object) -> str:
     if isinstance(value, str) and value in _VALID_CONFIDENCE:
         return value
     return "low"
 
 
-def _normalize_confidence_map_entry(item: Any) -> dict[str, str]:
+def _normalize_confidence_map_entry(item: object) -> dict[str, str]:
     """Coerce LLM confidence_map values into {confidence, reason}."""
     if isinstance(item, str):
         return {"confidence": _normalize_confidence(item), "reason": ""}
-    if not isinstance(item, dict):
+    entry = as_object_dict(item)
+    if entry is None:
         return {"confidence": "low", "reason": ""}
 
-    confidence = item.get("confidence")
-    reason = item.get("reason")
+    confidence = entry.get("confidence")
+    reason = entry.get("reason")
     if isinstance(confidence, str) and confidence in _VALID_CONFIDENCE:
         return {
             "confidence": confidence,
             "reason": reason.strip() if isinstance(reason, str) else "",
         }
 
-    # Model used level names as keys, e.g. {"high": "because ..."} or {"medium": true}.
     for level in ("high", "medium", "low"):
-        level_val = item.get(level)
+        level_val = entry.get(level)
         if isinstance(level_val, str) and level_val.strip():
             return {"confidence": level, "reason": level_val.strip()}
         if level_val is True:
@@ -147,17 +174,18 @@ def _normalize_confidence_map_entry(item: Any) -> dict[str, str]:
     return {"confidence": "low", "reason": ""}
 
 
-def _normalize_confidence_map(confidence_map: Any) -> dict[str, dict[str, str]]:
-    if not isinstance(confidence_map, dict):
+def _normalize_confidence_map(confidence_map: object) -> dict[str, dict[str, str]]:
+    mapping = as_object_dict(confidence_map)
+    if mapping is None:
         return {}
 
-    # Inverted shape: {"high": ["seniority_band", ...], "medium": [...]}.
-    if confidence_map and all(key in _VALID_CONFIDENCE for key in confidence_map):
+    if mapping and all(str(key) in _VALID_CONFIDENCE for key in mapping):
         rebuilt: dict[str, dict[str, str]] = {}
-        for level, fields in confidence_map.items():
+        for level, fields in mapping.items():
             field_names: list[str] = []
-            if isinstance(fields, list):
-                field_names = [str(f) for f in fields if f]
+            field_list = as_object_list(fields)
+            if field_list is not None:
+                field_names = [str(field) for field in field_list if field]
             elif isinstance(fields, str) and fields.strip():
                 field_names = [fields.strip()]
             for field in field_names:
@@ -169,11 +197,11 @@ def _normalize_confidence_map(confidence_map: Any) -> dict[str, dict[str, str]]:
 
     return {
         str(key): _normalize_confidence_map_entry(item)
-        for key, item in confidence_map.items()
+        for key, item in mapping.items()
     }
 
 
-def _prune_dict(item: dict[str, Any], allowed: frozenset[str]) -> None:
+def _prune_dict(item: JsonObject, allowed: frozenset[str]) -> None:
     for key in list(item.keys()):
         if key not in allowed:
             del item[key]
@@ -183,7 +211,7 @@ _SKILL_ITEM_KEYS = frozenset({"name", "confidence", "evidence_from_resume"})
 _LABELED_ITEM_KEYS = frozenset({"label", "confidence", "evidence_from_resume"})
 
 
-def _normalize_seniority_band(value: Any) -> str:
+def _normalize_seniority_band(value: object) -> str:
     if not isinstance(value, str):
         return "unknown"
     key = value.strip().lower()
@@ -192,7 +220,7 @@ def _normalize_seniority_band(value: Any) -> str:
     return _SENIORITY_ALIASES.get(key, "unknown")
 
 
-def _normalize_skill_item(item: dict[str, Any]) -> None:
+def _normalize_skill_item(item: JsonObject) -> None:
     name = item.get("name")
     label = item.get("label")
     if not isinstance(name, str) or not name.strip():
@@ -202,7 +230,7 @@ def _normalize_skill_item(item: dict[str, Any]) -> None:
     item["confidence"] = _normalize_confidence(item.get("confidence"))
 
 
-def _normalize_labeled_item(item: dict[str, Any]) -> None:
+def _normalize_labeled_item(item: JsonObject) -> None:
     label = item.get("label")
     name = item.get("name")
     if not isinstance(label, str) or not label.strip():
@@ -212,37 +240,36 @@ def _normalize_labeled_item(item: dict[str, Any]) -> None:
     item["confidence"] = _normalize_confidence(item.get("confidence"))
 
 
-def normalize_aptitude_profile(data: Any) -> Any:
-    if not isinstance(data, dict):
-        return data
+def normalize_aptitude_profile(data: object) -> JsonObject:
+    profile = as_object_dict(data)
+    if profile is None:
+        return {}
 
-    data["seniority_band"] = _normalize_seniority_band(data.get("seniority_band"))
+    profile["seniority_band"] = _normalize_seniority_band(profile.get("seniority_band"))
 
-    skill_keys = ("core_skills", "secondary_skills")
-    labeled_keys = ("domains", "strengths", "adjacent_roles", "working_style_signals")
-
-    for key in skill_keys:
-        items = data.get(key)
-        if not isinstance(items, list):
+    for key in ("core_skills", "secondary_skills"):
+        items = as_object_list(profile.get(key))
+        if items is None:
             continue
         for item in items:
-            if isinstance(item, dict):
-                _normalize_skill_item(item)
+            skill_item = as_object_dict(item)
+            if skill_item is not None:
+                _normalize_skill_item(skill_item)
 
-    for key in labeled_keys:
-        items = data.get(key)
-        if not isinstance(items, list):
+    for key in ("domains", "strengths", "adjacent_roles", "working_style_signals"):
+        items = as_object_list(profile.get(key))
+        if items is None:
             continue
         for item in items:
-            if isinstance(item, dict):
-                _normalize_labeled_item(item)
+            labeled_item = as_object_dict(item)
+            if labeled_item is not None:
+                _normalize_labeled_item(labeled_item)
 
-    data["confidence_map"] = _normalize_confidence_map(data.get("confidence_map"))
+    profile["confidence_map"] = _normalize_confidence_map(profile.get("confidence_map"))
+    return profile
 
-    return data
 
-
-def _build_match_description(item: dict) -> str:
+def _build_match_description(item: JsonObject) -> str:
     existing = item.get("match_description")
     if isinstance(existing, str) and existing.strip():
         return existing.strip()
@@ -256,8 +283,11 @@ def _build_match_description(item: dict) -> str:
         "adjacent_roles_match",
     ):
         val = item.get(key)
-        if isinstance(val, list) and val:
-            parts.append(f"{key.replace('_', ' ')}: {', '.join(str(x) for x in val)}")
+        val_list = as_object_list(val)
+        if val_list:
+            parts.append(
+                f"{key.replace('_', ' ')}: {', '.join(str(entry) for entry in val_list)}"
+            )
         elif isinstance(val, str) and val.strip():
             parts.append(val.strip())
 
@@ -269,26 +299,28 @@ def _build_match_description(item: dict) -> str:
     return f"Aligned with aptitude profile for {role} at {company}."
 
 
-def normalize_job_discovery_results(data: Any) -> Any:
-    if not isinstance(data, dict):
-        return data
+def normalize_job_discovery_results(data: object) -> JsonObject:
+    payload = as_object_dict(data)
+    if payload is None:
+        return {}
 
-    results = data.get("results")
-    if not isinstance(results, list):
-        return data
+    results = as_object_list(payload.get("results"))
+    if results is None:
+        return payload
 
-    normalized: list[Any] = []
+    normalized: list[JsonObject] = []
     for item in results:
-        if not isinstance(item, dict):
+        row = as_object_dict(item)
+        if row is None:
             continue
-        if "role" not in item and isinstance(item.get("title"), str):
-            item["role"] = item["title"]
-        item["match_description"] = _build_match_description(item)
-        if "seniority_level" in item:
-            item["seniority_level"] = _normalize_seniority_band(item.get("seniority_level"))
-        if isinstance(item.get("confidence"), str):
-            item["confidence"] = _normalize_confidence(item.get("confidence"))
-        normalized.append({k: v for k, v in item.items() if k in _JOB_POSTING_KEYS})
+        if "role" not in row and isinstance(row.get("title"), str):
+            row["role"] = row["title"]
+        row["match_description"] = _build_match_description(row)
+        if "seniority_level" in row:
+            row["seniority_level"] = _normalize_seniority_band(row.get("seniority_level"))
+        if isinstance(row.get("confidence"), str):
+            row["confidence"] = _normalize_confidence(row.get("confidence"))
+        normalized.append({key: value for key, value in row.items() if key in _JOB_POSTING_KEYS})
 
-    data["results"] = normalized
-    return data
+    payload["results"] = normalized
+    return payload

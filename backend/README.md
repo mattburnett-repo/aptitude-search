@@ -1,18 +1,16 @@
 # Aptitude Search API (Python / FastAPI)
 
-Orchestration for **Stage 1** (aptitude profile JSON, schema-validated) and **Stage 2** (planned web search → synthesis LLM call → `verified_matches` JSON, schema-validated).
+Orchestration for **Stage 1** (aptitude profile JSON, schema-validated) and **Stage 2** (profile-driven web search → synthesis LLM call → `verified_matches` JSON, schema-validated).
 
-**Hugging Face keys** in `config.toml` (separate per stage; values may be the same token):
+**Hugging Face keys** in `config.toml`:
 
 - **Stage 1:** `[llm.aptitude].model_key` + `[llm.aptitude].model` — resume → aptitude profile (chat JSON).
-- **Stage 2 discovery (default):** `[job_discovery].discovery_mode = "planned"` — Python builds queries from profile + constraints and runs `search_job_postings` per skill. Set `discovery_mode = "agent"` to use the `smolagents` CodeAgent instead (`[llm.job_discovery].max_steps`).
-- **Stage 2 synthesis:** `[llm.job_discovery].model_key` + `[llm.job_discovery].model` — maps `found_jobs` to verified matches JSON.
+- **Stage 2 discovery:** Python builds queries from profile + constraints and runs `search_job_postings` per skill (`[job_discovery].discovery_query_max`). No LLM for discovery.
+- **Stage 2 synthesis:** `[llm.aptitude].model` + `[llm.job_discovery].temperature` — maps `found_jobs` to verified matches JSON.
 
-See **[discovery_mode](../docs/PROMPT-CONTRACT.md#stage-2-discovery-mode-discovery_mode)** in PROMPT-CONTRACT for the full table and related settings (`discovery_query_max`, when to use `agent`).
+See **[PROMPT-CONTRACT](../docs/PROMPT-CONTRACT.md)** for the full pipeline.
 
-Smoke-test Stage 2 planned discovery: `.venv/bin/python scripts/smoke_planned_discovery.py`
-
-Smoke-test Stage 2 agent (optional): `.venv/bin/python scripts/smoke_job_discovery_agent.py`
+Smoke-test Stage 2 discovery: `.venv/bin/python scripts/smoke_job_discovery.py`
 
 Stage 2 output is parsed and validated against `schemas/job-discovery-results.schema.json`.
 
@@ -24,7 +22,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 cp config.example.toml config.toml   # if config.toml is missing
-# Edit config.toml: set [llm.aptitude].model_key and [llm.job_discovery].model_key
+# Edit config.toml: set [llm.aptitude].model_key
 ```
 
 App settings live in `config.toml` (see `config.example.toml`). Loaded once via `app.core.config.config`.
@@ -94,8 +92,7 @@ curl -s -X POST http://localhost:3001/v1/pipeline \
 ## Implementation notes
 
 - Stage 1 system prompt: `prompts/01-resume-to-aptitude-profile.md` (file body minus `#` title line).
-- **Stage 2a discovery (default):** `app/job_discovery/planned_discovery.py` — profile-driven queries + `search_job_postings`. Controlled by `[job_discovery].discovery_mode = "planned"` (see [PROMPT-CONTRACT](../docs/PROMPT-CONTRACT.md#stage-2-discovery-mode-discovery_mode)).
-- **Stage 2a discovery (optional):** `discovery_mode = "agent"` loads `prompts/02-job-discovery-agent.md` + `prompts/job-discovery-code-agent.yaml` (`smolagents` CodeAgent).
+- **Stage 2a discovery:** `app/job_discovery/discovery.py` — profile-driven queries + `search_job_postings` (see [PROMPT-CONTRACT](../docs/PROMPT-CONTRACT.md)).
 - Stage 2 synthesis: `prompts/03-job-discovery-synthesis.md` (chat JSON → `verified_matches`).
 - Filenames are configured in `config.toml` under `[prompts]`.
 - **URL filters (Stage 2):** blocked domains, path markers, and related SERP/`found_jobs` rules live in `app/job_discovery/url-filters.toml` (filename set by `[job_discovery].url_filters_file` in `config.toml`, resolved relative to `app/job_discovery/`). Add or remove entries in that file’s arrays (`skip_domains`, `skip_path_markers`, `skip_title_phrases`, `job_url_markers`); restart the API to pick up changes.

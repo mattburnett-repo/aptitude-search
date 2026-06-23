@@ -63,16 +63,14 @@ flowchart LR
   API --> S2
 ```
 
-**Stage 2a discovery:** default `discovery_mode = "planned"` (`planned_discovery.py` + `search_job_postings`). Optional `discovery_mode = "agent"` uses smolagents + `02-job-discovery-agent.md`. See [PROMPT-CONTRACT.md](../../docs/PROMPT-CONTRACT.md#stage-2-discovery-mode-discovery_mode).
+**Stage 2a discovery:** `discovery.py` + `search_job_postings` (profile-driven queries). See [PROMPT-CONTRACT.md](../../docs/PROMPT-CONTRACT.md).
 
 ### Repository layout (actual)
 
 ```
 prompts/
   01-resume-to-aptitude-profile.md
-  02-job-discovery-agent.md
   03-job-discovery-synthesis.md
-  job-discovery-code-agent.yaml
   02-verified-job-discovery.md    # reference only (monolithic predecessor)
   XX-original-aptitude-prompt.md    # reference only
 schemas/
@@ -94,7 +92,7 @@ design-docs/                        # original exploration (historical)
 | # | File | Input | Output |
 |---|------|-------|--------|
 | 1 | `01-resume-to-aptitude-profile.md` | Resume text | `aptitude-profile` JSON |
-| 2a | `planned_discovery.py` (default); optional: `02-job-discovery-agent.md`, `job-discovery-code-agent.yaml` | Stage 1 JSON + optional constraints | `found_jobs` (internal) |
+| 2a | `discovery.py` | Stage 1 JSON + optional constraints | `found_jobs` (internal) |
 | 2b | `03-job-discovery-synthesis.md` | Profile + constraints + `found_jobs` | `job-discovery-results` JSON |
 
 ### API (implemented)
@@ -121,7 +119,7 @@ Headers: none for API key/model override; key and model are configured server-si
 
 - API validates stage 1, stage 2, and constraints via `jsonschema`
 - `backend/scripts/validate_fixtures.py` checks stage-1 golden fixture only
-- Stage 2: planned discovery + synthesis LLM (API pipeline); smoke `scripts/smoke_planned_discovery.py`; optional agent smoke `scripts/smoke_job_discovery_agent.py`
+- Stage 2: discovery + synthesis LLM (API pipeline); smoke `scripts/smoke_job_discovery.py`
 
 ### Phase 1 gate
 

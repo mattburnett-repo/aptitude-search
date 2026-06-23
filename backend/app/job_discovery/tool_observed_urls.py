@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import re
-from typing import Any
 from urllib.parse import urlparse, urlunparse
+
+from app.core.json_types import JsonObject, as_object_dict, as_object_list
 
 _MARKDOWN_LINK_URL = re.compile(r"\]\((https?://[^)\s]+)\)")
 _PLAIN_HTTP_URL = re.compile(r"https?://[^\s\)\]>\",']+")
@@ -36,7 +37,7 @@ def extract_urls_from_tool_output(text: str) -> set[str]:
 
 
 class ToolObservedUrlRegistry:
-    """URLs returned by search_job_postings during one agent run."""
+    """URLs returned by search_job_postings during one discovery run."""
 
     def __init__(self) -> None:
         self._urls: set[str] = set()
@@ -57,35 +58,38 @@ class ToolObservedUrlRegistry:
 
 
 def filter_results_to_tool_observed_urls(
-    data: dict[str, Any],
+    data: JsonObject,
     registry: ToolObservedUrlRegistry,
-) -> dict[str, Any]:
+) -> JsonObject:
     """
     Drop job rows whose url never appeared in tool output (model may invent or alter links).
     """
-    results = data.get("results")
-    if not isinstance(results, list):
+    results = as_object_list(data.get("results"))
+    if results is None:
         return data
 
-    kept: list[Any] = []
+    kept: list[JsonObject] = []
     removed = 0
     for item in results:
-        if not isinstance(item, dict):
+        row = as_object_dict(item)
+        if row is None:
             continue
-        url = item.get("url")
+        url = row.get("url")
         if isinstance(url, str) and registry.was_observed(url):
-            kept.append(item)
+            kept.append(row)
         else:
             removed += 1
 
     data["results"] = kept
     if removed:
-        notes = data.get("notes")
-        if not isinstance(notes, list):
+        notes = as_object_list(data.get("notes"))
+        if notes is None:
             notes = []
         notes.append(
-            f"Removed {removed} result(s): URL was not present in "
-            "search_job_postings tool output."
+            (
+                f"Removed {removed} result(s): URL was not present in "
+                "search_job_postings tool output."
+            )
         )
         data["notes"] = notes
     return data

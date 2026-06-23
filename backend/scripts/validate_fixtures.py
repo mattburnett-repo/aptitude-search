@@ -4,10 +4,12 @@
 import json
 import sys
 from pathlib import Path
+from typing import cast
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from app.core.config import config
+from app.core.json_types import JsonObject
 from app.core.paths import FIXTURES_DIR
 from app.core.validate import validate_stage
 
@@ -16,7 +18,10 @@ def main() -> int:
     failed = 0
     for entry in config.fixtures.files:
         name, stage = entry.name, entry.stage
-        data = json.loads((FIXTURES_DIR / name).read_text(encoding="utf-8"))
+        data = cast(
+            JsonObject,
+            json.loads((FIXTURES_DIR / name).read_text(encoding="utf-8")),
+        )
         try:
             validate_stage(stage, data)
             print(f"OK  {name}")

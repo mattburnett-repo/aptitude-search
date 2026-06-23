@@ -1,8 +1,6 @@
 import sys
 import tomllib
 from pathlib import Path
-from typing import Literal
-
 from pydantic import BaseModel, Field, ValidationError, ValidationInfo, field_validator
 
 _CONFIG_PATH = Path(__file__).resolve().parents[2] / "config.toml"
@@ -46,9 +44,21 @@ class AptitudeLlmConfig(BaseModel):
 
 
 class JobDiscoveryConfig(BaseModel):
-    url_filters_file: str = "url-filters.toml"
-    discovery_mode: Literal["planned", "agent"] = "planned"
-    discovery_query_max: int = 6
+    url_filters_file: str
+    discovery_query_max: int
+
+    @field_validator("url_filters_file")
+    @classmethod
+    def url_filters_file_basename(cls, value: str, info: ValidationInfo) -> str:
+        stripped = value.strip()
+        if not stripped:
+            field = info.field_name or "field"
+            raise ValueError(f"job_discovery.{field} must be set in config.toml")
+        if Path(stripped).name != stripped or stripped in (".", ".."):
+            raise ValueError(
+                "job_discovery.url_filters_file must be a filename under app/job_discovery/"
+            )
+        return stripped
 
     @field_validator("discovery_query_max")
     @classmethod
@@ -60,43 +70,24 @@ class JobDiscoveryConfig(BaseModel):
 
 
 class JobDiscoveryLlmConfig(BaseModel):
-    model_key: str
-    model: str
     temperature: float
-    max_steps: int
     visit_max_output_length: int
     search_max_results: int
     search_scrape_max: int
     search_snippet_max_chars: int
     search_rate_limit: float | None
-    max_print_outputs_length: int
     page_summary_max_chars: int
     page_bullet_max_count: int
     page_snippet_max_chars: int
-    memory_keep_recent_steps: int
-    memory_pruned_observation_max_chars: int
-
-    @field_validator("model_key", "model")
-    @classmethod
-    def string_must_be_set(cls, value: str, info: ValidationInfo) -> str:
-        stripped = value.strip()
-        if not stripped:
-            field = info.field_name or "field"
-            raise ValueError(f"llm.job_discovery.{field} must be set in config.toml")
-        return stripped
 
     @field_validator(
-        "max_steps",
         "visit_max_output_length",
         "search_max_results",
         "search_scrape_max",
         "search_snippet_max_chars",
-        "max_print_outputs_length",
         "page_summary_max_chars",
         "page_bullet_max_count",
         "page_snippet_max_chars",
-        "memory_keep_recent_steps",
-        "memory_pruned_observation_max_chars",
     )
     @classmethod
     def positive_int(cls, value: int, info: ValidationInfo) -> int:
@@ -125,11 +116,8 @@ class LlmConfig(BaseModel):
 
 class PromptsConfig(BaseModel):
     stage1_file: str
-    stage2_discovery_file: str
     stage2_synthesis_file: str
-    code_agent_file: str
     stage1_user_task_file: str = "stage1-agent-user-task.txt"
-    stage2_user_task_file: str = "stage2-agent-user-task.txt"
     stage2_synthesis_user_task_file: str = "stage2-synthesis-user-task.txt"
 
 
@@ -158,7 +146,7 @@ class Config(BaseModel):
     app: AppConfig
     cors: CorsConfig
     llm: LlmConfig
-    job_discovery: JobDiscoveryConfig = Field(default_factory=JobDiscoveryConfig)
+    job_discovery: JobDiscoveryConfig
     prompts: PromptsConfig
     schemas: SchemasConfig
     paths: PathsConfig

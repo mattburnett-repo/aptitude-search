@@ -131,7 +131,7 @@ def stage1(body: Stage1Request):
 def stage2(body: Stage2Request):
     return {
         "verified_matches": run_stage2(
-            body.aptitude_profile,  # pyright: ignore[reportAny]
+            body.aptitude_profile,
             body.constraints,
         )
     }

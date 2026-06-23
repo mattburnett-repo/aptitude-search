@@ -3,6 +3,7 @@ from typing import cast
 
 import pytest
 
+from app.core.json_types import JsonObject
 from app.core.paths import FIXTURES_DIR
 from app.core.validate import (
     normalize_aptitude_profile,
@@ -10,8 +11,6 @@ from app.core.validate import (
     parse_json_response,
     validate_stage,
 )
-
-REPO_FIXTURES = FIXTURES_DIR
 
 
 def test_parse_json_response_from_fenced_block():
@@ -26,32 +25,32 @@ def test_parse_json_response_strips_trailing_commas():
 
 def test_parse_json_response_rejects_invalid_json():
     with pytest.raises(ValueError, match="Invalid JSON"):
-        parse_json_response("not json at all")
+        _ = parse_json_response("not json at all")
 
 
 def test_normalize_aptitude_profile_maps_seniority_aliases():
-    data: dict[str, object] = {
+    data: JsonObject = {
         "seniority_band": "mid-level",
         "core_skills": [],
         "confidence_map": {},
     }
-    result = cast(dict[str, object], normalize_aptitude_profile(data))
+    result = normalize_aptitude_profile(data)
     assert result["seniority_band"] == "mid"
 
 
 def test_normalize_aptitude_profile_coerces_inverted_confidence_map():
-    data: dict[str, object] = {
+    data: JsonObject = {
         "seniority_band": "senior",
         "confidence_map": {"high": ["core_skills"], "medium": ["adjacent_roles"]},
     }
-    result = cast(dict[str, object], normalize_aptitude_profile(data))
+    result = normalize_aptitude_profile(data)
     confidence_map = cast(dict[str, dict[str, str]], result["confidence_map"])
     assert confidence_map["core_skills"]["confidence"] == "high"
     assert confidence_map["adjacent_roles"]["confidence"] == "medium"
 
 
 def test_normalize_job_discovery_results_builds_match_description():
-    data: dict[str, object] = {
+    data: JsonObject = {
         "results": [
             {
                 "title": "Backend Engineer",
@@ -62,8 +61,8 @@ def test_normalize_job_discovery_results_builds_match_description():
             }
         ]
     }
-    result = cast(dict[str, object], normalize_job_discovery_results(data))
-    results = cast(list[dict[str, object]], result["results"])
+    result = normalize_job_discovery_results(data)
+    results = cast(list[JsonObject], result["results"])
     row = results[0]
     assert row["role"] == "Backend Engineer"
     match_description = cast(str, row["match_description"])
@@ -72,9 +71,9 @@ def test_normalize_job_discovery_results_builds_match_description():
 
 
 def test_validate_stage_accepts_golden_aptitude_fixture():
-    path = REPO_FIXTURES / "career-changer-mixed-stack-stage1.json"
-    data = cast(dict[str, object], json.loads(path.read_text(encoding="utf-8")))
-    normalized = cast(dict[str, object], normalize_aptitude_profile(data))
+    path = FIXTURES_DIR / "career-changer-mixed-stack-stage1.json"
+    data = cast(JsonObject, json.loads(path.read_text(encoding="utf-8")))
+    normalized = normalize_aptitude_profile(data)
     validate_stage("aptitudeProfile", normalized)
 
 

@@ -11,7 +11,7 @@ Terminal 1 — API:
 ```bash
 cd backend && python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-cp config.example.toml config.toml   # if needed; set [llm.aptitude].model_key and [llm.job_discovery].model_key
+cp config.example.toml config.toml   # if needed; set [llm.aptitude].model_key
 .venv/bin/python -m uvicorn app.main:app --reload --port 3001
 ```
 

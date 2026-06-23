@@ -9,7 +9,7 @@ Pack version: v1.0.0
 | Criterion | Status | Evidence |
 |-----------|--------|----------|
 | Core prompts produce schema-valid JSON on diverse resumes | Pass (stage 1) | `prompts/01-resume-to-aptitude-profile.md`, `schemas/aptitude-profile.schema.json`, three sample resumes under `fixtures/sample-resumes/` |
-| Stage 2 output matches job-discovery schema when run with verification | Manual | `prompts/02-job-discovery-agent.md`, `prompts/03-job-discovery-synthesis.md`, `schemas/job-discovery-results.schema.json`; API `POST /v1/pipeline` or `POST /v1/stages/2` |
+| Stage 2 output matches job-discovery schema when run with verification | Manual | `prompts/03-job-discovery-synthesis.md`, `app/job_discovery/discovery.py`, `schemas/job-discovery-results.schema.json`; API `POST /v1/pipeline` or `POST /v1/stages/2` |
 | Human review: matches useful vs raw keyword dump | Manual | Review `results[].match_description` and `search_plan` diversity |
 | Buyer doc sufficient for a stranger | Pass | `docs/WORKFLOW.md`, `backend/README.md` (Swagger), `prompts/README.md` |
 
