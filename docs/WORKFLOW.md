@@ -4,7 +4,7 @@
 
 **Run pipeline:** [backend/README.md](../backend/README.md) (Swagger at `/docs`)
 
-`XX-original-aptitude-prompt.md` is the reference spec used to build Prompts 1 and 2.
+`XX-original-aptitude-prompt.md` is the reference spec used to build the Stage 1 prompt (`01`) and the legacy monolithic Stage 2 prompt (`02`, reference only).
 
 ---
 

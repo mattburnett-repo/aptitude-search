@@ -12,7 +12,6 @@ Plans for this project are authoritative **only** when they live in:
 ## Authoritative
 
 - Any `*.plan.md` or other plan document under `.cursor/plans/`
-- Current build plan: `.cursor/plans/aptitude-search-build.plan.md`
 
 ## Not authoritative
 

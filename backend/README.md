@@ -63,7 +63,7 @@ During tests, `conftest.py` then swaps in `config.test.toml` so runs stay mocked
 | POST | `/v1/stages/1` | `{ "resume" }` | `{ "aptitude_profile" }` |
 | POST | `/v1/stages/2` | `{ "aptitude_profile", "constraints"? }` | `{ "verified_matches" }` |
 
-POST routes use the server-configured Hugging Face keys and models from `config.toml` (per stage).
+POST routes use the server-configured Hugging Face key and model from `[llm.aptitude]` in `config.toml` (Stage 2 discovery is Python-only; synthesis reuses the aptitude model).
 
 `constraints` matches `schemas/constraints.schema.json` (location, remote_preference, salary_min, industries_include/exclude).
 

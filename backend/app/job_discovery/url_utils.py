@@ -15,7 +15,7 @@ _JOB_QUERY_HINTS = frozenset(
 
 
 def _is_placeholder_scrape_url(url: str) -> bool:
-    """True for documentation placeholders the agent must not pass to scrape_webpage."""
+    """True for documentation placeholders that must not be scraped."""
     lower = url.strip().lower()
     if "..." in lower or lower.endswith("…"):
         return True
@@ -69,7 +69,7 @@ def prepare_scrape_url(url: str) -> tuple[str | None, str | None]:
 
 
 def normalize_job_search_query(query: str) -> str:
-    """Append hiring keywords when the agent passes skill-only queries."""
+    """Append hiring keywords when a query is skill-only."""
     stripped = " ".join(query.split())
     if not stripped:
         return "software engineer jobs hiring"

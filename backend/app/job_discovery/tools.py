@@ -1,4 +1,4 @@
-"""Stage 2 agent tools (composite search + scrape per query)."""
+"""Stage 2 discovery tools (composite search + scrape per query)."""
 
 from __future__ import annotations
 

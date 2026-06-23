@@ -2,7 +2,7 @@
 
 Single-page UI for the two-stage pipeline (resume → aptitude profile → verified matches).
 
-Hugging Face credentials are configured on the API server in `backend/config.toml` (`[llm.aptitude]` for Stage 1; `[llm.job_discovery]` for Stage 2). The browser does not send API keys.
+Hugging Face credentials are configured on the API server in `backend/config.toml` (`[llm.aptitude].model_key` for LLM calls in Stage 1 and Stage 2 synthesis). Stage 2 discovery uses web search only (`[llm.job_discovery]` sets search/scrape limits and synthesis temperature). The browser does not send API keys.
 
 ## Run
 

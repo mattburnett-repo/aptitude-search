@@ -7,7 +7,7 @@ These files capture the **original exploration** of Aptitude Search (multi-stage
 See the repo root [README.md](../README.md) and [docs/WORKFLOW.md](../docs/WORKFLOW.md):
 
 1. **Stage 1** — resume → aptitude profile JSON
-2. **Stage 2** — discovery agent (web search) + synthesis → verified job discovery JSON (`search_plan`, `results`, `notes`)
+2. **Stage 2** — profile-driven web discovery + synthesis → verified job discovery JSON (`search_plan`, `results`, `notes`)
 3. **API + MVP UI** — FastAPI (`backend/`) and Vite (`frontend/`)
 
 The core thesis in [03-core-thesis.md](03-core-thesis.md) (career inference before search) still applies; the pipeline shape changed from “targeting strategy + search queries” to “verified openings only.”

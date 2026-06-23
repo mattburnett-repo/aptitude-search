@@ -131,7 +131,7 @@ def _loads_json_lenient(payload: str) -> JsonValue:
 
 
 def parse_json_response(text: str) -> JsonValue:
-    """Parse JSON from LLM/agent text (fenced block, embedded fence, or raw object)."""
+    """Parse JSON from LLM text (fenced block, embedded fence, or raw object)."""
     payload = _json_payload_from_text(text)
     try:
         return _loads_json_lenient(payload)

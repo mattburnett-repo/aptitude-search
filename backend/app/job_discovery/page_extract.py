@@ -1,4 +1,4 @@
-"""Compact job posting pages for agent context (full fetch, small return)."""
+"""Compact job posting pages for discovery context (full fetch, small return)."""
 
 from __future__ import annotations
 
@@ -32,7 +32,7 @@ _BULLET_LINE = re.compile(r"^(\d+[\.)]\s+|[-*•]\s+)")
 
 
 def job_page_dict_for_agent(url: str, page_text: str) -> dict[str, str]:
-    """Structured scrape fields for the discovery agent (JSON tool output)."""
+    """Structured scrape fields for discovery tool output (JSON)."""
     text = page_text.strip()
     if not text:
         return {
