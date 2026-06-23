@@ -18,6 +18,8 @@
 
 Aptitude-driven **opportunity discovery**: resume → aptitude profile → **verified openings only**.
 
+Keyword-based job search does a poor job of connecting people with roles that fit their actual capabilities. This project infers aptitude from a resume, then discovers and verifies openings aligned to that profile—not just keyword overlap.
+
 ## Product workflow
 
 **Opportunity discovery** in two stages — **[Stage 1](prompts/01-resume-to-aptitude-profile.md)** (profile) → **Stage 2** ([profile-driven discovery](docs/PROMPT-CONTRACT.md) + [synthesis](prompts/03-job-discovery-synthesis.md))
