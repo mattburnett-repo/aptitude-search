@@ -442,6 +442,20 @@ button.theme-toggle:hover {
   margin-top: 1.5rem;
 }
 
+.aptitude-profile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--color-field-border);
+}
+
+.aptitude-pdf-error {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
 .aptitude-summary {
   margin: 0 0 1rem;
   font-size: 1.05rem;
@@ -479,6 +493,12 @@ button.theme-toggle:hover {
 
 .aptitude-section {
   margin: 0;
+}
+
+.aptitude-rationale-section {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--color-field-border);
 }
 
 .aptitude-section-title {
@@ -609,6 +629,80 @@ button.theme-toggle:hover {
   max-height: 320px;
   background: var(--color-bg);
   border-top: 1px solid var(--color-field-border);
+}
+
+/* PDF export: force light, high-contrast rendering regardless of app theme */
+.aptitude-profile.aptitude-profile--pdf-export {
+  color: #202124;
+  background: #ffffff;
+}
+
+.aptitude-profile.aptitude-profile--pdf-export .collapsible-section {
+  background: #ffffff;
+  border-color: #9aa0a6;
+}
+
+.aptitude-profile.aptitude-profile--pdf-export .collapsible-section summary {
+  color: #202124;
+}
+
+.aptitude-profile.aptitude-profile--pdf-export .collapsible-section[open] summary {
+  border-bottom-color: #9aa0a6;
+}
+
+.aptitude-profile.aptitude-profile--pdf-export .aptitude-rationale-section {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #dadce0;
+}
+
+.aptitude-profile.aptitude-profile--pdf-export .aptitude-section-title,
+.aptitude-profile.aptitude-profile--pdf-export .aptitude-seniority {
+  color: #3c4043;
+}
+
+.aptitude-profile.aptitude-profile--pdf-export .aptitude-item-label,
+.aptitude-profile.aptitude-profile--pdf-export .aptitude-confidence-key,
+.aptitude-profile.aptitude-profile--pdf-export .aptitude-summary {
+  color: #202124;
+}
+
+.aptitude-profile.aptitude-profile--pdf-export .aptitude-evidence {
+  color: #3c4043;
+}
+
+.aptitude-profile.aptitude-profile--pdf-export .aptitude-item + .aptitude-item,
+.aptitude-profile.aptitude-profile--pdf-export .aptitude-confidence-map li + li {
+  border-top-color: #dadce0;
+}
+
+.aptitude-profile.aptitude-profile--pdf-export .seniority-badge {
+  color: #202124;
+  background: #f1f3f4;
+  border-color: #9aa0a6;
+}
+
+.aptitude-profile.aptitude-profile--pdf-export .aptitude-rationale li {
+  color: #202124;
+}
+
+.aptitude-profile.aptitude-profile--pdf-export .aptitude-rationale li::before {
+  color: #202124;
+}
+
+.aptitude-profile.aptitude-profile--pdf-export .confidence-high {
+  color: #0d652d;
+  background: #ceead6;
+}
+
+.aptitude-profile.aptitude-profile--pdf-export .confidence-medium {
+  color: #8a5000;
+  background: #feefc3;
+}
+
+.aptitude-profile.aptitude-profile--pdf-export .confidence-low {
+  color: #a50e0e;
+  background: #fce8e6;
 }
 
 .verified-section + .verified-section {

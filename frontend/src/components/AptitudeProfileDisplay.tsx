@@ -1,3 +1,5 @@
+import { useRef, useState } from "react";
+
 type Confidence = "high" | "medium" | "low";
 
 type SkillItem = {
@@ -97,18 +99,65 @@ function LabeledList({ title, items }: { title: string; items: LabeledItem[] }) 
   );
 }
 
+type SaveAsPdfToolbarProps = {
+  profileRef: React.RefObject<HTMLDivElement | null>;
+};
+
+function SaveAsPdfToolbar({ profileRef }: SaveAsPdfToolbarProps) {
+  const [pdfBusy, setPdfBusy] = useState(false);
+  const [pdfError, setPdfError] = useState<string | null>(null);
+
+  async function handleSaveAsPdf() {
+    const element = profileRef.current;
+    if (!element || pdfBusy) return;
+
+    setPdfError(null);
+    setPdfBusy(true);
+    try {
+      // Dynamic import keeps this module (and its PDF dependencies) out of the main bundle.
+      const { openAptitudeProfilePdf } = await import("../lib/exportAptitudeProfilePdf");
+      await openAptitudeProfilePdf(element);
+    } catch (err) {
+      setPdfError(
+        err instanceof Error ? err.message : "Could not create PDF. Try again."
+      );
+    } finally {
+      setPdfBusy(false);
+    }
+  }
+
+  return (
+    <div className="aptitude-profile-actions">
+      <button
+        type="button"
+        className="secondary"
+        disabled={pdfBusy}
+        onClick={() => void handleSaveAsPdf()}
+      >
+        {pdfBusy ? "Generating PDF…" : "Save as PDF"}
+      </button>
+      {pdfError && <p className="error aptitude-pdf-error">{pdfError}</p>}
+    </div>
+  );
+}
+
 type AptitudeProfileDisplayProps = {
   profile: unknown;
 };
 
 export function AptitudeProfileDisplay({ profile }: AptitudeProfileDisplayProps) {
+  const profileRef = useRef<HTMLDivElement>(null);
+
   if (!profile) return null;
 
   if (!isAptitudeProfile(profile)) {
     return (
       <details className="collapsible-section" open>
         <summary>Stage 1 — Aptitude profile</summary>
-        <pre className="aptitude-raw-pre">{JSON.stringify(profile, null, 2)}</pre>
+        <SaveAsPdfToolbar profileRef={profileRef} />
+        <div ref={profileRef} className="collapsible-section-body aptitude-profile">
+          <pre className="aptitude-raw-pre">{JSON.stringify(profile, null, 2)}</pre>
+        </div>
       </details>
     );
   }
@@ -123,55 +172,72 @@ export function AptitudeProfileDisplay({ profile }: AptitudeProfileDisplayProps)
   return (
     <details className="collapsible-section" open>
       <summary>Stage 1 — Aptitude profile</summary>
-      <div className="collapsible-section-body aptitude-profile">
-        <p className="aptitude-summary">{profile.aptitude_summary}</p>
+      <SaveAsPdfToolbar profileRef={profileRef} />
+      <div className="collapsible-section-body">
+        <div ref={profileRef} className="aptitude-profile">
+          <div className="aptitude-pdf-page" data-pdf-page>
+            <p className="aptitude-summary">{profile.aptitude_summary}</p>
 
-        <p className="aptitude-seniority">
-          Seniority band:{" "}
-          <span className="seniority-badge">{profile.seniority_band}</span>
-        </p>
+            <p className="aptitude-seniority">
+              Seniority band:{" "}
+              <span className="seniority-badge">{profile.seniority_band}</span>
+            </p>
 
-        <div className="aptitude-grid">
-          <SkillList title="Core skills" items={profile.core_skills} />
-          <SkillList title="Secondary skills" items={profile.secondary_skills} />
-          <LabeledList title="Domains" items={profile.domains} />
-          <LabeledList title="Strengths" items={profile.strengths} />
-          <LabeledList title="Adjacent roles" items={profile.adjacent_roles} />
-          <LabeledList
-            title="Working style signals"
-            items={profile.working_style_signals}
-          />
-        </div>
-
-        {profile.rationale.length > 0 && (
-          <section className="aptitude-section">
-            <h3 className="aptitude-section-title">Rationale</h3>
-            <ul className="aptitude-rationale">
-              {profile.rationale.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </section>
-        )}
-
-        {confidenceEntries.length > 0 && (
-          <details className="collapsible-section aptitude-meta">
-            <summary>Inference confidence</summary>
-            <div className="collapsible-section-body">
-              <ul className="aptitude-confidence-map">
-                {confidenceEntries.map(([key, entry]) => (
-                  <li key={key}>
-                    <span className="aptitude-confidence-key">
-                      {key.replace(/_/g, " ")}
-                    </span>
-                    <ConfidenceBadge level={entry.confidence} />
-                    <p className="aptitude-evidence">{entry.reason}</p>
-                  </li>
-                ))}
-              </ul>
+            <div className="aptitude-grid">
+              <SkillList title="Core skills" items={profile.core_skills} />
+              <SkillList title="Secondary skills" items={profile.secondary_skills} />
             </div>
-          </details>
-        )}
+          </div>
+
+          <div className="aptitude-pdf-page" data-pdf-page>
+            <div className="aptitude-grid">
+              <LabeledList title="Domains" items={profile.domains} />
+              <LabeledList title="Strengths" items={profile.strengths} />
+            </div>
+          </div>
+
+          <div className="aptitude-pdf-page" data-pdf-page>
+            <div className="aptitude-grid">
+              <LabeledList title="Adjacent roles" items={profile.adjacent_roles} />
+              <LabeledList
+                title="Working style signals"
+                items={profile.working_style_signals}
+              />
+            </div>
+
+            {profile.rationale.length > 0 && (
+              <section className="aptitude-section aptitude-rationale-section">
+                <h3 className="aptitude-section-title">Rationale</h3>
+                <ul className="aptitude-rationale">
+                  {profile.rationale.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </section>
+            )}
+          </div>
+
+          {confidenceEntries.length > 0 && (
+            <div className="aptitude-pdf-page" data-pdf-page>
+              <details className="collapsible-section aptitude-meta">
+                <summary>Inference confidence</summary>
+                <div className="collapsible-section-body">
+                  <ul className="aptitude-confidence-map">
+                    {confidenceEntries.map(([key, entry]) => (
+                      <li key={key}>
+                        <span className="aptitude-confidence-key">
+                          {key.replace(/_/g, " ")}
+                        </span>
+                        <ConfidenceBadge level={entry.confidence} />
+                        <p className="aptitude-evidence">{entry.reason}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </details>
+            </div>
+          )}
+        </div>
 
         <details className="collapsible-section aptitude-raw-json">
           <summary>Raw JSON</summary>
