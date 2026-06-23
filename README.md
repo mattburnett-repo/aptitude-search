@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner.png" alt="Aptitude Search — resume to aptitude profile to verified job openings" width="100%"/>
+  <img src="assets/banner.png" alt="Aptitude Search — aptitude-driven opportunity discovery from resume to verified job openings" width="100%"/>
 </p>
 
 <p align="center">
@@ -16,11 +16,11 @@
 
 # aptitude-search
 
-Aptitude-driven job search: resume → aptitude profile → **verified openings only**.
+Aptitude-driven **opportunity discovery**: resume → aptitude profile → **verified openings only**.
 
 ## Product workflow
 
-**[Stage 1](prompts/01-resume-to-aptitude-profile.md)** → **Stage 2** ([profile-driven discovery](docs/PROMPT-CONTRACT.md) + [synthesis](prompts/03-job-discovery-synthesis.md))
+**Opportunity discovery** in two stages — **[Stage 1](prompts/01-resume-to-aptitude-profile.md)** (profile) → **Stage 2** ([profile-driven discovery](docs/PROMPT-CONTRACT.md) + [synthesis](prompts/03-job-discovery-synthesis.md))
 
 Steps: **[prompts/README.md](prompts/README.md)**
 
@@ -53,7 +53,7 @@ curl -s -X POST http://localhost:3001/v1/pipeline \
   -d @fixtures/pipeline-request-example.json
 ```
 
-Response: `aptitude_profile` (JSON) and `verified_matches` (job search results). See **[docs/PROMPT-CONTRACT.md](docs/PROMPT-CONTRACT.md)** for the pipeline.
+Response: `aptitude_profile` (JSON) and `verified_matches` (discovered opportunities). See **[docs/PROMPT-CONTRACT.md](docs/PROMPT-CONTRACT.md)** for the pipeline.
 
 ## Repository layout
 
