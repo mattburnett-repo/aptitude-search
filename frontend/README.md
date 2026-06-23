@@ -31,7 +31,7 @@ If pipeline progress updates lag in the UI, set `VITE_API_URL=http://localhost:3
 
 - Paste resume; optional constraints (location, remote, salary min, industries include/exclude).
 - **Run pipeline (1 → 2)** — single request; shows stage 1 and stage 2 JSON in expandable panels.
-- **Save as PDF** — on the aptitude profile panel; opens a formatted profile PDF in a new browser tab (profile content only; Raw JSON is excluded).
+- **Save as PDF** — on the aptitude profile and verified matches panels; opens formatted PDFs in new browser tabs (panel content only; Raw JSON is excluded).
 - **Export JSON** — downloads `{ aptitude_profile, verified_matches }`.
 - **Copy verified matches** — copies `verified_matches` JSON to clipboard.
 

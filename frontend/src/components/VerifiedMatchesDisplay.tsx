@@ -1,3 +1,6 @@
+import { useRef } from "react";
+import { SaveAsPdfToolbar } from "./SaveAsPdfToolbar";
+
 type Confidence = "high" | "medium" | "low";
 
 type JobPosting = {
@@ -90,14 +93,37 @@ type VerifiedMatchesDisplayProps = {
   matches: unknown;
 };
 
+function VerifiedSaveAsPdfToolbar({
+  matchesRef,
+}: {
+  matchesRef: React.RefObject<HTMLDivElement | null>;
+}) {
+  return (
+    <SaveAsPdfToolbar
+      contentRef={matchesRef}
+      loadExporter={async () => {
+        const { openVerifiedMatchesPdf } = await import(
+          "../lib/exportVerifiedMatchesPdf"
+        );
+        return openVerifiedMatchesPdf;
+      }}
+    />
+  );
+}
+
 export function VerifiedMatchesDisplay({ matches }: VerifiedMatchesDisplayProps) {
+  const matchesRef = useRef<HTMLDivElement>(null);
+
   if (!matches) return null;
 
   if (!isVerifiedMatches(matches)) {
     return (
       <details className="collapsible-section" open>
         <summary>Stage 2 — Verified matches</summary>
-        <pre className="aptitude-raw-pre">{JSON.stringify(matches, null, 2)}</pre>
+        <VerifiedSaveAsPdfToolbar matchesRef={matchesRef} />
+        <div ref={matchesRef} className="collapsible-section-body verified-matches">
+          <pre className="aptitude-raw-pre">{JSON.stringify(matches, null, 2)}</pre>
+        </div>
       </details>
     );
   }
@@ -105,46 +131,49 @@ export function VerifiedMatchesDisplay({ matches }: VerifiedMatchesDisplayProps)
   return (
     <details className="collapsible-section" open>
       <summary>Stage 2 — Verified matches</summary>
-      <div className="collapsible-section-body verified-matches">
-        {matches.search_plan.length > 0 && (
-          <section className="verified-section">
-            <h3 className="verified-section-title">Search plan</h3>
-            <ol className="verified-search-plan">
-              {matches.search_plan.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ol>
-          </section>
-        )}
-
-        <section className="verified-section">
-          <h3 className="verified-section-title">
-            Results ({matches.results.length})
-          </h3>
-          {matches.results.length === 0 ? (
-            <p className="verified-empty">No verified postings found.</p>
-          ) : (
-            <div className="job-card-list">
-              {matches.results.map((job, index) => (
-                <JobCard
-                  key={`${job.company}-${job.role}-${job.url}-${index}`}
-                  job={job}
-                />
-              ))}
-            </div>
+      <VerifiedSaveAsPdfToolbar matchesRef={matchesRef} />
+      <div className="collapsible-section-body">
+        <div ref={matchesRef} className="verified-matches">
+          {matches.search_plan.length > 0 && (
+            <section className="verified-section">
+              <h3 className="verified-section-title">Search plan</h3>
+              <ol className="verified-search-plan">
+                {matches.search_plan.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ol>
+            </section>
           )}
-        </section>
 
-        {matches.notes.length > 0 && (
           <section className="verified-section">
-            <h3 className="verified-section-title">Notes</h3>
-            <ul className="verified-notes">
-              {matches.notes.map((note) => (
-                <li key={note}>{note}</li>
-              ))}
-            </ul>
+            <h3 className="verified-section-title">
+              Results ({matches.results.length})
+            </h3>
+            {matches.results.length === 0 ? (
+              <p className="verified-empty">No verified postings found.</p>
+            ) : (
+              <div className="job-card-list">
+                {matches.results.map((job, index) => (
+                  <JobCard
+                    key={`${job.company}-${job.role}-${job.url}-${index}`}
+                    job={job}
+                  />
+                ))}
+              </div>
+            )}
           </section>
-        )}
+
+          {matches.notes.length > 0 && (
+            <section className="verified-section">
+              <h3 className="verified-section-title">Notes</h3>
+              <ul className="verified-notes">
+                {matches.notes.map((note) => (
+                  <li key={note}>{note}</li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </div>
 
         <details className="collapsible-section verified-raw-json">
           <summary>Raw JSON</summary>

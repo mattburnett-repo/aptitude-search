@@ -1,4 +1,5 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
+import { SaveAsPdfToolbar } from "./SaveAsPdfToolbar";
 
 type Confidence = "high" | "medium" | "low";
 
@@ -103,41 +104,19 @@ type SaveAsPdfToolbarProps = {
   profileRef: React.RefObject<HTMLDivElement | null>;
 };
 
-function SaveAsPdfToolbar({ profileRef }: SaveAsPdfToolbarProps) {
-  const [pdfBusy, setPdfBusy] = useState(false);
-  const [pdfError, setPdfError] = useState<string | null>(null);
-
-  async function handleSaveAsPdf() {
-    const element = profileRef.current;
-    if (!element || pdfBusy) return;
-
-    setPdfError(null);
-    setPdfBusy(true);
-    try {
-      // Dynamic import keeps this module (and its PDF dependencies) out of the main bundle.
-      const { openAptitudeProfilePdf } = await import("../lib/exportAptitudeProfilePdf");
-      await openAptitudeProfilePdf(element);
-    } catch (err) {
-      setPdfError(
-        err instanceof Error ? err.message : "Could not create PDF. Try again."
-      );
-    } finally {
-      setPdfBusy(false);
-    }
-  }
-
+function AptitudeSaveAsPdfToolbar({
+  profileRef,
+}: SaveAsPdfToolbarProps) {
   return (
-    <div className="aptitude-profile-actions">
-      <button
-        type="button"
-        className="secondary"
-        disabled={pdfBusy}
-        onClick={() => void handleSaveAsPdf()}
-      >
-        {pdfBusy ? "Generating PDF…" : "Save as PDF"}
-      </button>
-      {pdfError && <p className="error aptitude-pdf-error">{pdfError}</p>}
-    </div>
+    <SaveAsPdfToolbar
+      contentRef={profileRef}
+      loadExporter={async () => {
+        const { openAptitudeProfilePdf } = await import(
+          "../lib/exportAptitudeProfilePdf"
+        );
+        return openAptitudeProfilePdf;
+      }}
+    />
   );
 }
 
@@ -154,7 +133,7 @@ export function AptitudeProfileDisplay({ profile }: AptitudeProfileDisplayProps)
     return (
       <details className="collapsible-section" open>
         <summary>Stage 1 — Aptitude profile</summary>
-        <SaveAsPdfToolbar profileRef={profileRef} />
+        <AptitudeSaveAsPdfToolbar profileRef={profileRef} />
         <div ref={profileRef} className="collapsible-section-body aptitude-profile">
           <pre className="aptitude-raw-pre">{JSON.stringify(profile, null, 2)}</pre>
         </div>
@@ -172,7 +151,7 @@ export function AptitudeProfileDisplay({ profile }: AptitudeProfileDisplayProps)
   return (
     <details className="collapsible-section" open>
       <summary>Stage 1 — Aptitude profile</summary>
-      <SaveAsPdfToolbar profileRef={profileRef} />
+      <AptitudeSaveAsPdfToolbar profileRef={profileRef} />
       <div className="collapsible-section-body">
         <div ref={profileRef} className="aptitude-profile">
           <div className="aptitude-pdf-page" data-pdf-page>

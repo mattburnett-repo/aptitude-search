@@ -1,7 +1,14 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 import { VerifiedMatchesDisplay } from "../../src/components/VerifiedMatchesDisplay";
 import verifiedMatches from "../fixtures/sample-verified-matches.json";
+
+vi.mock("../../src/lib/exportVerifiedMatchesPdf", () => ({
+  openVerifiedMatchesPdf: vi.fn(),
+}));
+
+import { openVerifiedMatchesPdf } from "../../src/lib/exportVerifiedMatchesPdf";
 
 describe("VerifiedMatchesDisplay", () => {
   it("renders search plan, results, and notes", () => {
@@ -24,5 +31,17 @@ describe("VerifiedMatchesDisplay", () => {
     render(<VerifiedMatchesDisplay matches={{ partial: true }} />);
 
     expect(screen.getByText(/"partial": true/)).toBeInTheDocument();
+  });
+
+  it("opens a PDF in a new tab when Save as PDF is clicked", async () => {
+    const user = userEvent.setup();
+    render(<VerifiedMatchesDisplay matches={verifiedMatches} />);
+
+    await user.click(screen.getByRole("button", { name: "Save as PDF" }));
+
+    expect(openVerifiedMatchesPdf).toHaveBeenCalledTimes(1);
+    expect(openVerifiedMatchesPdf).toHaveBeenCalledWith(
+      document.querySelector(".verified-matches")
+    );
   });
 });
