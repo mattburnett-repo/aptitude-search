@@ -149,7 +149,7 @@ export function appendCanvasToPdf(
   }
 }
 
-function openPdfBlob(pdf: jsPDF) {
+export function openPdfBlob(pdf: jsPDF) {
   const blob = pdf.output("blob");
   const url = URL.createObjectURL(blob);
   const tab = window.open(url, "_blank", "noopener,noreferrer");
