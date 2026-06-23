@@ -24,8 +24,6 @@ Aptitude-driven job search: resume → aptitude profile → **verified openings 
 
 Steps: **[prompts/README.md](prompts/README.md)**
 
-Reference (do not run): [`prompts/XX-original-aptitude-prompt.md`](prompts/XX-original-aptitude-prompt.md)
-
 ## Quick start
 
 1. Set up and run the API — [backend/README.md](backend/README.md) (`uvicorn` on port **3001**).
@@ -60,11 +58,10 @@ Response: `aptitude_profile` (JSON) and `verified_matches` (job search results).
 ## Repository layout
 
 ```
-prompts/          # 01 profile, 03 synthesis; XX + 02-verified = reference
+prompts/          # 01 profile, 03 synthesis
 schemas/          # aptitude-profile, job-discovery-results, constraints
 fixtures/         # sample resumes, pipeline-request-example.json, stage-1 golden output
 docs/             # WORKFLOW, TESTING, PROMPT-CONTRACT
-design-docs/      # original concept (historical); see design-docs/README.md
 backend/          # FastAPI — stages 1 and 2
 frontend/         # MVP UI (Vite + React)
 ```

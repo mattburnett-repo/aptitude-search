@@ -4,8 +4,6 @@
 
 **Run pipeline:** [backend/README.md](../backend/README.md) (Swagger at `/docs`)
 
-`XX-original-aptitude-prompt.md` is the reference spec used to build the Stage 1 prompt (`01`) and the legacy monolithic Stage 2 prompt (`02`, reference only).
-
 ---
 
 ## Resume source
@@ -42,6 +40,6 @@ Configure **`[job_discovery].discovery_query_max`** in `backend/config.toml`. De
 
 ---
 
-## Checklist
+## Testing
 
-See `docs/TESTING.md`.
+See [TESTING.md](TESTING.md) — run the API or UI for end-to-end checks; optional spot-checks when tuning prompts or discovery.

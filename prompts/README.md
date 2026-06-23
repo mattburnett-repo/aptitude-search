@@ -9,11 +9,6 @@
 
 Stage 2a discovery is implemented in `backend/app/job_discovery/discovery.py` (profile-driven `search_job_postings`; no prompt file).
 
-Reference only (not loaded by the API):
-
-- `02-verified-job-discovery.md` — monolithic single-shot predecessor
-- `XX-original-aptitude-prompt.md` — pre-migration spec
-
 Prompt bodies are loaded by the API per `backend/config.toml`. See [PROMPT-CONTRACT](../docs/PROMPT-CONTRACT.md).
 
 ## Sample resume

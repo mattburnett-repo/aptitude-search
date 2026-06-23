@@ -42,11 +42,6 @@ Related settings in `backend/config.toml`:
 - **`[job_discovery].discovery_query_max`** — max `search_job_postings` calls per pipeline run (default `6`).
 - **`[llm.job_discovery]`** — search/scrape limits and synthesis temperature (`[llm.aptitude].model` is used for the synthesis chat call).
 
-Reference only (not loaded by the API):
-
-- `02-verified-job-discovery.md` — monolithic single-shot predecessor (search + schema JSON in one prompt)
-- `XX-original-aptitude-prompt.md` — pre-migration spec
-
 ## API validation
 
 | Stage | Validated by API? |

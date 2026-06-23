@@ -1,46 +1,90 @@
-# Manual testing checklist
+# Testing
 
-## Stage 1 (Prompt 1)
+## Normal path (end-to-end)
 
-- [ ] Output is valid JSON; parses against `schemas/aptitude-profile.schema.json`
-- [ ] `core_skills` and `strengths` grounded in resume (spot-check 3 claims)
-- [ ] At least one non-obvious `adjacent_roles` entry
-- [ ] `rationale` present and readable
+Run the stack and call the pipeline — Stage 1 and Stage 2 run automatically with schema validation on every response.
 
-## Stage 2 (discovery + synthesis)
+- **UI:** [frontend/README.md](../frontend/README.md) — `npm run dev` on port 5173
+- **API:** [backend/README.md](../backend/README.md) — Swagger at `http://localhost:3001/docs` → `POST /v1/pipeline`
 
-- [ ] `verified_matches` parses against `schemas/job-discovery-results.schema.json`
-- [ ] `search_plan` has 3–6 strings drawn from the aptitude profile (not one ATS/board host)
-- [ ] `results` use diverse employers and industries (≤2 per company, ≤3 per board domain)
-- [ ] Each result has a direct apply/posting URL and `match_description` tied to profile evidence
-- [ ] At most 20 results; no padding
-- [ ] `notes` has 1+ meaningful search caveats (exclusions, limits, sparse results)
+Example body: [`fixtures/pipeline-request-example.json`](../fixtures/pipeline-request-example.json).
 
-Stage 2 should reflect current postings (web search via `search_job_postings`), not memory alone. The API runs Stage 2 as part of `POST /v1/pipeline` and returns parsed, schema-validated `verified_matches`. See [PROMPT-CONTRACT.md](PROMPT-CONTRACT.md).
+Requires `[llm.aptitude].model_key` in `backend/config.toml`. See [PROMPT-CONTRACT.md](PROMPT-CONTRACT.md).
 
-## Fixtures
+---
+
+## Automated checks (offline, no live LLM)
+
+**Unit/integration tests** (mocked; no network):
+
+```bash
+cd backend && pip install -r requirements-dev.txt && pytest
+```
+
+`conftest.py` swaps in `config.test.toml` during tests.
+
+**Stage 1 golden fixture:**
 
 ```bash
 cd backend && .venv/bin/python scripts/validate_fixtures.py
 ```
 
-Validates `fixtures/example-outputs/career-changer-mixed-stack-stage1.json` against the aptitude profile schema only.
+Validates `fixtures/example-outputs/career-changer-mixed-stack-stage1.json` against `aptitude-profile.schema.json` only. There is no committed golden Stage 2 output — Stage 2 quality is judged when running the live pipeline (above).
 
-**Note:** The committed golden file may fail until `confidence_map` values are objects `{ "confidence", "reason" }` per the schema (not bare strings). Regenerate from Prompt 1 if validation fails.
-
-## Models
-
-Test stage 1 on capable models for reliable JSON. Stage 2 via API uses `[llm.aptitude].model` for stage 1 and synthesis; `[llm.job_discovery]` controls search/scrape limits and synthesis temperature. Smoke script: `scripts/smoke_job_discovery.py`.
-
-## API smoke test (optional)
+**Stage 2 discovery smoke** (live web search; optional):
 
 ```bash
-# Stage 1 only
+cd backend && .venv/bin/python scripts/smoke_job_discovery.py
+```
+
+---
+
+## Optional quality spot-checks
+
+Use when changing Prompt 1, discovery queries, URL filters, or synthesis — not required on every run if results are already acceptable.
+
+### Stage 1
+
+- [ ] `core_skills` and `strengths` grounded in resume (spot-check 3 claims)
+- [ ] At least one non-obvious `adjacent_roles` entry
+- [ ] `rationale` present and readable
+
+### Stage 2
+
+- [ ] `search_plan` reflects profile and constraints (not a single ATS/board host)
+- [ ] `results` use diverse employers (≤2 per company, ≤3 per board domain)
+- [ ] Each result has a direct posting URL and `match_description` tied to profile evidence
+- [ ] At most 20 results; no padding
+- [ ] `notes` has meaningful caveats (exclusions, limits, sparse results)
+
+Stage 2 should reflect current postings from web search (`search_job_postings`), not model memory alone.
+
+---
+
+## Models and config
+
+- **Stage 1 + synthesis:** `[llm.aptitude].model` and `[llm.aptitude].model_key`
+- **Discovery tools + synthesis temperature:** `[llm.job_discovery]` (search/scrape limits, `temperature`)
+- **Query budget:** `[job_discovery].discovery_query_max`
+
+Use capable models for reliable Stage 1 JSON.
+
+---
+
+## curl examples
+
+Stage 1 only:
+
+```bash
 curl -s -X POST http://localhost:3001/v1/stages/1 \
   -H "Content-Type: application/json" \
   -d "$(jq -n --rawfile r ../fixtures/sample-resumes/career-changer-mixed-stack.txt '{resume: $r}')"
 ```
 
-Requires `[llm.aptitude].model_key` in `backend/config.toml`.
+Full pipeline:
 
-Full pipeline: `POST /v1/pipeline` — copy body from [`fixtures/pipeline-request-example.json`](../fixtures/pipeline-request-example.json) or use the Swagger example on `/docs`. See [backend/README.md](../backend/README.md).
+```bash
+curl -s -X POST http://localhost:3001/v1/pipeline \
+  -H "Content-Type: application/json" \
+  -d @fixtures/pipeline-request-example.json
+```
