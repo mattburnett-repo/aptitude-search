@@ -1,13 +1,16 @@
 # Aptitude Search API (Python / FastAPI)
 
-Orchestration for **Stage 1** (aptitude profile JSON, schema-validated) and **Stage 2** (web-search agent → synthesis LLM call → `verified_matches` JSON, schema-validated).
+Orchestration for **Stage 1** (aptitude profile JSON, schema-validated) and **Stage 2** (planned web search → synthesis LLM call → `verified_matches` JSON, schema-validated).
 
 **Hugging Face keys** in `config.toml` (separate per stage; values may be the same token):
 
 - **Stage 1:** `[llm.aptitude].model_key` + `[llm.aptitude].model` — resume → aptitude profile (chat JSON).
-- **Stage 2:** `[llm.job_discovery].model_key` + `[llm.job_discovery].model` — job discovery **agent** (`smolagents` with web search + page scraping). Config: `[llm.job_discovery].max_steps`.
+- **Stage 2 discovery (default):** `[job_discovery].discovery_mode = "planned"` — Python builds queries from profile + constraints and runs `search_job_postings` per skill. Set `discovery_mode = "agent"` to use the `smolagents` CodeAgent instead (`[llm.job_discovery].max_steps`).
+- **Stage 2 synthesis:** `[llm.job_discovery].model_key` + `[llm.job_discovery].model` — maps `found_jobs` to verified matches JSON.
 
-Smoke-test Stage 2 agent: `.venv/bin/python scripts/smoke_job_discovery_agent.py`
+Smoke-test Stage 2 planned discovery: `.venv/bin/python scripts/smoke_planned_discovery.py`
+
+Smoke-test Stage 2 agent (optional): `.venv/bin/python scripts/smoke_job_discovery_agent.py`
 
 Stage 2 output is parsed and validated against `schemas/job-discovery-results.schema.json`.
 

@@ -6,7 +6,7 @@
 - **Stage 2 is job search.** The API runs a web-search agent, then a synthesis LLM call, and returns currently open postings in **`verified_matches`**.
 - **Primary path:** API + UI (or Swagger). Prompt text lives under `prompts/` (see Stages table); filenames are wired in `backend/config.toml`.
 - **Testing:** Swagger UI at `/docs` on the running API (see [backend/README.md](../backend/README.md)).
-- **Implementation (not user-facing):** Stage 2 is two Hugging Face phases: (1) a `smolagents` CodeAgent with DuckDuckGo search and page scraping; (2) a single chat completion that maps `found_jobs` into schema-strict JSON. Result URLs are filtered to those observed in agent tool output. The API jsonschema-validates `verified_matches` against `job-discovery-results.schema.json`. There is no separate jobs/search API wired in Python.
+- **Implementation (not user-facing):** Stage 2 is two phases: (1) **planned discovery** (default)—Python builds search queries from the aptitude profile and constraints, then runs `search_job_postings` (DuckDuckGo search, URL filters, page scrape) for each query; optional **`discovery_mode = "agent"`** uses a `smolagents` CodeAgent instead; (2) a single chat completion maps `found_jobs` into schema-strict JSON. Result URLs are filtered to those observed in tool output. The API jsonschema-validates `verified_matches` against `job-discovery-results.schema.json`.
 
 ---
 
@@ -33,7 +33,7 @@ Cross-cutting:
 | Stage | Prompt file(s) | Output schema |
 |-------|----------------|---------------|
 | 1 | `01-resume-to-aptitude-profile.md` | `schemas/aptitude-profile.schema.json` |
-| 2a (discovery) | `02-job-discovery-agent.md`, `job-discovery-code-agent.yaml` | `found_jobs` (agent-internal; not the API response) |
+| 2a (discovery) | `02-job-discovery-agent.md`, `job-discovery-code-agent.yaml` (agent mode only) | `found_jobs` (internal; not the API response) |
 | 2b (synthesis) | `03-job-discovery-synthesis.md` | `schemas/job-discovery-results.schema.json` |
 | Constraints (optional, stage 2) | — | `schemas/constraints.schema.json` |
 

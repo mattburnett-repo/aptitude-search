@@ -1,6 +1,7 @@
 import sys
 import tomllib
 from pathlib import Path
+from typing import Literal
 
 from pydantic import BaseModel, Field, ValidationError, ValidationInfo, field_validator
 
@@ -46,6 +47,16 @@ class AptitudeLlmConfig(BaseModel):
 
 class JobDiscoveryConfig(BaseModel):
     url_filters_file: str = "url-filters.toml"
+    discovery_mode: Literal["planned", "agent"] = "planned"
+    discovery_query_max: int = 6
+
+    @field_validator("discovery_query_max")
+    @classmethod
+    def discovery_query_max_positive(cls, value: int, info: ValidationInfo) -> int:
+        if value < 1:
+            field = info.field_name or "field"
+            raise ValueError(f"job_discovery.{field} must be at least 1")
+        return value
 
 
 class JobDiscoveryLlmConfig(BaseModel):
@@ -55,6 +66,7 @@ class JobDiscoveryLlmConfig(BaseModel):
     max_steps: int
     visit_max_output_length: int
     search_max_results: int
+    search_scrape_max: int
     search_snippet_max_chars: int
     search_rate_limit: float | None
     max_print_outputs_length: int
@@ -77,6 +89,7 @@ class JobDiscoveryLlmConfig(BaseModel):
         "max_steps",
         "visit_max_output_length",
         "search_max_results",
+        "search_scrape_max",
         "search_snippet_max_chars",
         "max_print_outputs_length",
         "page_summary_max_chars",

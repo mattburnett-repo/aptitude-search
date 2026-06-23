@@ -22,6 +22,7 @@ temperature = 0.0
 max_steps = 10
 visit_max_output_length = 8000
 search_max_results = 10
+search_scrape_max = 3
 search_snippet_max_chars = 300
 search_rate_limit = 1.0
 max_print_outputs_length = 10000
@@ -33,6 +34,8 @@ memory_pruned_observation_max_chars = 200
 
 [job_discovery]
 url_filters_file = "url-filters.toml"
+discovery_mode = "planned"
+discovery_query_max = 6
 
 [prompts]
 stage1_file = "01-resume-to-aptitude-profile.md"

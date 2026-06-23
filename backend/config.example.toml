@@ -22,6 +22,7 @@ temperature = 0.0  # deterministic agent steps and synthesis JSON
 max_steps = 10  # smolagents defaults to 20 steps
 visit_max_output_length = 8000  # max chars fetched per page (agent sees compact extract)
 search_max_results = 10  # DuckDuckGo results per search query
+search_scrape_max = 3  # max posting URLs scraped per search_job_postings call
 search_snippet_max_chars = 300  # max chars per DuckDuckGo result body in agent context
 search_rate_limit = 1.0  # min seconds between searches; omit or set null to disable
 max_print_outputs_length = 10000  # max chars from print() per agent step (smolagents default 50000)
@@ -31,8 +32,12 @@ page_snippet_max_chars = 400  # max chars in body snippet per visited page
 memory_keep_recent_steps = 2  # full observations kept for this many recent steps
 memory_pruned_observation_max_chars = 200  # max chars for pruned step model_output
 
+# Stage 2a discovery. planned (default): Python builds hiring queries from profile—stable and debuggable.
+# agent: optional smolagents CodeAgent; kept for experiments—the 8B model often picked poor queries (e.g. skill-only searches).
 [job_discovery]
 url_filters_file = "url-filters.toml"  # SERP/found_jobs skip lists (app/job_discovery/)
+discovery_mode = "planned"  # planned | agent
+discovery_query_max = 6  # max search_job_postings calls per pipeline run (planned mode only)
 
 [prompts]
 stage1_file = "01-resume-to-aptitude-profile.md"

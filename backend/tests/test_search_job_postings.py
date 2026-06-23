@@ -1,13 +1,14 @@
 from unittest.mock import MagicMock, patch
 
 from app.job_discovery.tool_observed_urls import ToolObservedUrlRegistry
-from app.job_discovery.tools import SearchJobPostingsTool, _run_search_job_postings
+from app.job_discovery.tools import SearchJobPostingsTool
 
 
 def _make_tool() -> SearchJobPostingsTool:
     return SearchJobPostingsTool(
         ToolObservedUrlRegistry(),
         max_results=10,
+        scrape_max=3,
         rate_limit=None,
         max_output_length=5000,
     )
@@ -40,7 +41,7 @@ def test_search_job_postings_filters_list_pages_and_scrapes_candidates() -> None
             "error": "",
         },
     ) as mock_scrape:
-        output = _run_search_job_postings(tool, "python backend remote")
+        output = tool.run_search_job_postings("python backend remote")
 
     import json
 
@@ -70,7 +71,7 @@ def test_search_job_postings_skips_non_job_urls_without_scraping() -> None:
     with patch("app.job_discovery.tools._scrape_job_page") as mock_scrape:
         import json
 
-        payload = json.loads(_run_search_job_postings(tool, "Node.js Django"))
+        payload = json.loads(tool.run_search_job_postings("Node.js Django"))
 
     assert payload["jobs"] == []
     assert "No direct job posting URLs" in payload["message"]
@@ -84,6 +85,6 @@ def test_search_job_postings_returns_message_when_no_results() -> None:
 
     import json
 
-    payload = json.loads(_run_search_job_postings(tool, "nonsense query xyz"))
+    payload = json.loads(tool.run_search_job_postings("nonsense query xyz"))
     assert payload["jobs"] == []
     assert "No results" in payload["message"]

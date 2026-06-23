@@ -14,6 +14,7 @@ skip_domains = [
   "freecodecamp.org",
   "geeksforgeeks.org",
   "hashnode.dev",
+  "linkedin.com",
   "medium.com",
   "react.dev",
   "reddit.com",

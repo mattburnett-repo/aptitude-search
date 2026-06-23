@@ -15,6 +15,7 @@ from app.job_discovery import (
     build_stage2_user_message,
     empty_job_discovery_results,
     run_job_discovery_agent,
+    run_planned_job_discovery,
     synthesize_job_discovery_results,
 )
 from app.job_discovery.tool_observed_urls import (
@@ -61,19 +62,27 @@ def run_stage2(
 ) -> Any:
     c = constraints or DEFAULT_CONSTRAINTS
     validate_stage("constraints", c.model_dump())
-    user = build_stage2_user_message(aptitude_profile, c)
     tool_observed_urls = ToolObservedUrlRegistry()
     emit_progress(
         "Stage 2: Searching the web for job postings…",
         on_progress=on_progress,
     )
-    found_jobs = run_job_discovery_agent(
-        prompt_loader.system_prompt_stage2_discovery(),
-        user,
-        max_steps=config.llm.job_discovery.max_steps,
-        observed_urls=tool_observed_urls,
-        on_progress=on_progress,
-    )
+    if config.job_discovery.discovery_mode == "agent":
+        user = build_stage2_user_message(aptitude_profile, c)
+        found_jobs = run_job_discovery_agent(
+            prompt_loader.system_prompt_stage2_discovery(),
+            user,
+            max_steps=config.llm.job_discovery.max_steps,
+            observed_urls=tool_observed_urls,
+            on_progress=on_progress,
+        )
+    else:
+        found_jobs = run_planned_job_discovery(
+            aptitude_profile,
+            c,
+            observed_urls=tool_observed_urls,
+            on_progress=on_progress,
+        )
     if found_jobs:
         emit_progress("Filtering search results…", on_progress=on_progress)
         kept = filter_found_jobs(found_jobs)
