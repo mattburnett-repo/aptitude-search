@@ -485,6 +485,10 @@ button.theme-toggle:hover {
   gap: 1.25rem;
 }
 
+.aptitude-pdf-page + .aptitude-pdf-page {
+  margin-top: 1.25rem;
+}
+
 @media (min-width: 640px) {
   .aptitude-grid {
     grid-template-columns: 1fr 1fr;

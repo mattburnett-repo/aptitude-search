@@ -130,7 +130,6 @@ export default function App() {
       <PipelineActions
         loading={loading}
         canRun={hasResumeInput(resumeInput)}
-        result={result}
         onRun={() => void runPipeline(resumeInput, constraints)}
       />
 
