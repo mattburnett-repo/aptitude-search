@@ -45,7 +45,7 @@ isProject: true
 
 ---
 
-## Current implementation (as of 2026-06-08)
+## Current implementation (as of 2026-06-16)
 
 **Strategy:** Career inference before search ([design-docs/03-core-thesis.md](../../design-docs/03-core-thesis.md)), implemented as a **two-stage** pipeline ending in **verified job postings**, not a separate Boolean/query-generation stage.
 
@@ -53,15 +53,17 @@ isProject: true
 flowchart LR
   R[ResumeText] --> P1[Prompt1_AptitudeProfile]
   P1 --> AP[AptitudeProfile_JSON]
-  AP --> A2[Stage2a_DiscoveryAgent]
-  A2 --> FJ[found_jobs]
+  AP --> D2[Stage2a_PlannedDiscovery]
+  D2 --> FJ[found_jobs]
   FJ --> S2[Stage2b_Synthesis]
   S2 --> JD[JobDiscoveryResults_JSON]
   FE[MVP_Frontend] --> API[FastAPI]
   API --> P1
-  API --> A2
+  API --> D2
   API --> S2
 ```
+
+**Stage 2a discovery:** default `discovery_mode = "planned"` (`planned_discovery.py` + `search_job_postings`). Optional `discovery_mode = "agent"` uses smolagents + `02-job-discovery-agent.md`. See [PROMPT-CONTRACT.md](../../docs/PROMPT-CONTRACT.md#stage-2-discovery-mode-discovery_mode).
 
 ### Repository layout (actual)
 
@@ -92,7 +94,7 @@ design-docs/                        # original exploration (historical)
 | # | File | Input | Output |
 |---|------|-------|--------|
 | 1 | `01-resume-to-aptitude-profile.md` | Resume text | `aptitude-profile` JSON |
-| 2a | `02-job-discovery-agent.md`, `job-discovery-code-agent.yaml` | Stage 1 JSON + optional constraints | `found_jobs` (agent-internal) |
+| 2a | `planned_discovery.py` (default); optional: `02-job-discovery-agent.md`, `job-discovery-code-agent.yaml` | Stage 1 JSON + optional constraints | `found_jobs` (internal) |
 | 2b | `03-job-discovery-synthesis.md` | Profile + constraints + `found_jobs` | `job-discovery-results` JSON |
 
 ### API (implemented)
@@ -119,7 +121,7 @@ Headers: none for API key/model override; key and model are configured server-si
 
 - API validates stage 1, stage 2, and constraints via `jsonschema`
 - `backend/scripts/validate_fixtures.py` checks stage-1 golden fixture only
-- Stage 2: smolagents discovery agent + synthesis LLM (API pipeline); smoke script `backend/scripts/smoke_job_discovery_agent.py`
+- Stage 2: planned discovery + synthesis LLM (API pipeline); smoke `scripts/smoke_planned_discovery.py`; optional agent smoke `scripts/smoke_job_discovery_agent.py`
 
 ### Phase 1 gate
 
@@ -146,6 +148,6 @@ An earlier plan called for four prompts and schemas (`targeting-strategy`, `sear
 
 | Risk | Mitigation |
 |------|------------|
-| Stage 2 low-quality listings | Job discovery agent + web search; spot-check URLs in results |
+| Stage 2 low-quality listings | Planned profile-driven `search_job_postings`; URL filters in `url-filters.toml`; spot-check URLs |
 | Prompt/docs drift on “API vs Agent search” | Canonical model in `docs/PROMPT-CONTRACT.md` |
 | Prompt/schema drift | Validate stage 1 in API; manual checklist in `docs/TESTING.md` |

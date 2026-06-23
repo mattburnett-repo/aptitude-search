@@ -5,17 +5,19 @@ alwaysApply: true
 
 # Pipeline product model (aptitude-search)
 
-Authoritative detail: `docs/PROMPT-CONTRACT.md` (Product model section).
+Authoritative detail: `docs/PROMPT-CONTRACT.md` (Product model + **discovery_mode** sections).
 
 ## Do not misstate
 
 - **Stage 2 is job search.** `POST /v1/pipeline` runs Stage 1 then Stage 2 with no manual step. `verified_matches` is the search result.
-- The API **searches the web** for open postings via a Stage 2 discovery agent (`prompts/02-job-discovery-agent.md`), then synthesizes schema-strict results (`prompts/03-job-discovery-synthesis.md`). See `backend/app/pipeline.py` and `docs/PROMPT-CONTRACT.md`.
+- The API **searches the web** for open postings via Stage 2 discovery (default: **planned** — profile-driven `search_job_postings`; optional **`discovery_mode = "agent"`** CodeAgent), then synthesizes schema-strict results (`prompts/03-job-discovery-synthesis.md`). See `backend/app/pipeline.py` and `docs/PROMPT-CONTRACT.md`.
 - Do **not** tell users the API path is "draft only" or that "only Cursor Agent can browse" as the primary story.
 
 ## Optional nuance (implementation, not user-facing)
 
-- Stage 2 uses a **smolagents** CodeAgent (Hugging Face) with DuckDuckGo search and page scraping, then a synthesis chat call—not a separate jobs API wired in Python.
+- Stage 2 discovery default: `planned_discovery.py` + `search_job_postings` (DuckDuckGo, URL filters, scrape). Optional `agent` mode uses **smolagents** CodeAgent with the same tool.
+- Stage 2b is a synthesis chat call (`[llm.job_discovery].model`) — not a separate jobs API wired in Python.
+- Configure **`[job_discovery].discovery_mode`** in `backend/config.toml` (`planned` | `agent`).
 - The API jsonschema-validates `verified_matches` against `job-discovery-results.schema.json`.
 
 ## Testing

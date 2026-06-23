@@ -20,7 +20,7 @@ Aptitude-driven job search: resume → aptitude profile → **verified openings 
 
 ## Product workflow
 
-**[Stage 1](prompts/01-resume-to-aptitude-profile.md)** → **[Stage 2](prompts/02-job-discovery-agent.md)** (discovery agent + [synthesis](prompts/03-job-discovery-synthesis.md))
+**[Stage 1](prompts/01-resume-to-aptitude-profile.md)** → **Stage 2** ([planned web discovery](docs/PROMPT-CONTRACT.md#stage-2-discovery-mode-discovery_mode) + [synthesis](prompts/03-job-discovery-synthesis.md))
 
 Steps: **[prompts/README.md](prompts/README.md)**
 
@@ -55,12 +55,12 @@ curl -s -X POST http://localhost:3001/v1/pipeline \
   -d @fixtures/pipeline-request-example.json
 ```
 
-Response: `aptitude_profile` (JSON) and `verified_matches` (job search results). See **[docs/PROMPT-CONTRACT.md](docs/PROMPT-CONTRACT.md)** for how the pipeline works.
+Response: `aptitude_profile` (JSON) and `verified_matches` (job search results). See **[docs/PROMPT-CONTRACT.md](docs/PROMPT-CONTRACT.md)** for the pipeline and **[discovery_mode](docs/PROMPT-CONTRACT.md#stage-2-discovery-mode-discovery_mode)** (`planned` vs `agent`).
 
 ## Repository layout
 
 ```
-prompts/          # 01 profile, 02a discovery agent, 02b synthesis; XX + 02-verified = reference
+prompts/          # 01 profile, 02a agent prompts (agent mode), 02b synthesis; XX + 02-verified = reference
 schemas/          # aptitude-profile, job-discovery-results, constraints
 fixtures/         # sample resumes, pipeline-request-example.json, stage-1 golden output
 docs/             # WORKFLOW, TESTING, PROMPT-CONTRACT

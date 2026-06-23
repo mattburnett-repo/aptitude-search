@@ -7,7 +7,7 @@
 - [ ] At least one non-obvious `adjacent_roles` entry
 - [ ] `rationale` present and readable
 
-## Stage 2 (discovery agent + synthesis)
+## Stage 2 (planned discovery + synthesis)
 
 - [ ] `verified_matches` parses against `schemas/job-discovery-results.schema.json`
 - [ ] `search_plan` has 3–6 strings drawn from the aptitude profile (not one ATS/board host)
@@ -16,7 +16,7 @@
 - [ ] At most 20 results; no padding
 - [ ] `notes` has 1+ meaningful search caveats (exclusions, limits, sparse results)
 
-Stage 2 should reflect current postings (web search via the discovery agent), not memory alone. The API runs Stage 2 as part of `POST /v1/pipeline` and returns parsed, schema-validated `verified_matches`. See [PROMPT-CONTRACT.md](PROMPT-CONTRACT.md).
+Stage 2 should reflect current postings (web search via **planned** `search_job_postings`, or the optional agent), not memory alone. The API runs Stage 2 as part of `POST /v1/pipeline` and returns parsed, schema-validated `verified_matches`. See [PROMPT-CONTRACT.md](PROMPT-CONTRACT.md) and [discovery_mode](PROMPT-CONTRACT.md#stage-2-discovery-mode-discovery_mode).
 
 ## Fixtures
 
@@ -30,7 +30,7 @@ Validates `fixtures/example-outputs/career-changer-mixed-stack-stage1.json` agai
 
 ## Models
 
-Test stage 1 on capable models for reliable JSON. Stage 2 via API uses the configured Hugging Face models (`[llm.aptitude].model` for stage 1 and synthesis, `[llm.job_discovery].model` for the agent); quality depends on model and provider. Smoke-test the discovery agent: `backend/scripts/smoke_job_discovery_agent.py`.
+Test stage 1 on capable models for reliable JSON. Stage 2 via API uses `[llm.aptitude].model` for stage 1, `[llm.job_discovery].model` for synthesis; discovery defaults to **planned** (`[job_discovery].discovery_mode`). Smoke scripts: `scripts/smoke_planned_discovery.py` (default path), `scripts/smoke_job_discovery_agent.py` (`agent` mode).
 
 ## API smoke test (optional)
 
