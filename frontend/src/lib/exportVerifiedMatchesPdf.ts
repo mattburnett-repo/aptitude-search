@@ -1,29 +1,29 @@
 import {
-  appendCanvasToPdf,
-  captureElement,
   isPdfPageEmpty,
-  loadPdfLibs,
-  openPdfBlob,
-  PDF_MARGIN_PT,
+  maxSourceHeightPx,
+  openPackedDomPdf,
 } from "./exportDomPdf";
 
 function prepareVerifiedMatchesCloneForExport(_doc: Document, clone: HTMLElement) {
   clone.classList.add("verified-matches", "verified-matches--pdf-export");
 }
 
-function maxSourceHeightPerPdfPage(sourceWidthPx: number): number {
-  const pageWidth = 595.28;
-  const pageHeight = 841.89;
-  const contentWidth = pageWidth - PDF_MARGIN_PT * 2;
-  const printableHeight = pageHeight - PDF_MARGIN_PT * 2;
-  return (printableHeight * sourceWidthPx) / contentWidth;
-}
+type MeasuredCard = {
+  element: HTMLElement;
+  height: number;
+};
 
-function listGapPx(list: HTMLElement): number {
-  const style = getComputedStyle(list);
-  const gap = parseFloat(style.rowGap || style.gap);
-  return Number.isFinite(gap) ? gap : 12;
-}
+type VerifiedExportParts = {
+  leading: HTMLElement[];
+  cards: MeasuredCard[];
+  cardGap: number;
+  notes: HTMLElement | null;
+};
+
+type PdfPagePlan = {
+  leading: HTMLElement[];
+  cards: MeasuredCard[];
+};
 
 function createPageShell(width: number): HTMLElement {
   const page = document.createElement("div");
@@ -33,7 +33,7 @@ function createPageShell(width: number): HTMLElement {
   return page;
 }
 
-function measurePageHeight(
+function measureBlocks(
   staging: HTMLElement,
   width: number,
   blocks: HTMLElement[]
@@ -55,36 +55,149 @@ function measurePageHeight(
   return height;
 }
 
-function fitsOnPage(
-  page: HTMLElement,
-  block: HTMLElement,
-  maxPageHeight: number
-): boolean {
-  page.appendChild(block);
-  void page.offsetHeight;
-  const fits = page.getBoundingClientRect().height <= maxPageHeight;
-  if (!fits) {
-    page.removeChild(block);
+function listGapPx(list: HTMLElement): number {
+  const style = getComputedStyle(list);
+  const gap = parseFloat(style.rowGap || style.gap);
+  return Number.isFinite(gap) ? gap : 12;
+}
+
+function parseVerifiedExportParts(working: HTMLElement): VerifiedExportParts {
+  const searchSection = working
+    .querySelector(".verified-search-plan")
+    ?.closest<HTMLElement>(".verified-section");
+  if (searchSection) searchSection.remove();
+
+  const notesSection = working
+    .querySelector(".verified-notes")
+    ?.closest<HTMLElement>(".verified-section");
+  if (notesSection) notesSection.remove();
+
+  const leading: HTMLElement[] = [];
+  if (searchSection && !isPdfPageEmpty(searchSection)) {
+    leading.push(searchSection);
   }
-  return fits;
+
+  const resultsSection = working
+    .querySelector(".job-card-list")
+    ?.closest<HTMLElement>(".verified-section");
+
+  let cards: MeasuredCard[] = [];
+  let cardGap = 12;
+
+  if (resultsSection) {
+    const list = resultsSection.querySelector<HTMLElement>(".job-card-list");
+    if (list) {
+      cards = Array.from(list.querySelectorAll<HTMLElement>(".job-card")).map(
+        (element) => ({
+          element,
+          height: element.getBoundingClientRect().height,
+        })
+      );
+      cardGap = listGapPx(list);
+    }
+
+    const header = document.createElement("div");
+    header.className = "verified-results-header";
+    for (const child of Array.from(resultsSection.children)) {
+      if (child === list) continue;
+      header.appendChild(child);
+    }
+    resultsSection.remove();
+
+    if (header.childNodes.length > 0) {
+      leading.push(header);
+    }
+  }
+
+  return { leading, cards, cardGap, notes: notesSection ?? null };
 }
 
-type MeasuredCard = {
-  element: HTMLElement;
-  height: number;
-};
+function packCardPages(
+  cards: MeasuredCard[],
+  gap: number,
+  maxPageHeight: number,
+  initialLeading: HTMLElement[],
+  measureLeading: (blocks: HTMLElement[]) => number
+): PdfPagePlan[] {
+  const plans: PdfPagePlan[] = [];
+  let cardIndex = 0;
+  let leading = initialLeading;
 
-function measureJobCards(list: HTMLElement): MeasuredCard[] {
-  return Array.from(list.querySelectorAll<HTMLElement>(".job-card")).map((element) => ({
-    element,
-    height: element.getBoundingClientRect().height,
-  }));
+  while (cardIndex < cards.length) {
+    const leadingHeight = measureLeading(leading);
+    let used = leadingHeight + (leading.length > 0 ? gap : 0);
+    const pageCards: MeasuredCard[] = [];
+
+    while (cardIndex < cards.length) {
+      const gapBefore = pageCards.length > 0 ? gap : 0;
+      const needed = gapBefore + cards[cardIndex].height;
+
+      if (pageCards.length > 0 && used + needed > maxPageHeight) break;
+
+      if (pageCards.length === 0 && used + needed > maxPageHeight) {
+        if (used > 0) break;
+        pageCards.push(cards[cardIndex++]);
+        break;
+      }
+
+      pageCards.push(cards[cardIndex++]);
+      used += needed;
+    }
+
+    if (pageCards.length === 0 && leading.length === 0) break;
+
+    plans.push({ leading, cards: pageCards });
+    leading = [];
+  }
+
+  if (leading.length > 0) {
+    plans.push({ leading, cards: [] });
+  }
+
+  return plans;
 }
 
-type PackedPage = {
-  leading: HTMLElement[];
-  cards: MeasuredCard[];
-};
+function renderVerifiedPage(
+  width: number,
+  plan: PdfPagePlan
+): HTMLElement {
+  const page = createPageShell(width);
+  for (const block of plan.leading) {
+    page.appendChild(block);
+  }
+  if (plan.cards.length > 0) {
+    const cardList = document.createElement("div");
+    cardList.className = "job-card-list";
+    for (const card of plan.cards) {
+      cardList.appendChild(card.element);
+    }
+    page.appendChild(cardList);
+  }
+  return page;
+}
+
+function appendNotes(
+  pages: HTMLElement[],
+  notes: HTMLElement,
+  maxPageHeight: number,
+  width: number
+): HTMLElement[] {
+  notes.style.marginTop = "1.25rem";
+  const lastPage = pages.at(-1);
+
+  if (lastPage) {
+    lastPage.appendChild(notes);
+    void lastPage.offsetHeight;
+    if (lastPage.getBoundingClientRect().height <= maxPageHeight) {
+      return pages;
+    }
+    lastPage.removeChild(notes);
+  }
+
+  const notesPage = createPageShell(width);
+  notesPage.appendChild(notes);
+  return [...pages, notesPage];
+}
 
 function buildVerifiedMatchesPages(source: HTMLElement): {
   staging: HTMLElement;
@@ -106,171 +219,40 @@ function buildVerifiedMatchesPages(source: HTMLElement): {
   staging.appendChild(working);
   void working.offsetHeight;
 
-  const maxPageHeight = maxSourceHeightPerPdfPage(width);
-  const pages: HTMLElement[] = [];
-
-  const searchSection = working
-    .querySelector(".verified-search-plan")
-    ?.closest<HTMLElement>(".verified-section");
-  if (searchSection) {
-    searchSection.remove();
-  }
-
-  const notesSection = working
-    .querySelector(".verified-notes")
-    ?.closest<HTMLElement>(".verified-section");
-  if (notesSection) {
-    notesSection.remove();
-  }
-
-  const resultsSection = working
-    .querySelector(".job-card-list")
-    ?.closest<HTMLElement>(".verified-section");
-
-  const initialLeading: HTMLElement[] = [];
-  if (searchSection && !isPdfPageEmpty(searchSection)) {
-    initialLeading.push(searchSection);
-  }
-
-  if (resultsSection) {
-    const list = resultsSection.querySelector<HTMLElement>(".job-card-list");
-    const cards = list ? measureJobCards(list) : [];
-
-    const header = document.createElement("div");
-    header.className = "verified-results-header";
-    for (const child of Array.from(resultsSection.children)) {
-      if (child === list) continue;
-      header.appendChild(child);
-    }
-    resultsSection.remove();
-    list?.remove();
-
-    if (header.childNodes.length > 0) {
-      initialLeading.push(header);
-    }
-
-    const gap = list ? listGapPx(list) : 12;
-
-    if (cards.length === 0) {
-      const page = createPageShell(width);
-      for (const block of initialLeading) {
-        page.appendChild(block);
-      }
-      staging.appendChild(page);
-      pages.push(page);
-    } else {
-      const measureLeading = (blocks: HTMLElement[]) =>
-        measurePageHeight(staging, width, blocks);
-
-      const packedPages: PackedPage[] = [];
-      let cardIndex = 0;
-      let leading = initialLeading;
-
-      while (cardIndex < cards.length) {
-        const leadingHeight = measureLeading(leading);
-        let used = leadingHeight + (leading.length > 0 && cards.length > 0 ? gap : 0);
-        const pageCards: MeasuredCard[] = [];
-
-        while (cardIndex < cards.length) {
-          const gapBefore = pageCards.length > 0 ? gap : 0;
-          const needed = gapBefore + cards[cardIndex].height;
-
-          if (pageCards.length > 0 && used + needed > maxPageHeight) {
-            break;
-          }
-
-          if (pageCards.length === 0 && used + needed > maxPageHeight) {
-            if (used > 0) {
-              break;
-            }
-            pageCards.push(cards[cardIndex]);
-            cardIndex += 1;
-            break;
-          }
-
-          pageCards.push(cards[cardIndex]);
-          used += needed;
-          cardIndex += 1;
-        }
-
-        if (pageCards.length === 0 && leading.length === 0) {
-          break;
-        }
-
-        packedPages.push({ leading, cards: pageCards });
-        leading = [];
-      }
-
-      if (leading.length > 0) {
-        packedPages.push({ leading, cards: [] });
-      }
-
-      for (const packed of packedPages) {
-        const page = createPageShell(width);
-        for (const block of packed.leading) {
-          page.appendChild(block);
-        }
-        if (packed.cards.length > 0) {
-          const cardList = document.createElement("div");
-          cardList.className = "job-card-list";
-          for (const card of packed.cards) {
-            cardList.appendChild(card.element);
-          }
-          page.appendChild(cardList);
-        }
-        staging.appendChild(page);
-        pages.push(page);
-      }
-    }
-  } else if (initialLeading.length > 0) {
-    const page = createPageShell(width);
-    for (const block of initialLeading) {
-      page.appendChild(block);
-    }
-    staging.appendChild(page);
-    pages.push(page);
-  }
-
-  if (notesSection && !isPdfPageEmpty(notesSection)) {
-    notesSection.style.marginTop = "1.25rem";
-    const lastPage = pages.at(-1);
-
-    if (lastPage && fitsOnPage(lastPage, notesSection, maxPageHeight)) {
-      // notes appended to last page
-    } else {
-      const page = createPageShell(width);
-      page.appendChild(notesSection);
-      staging.appendChild(page);
-      pages.push(page);
-    }
-  }
-
+  const maxPageHeight = maxSourceHeightPx(width);
+  const measureLeading = (blocks: HTMLElement[]) =>
+    measureBlocks(staging, width, blocks);
+  const { leading, cards, cardGap, notes } = parseVerifiedExportParts(working);
   working.remove();
+
+  let pagePlans: PdfPagePlan[] =
+    cards.length > 0
+      ? packCardPages(cards, cardGap, maxPageHeight, leading, measureLeading)
+      : leading.length > 0
+        ? [{ leading, cards: [] }]
+        : [];
+
+  let pages = pagePlans.map((plan) => renderVerifiedPage(width, plan));
+  for (const page of pages) {
+    staging.appendChild(page);
+  }
+
+  if (notes && !isPdfPageEmpty(notes)) {
+    const pageCountBefore = pages.length;
+    pages = appendNotes(pages, notes, maxPageHeight, width);
+    if (pages.length > pageCountBefore) {
+      staging.appendChild(pages.at(-1)!);
+    }
+  }
+
   return { staging, pages };
 }
 
 export async function openVerifiedMatchesPdf(element: HTMLElement): Promise<void> {
-  const { html2canvas, jsPDF: JsPDF } = await loadPdfLibs();
   const { staging, pages } = buildVerifiedMatchesPages(element);
 
   try {
-    const pdf = new JsPDF({ orientation: "p", unit: "pt", format: "a4" });
-    let isFirstContent = true;
-
-    for (const pageElement of pages.filter((page) => !isPdfPageEmpty(page))) {
-      const capture = await captureElement(
-        html2canvas,
-        pageElement,
-        prepareVerifiedMatchesCloneForExport
-      );
-      appendCanvasToPdf(pdf, capture, {
-        newPageBefore: true,
-        isFirstContent,
-      });
-      isFirstContent = false;
-    }
-
-    openPdfBlob(pdf);
+    await openPackedDomPdf(pages, prepareVerifiedMatchesCloneForExport);
   } finally {
     staging.remove();
   }

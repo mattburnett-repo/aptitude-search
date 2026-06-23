@@ -149,6 +149,34 @@ export function appendCanvasToPdf(
   }
 }
 
+export function maxSourceHeightPx(sourceWidthPx: number): number {
+  const pageWidth = 595.28;
+  const pageHeight = 841.89;
+  const contentWidth = pageWidth - PDF_MARGIN_PT * 2;
+  const printableHeight = pageHeight - PDF_MARGIN_PT * 2;
+  return (printableHeight * sourceWidthPx) / contentWidth;
+}
+
+export async function openPackedDomPdf(
+  pages: HTMLElement[],
+  prepareClone: PrepareCloneFn
+): Promise<void> {
+  const { html2canvas, jsPDF: JsPDF } = await loadPdfLibs();
+  const pdf = new JsPDF({ orientation: "p", unit: "pt", format: "a4" });
+  let isFirstContent = true;
+
+  for (const pageElement of pages.filter((page) => !isPdfPageEmpty(page))) {
+    const capture = await captureElement(html2canvas, pageElement, prepareClone);
+    appendCanvasToPdf(pdf, capture, {
+      newPageBefore: true,
+      isFirstContent,
+    });
+    isFirstContent = false;
+  }
+
+  openPdfBlob(pdf);
+}
+
 export function openPdfBlob(pdf: jsPDF) {
   const blob = pdf.output("blob");
   const url = URL.createObjectURL(blob);
