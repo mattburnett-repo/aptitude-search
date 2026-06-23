@@ -656,6 +656,13 @@ button.theme-toggle:hover {
   border-top: 1px solid #dadce0;
 }
 
+.aptitude-profile.aptitude-profile--pdf-export
+  .aptitude-inference-confidence-pdf--follows-content {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #dadce0;
+}
+
 .aptitude-profile.aptitude-profile--pdf-export .aptitude-section-title,
 .aptitude-profile.aptitude-profile--pdf-export .aptitude-seniority {
   color: #3c4043;

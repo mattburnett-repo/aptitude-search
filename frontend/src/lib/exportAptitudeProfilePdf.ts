@@ -53,7 +53,7 @@ function mergeInferenceConfidenceIfFits(
   );
   if (!inference) return pages;
 
-  inference.style.marginTop = "1.25rem";
+  inference.classList.add("aptitude-inference-confidence-pdf--follows-content");
   rationalePage.appendChild(inference);
   void rationalePage.offsetHeight;
 
@@ -63,6 +63,7 @@ function mergeInferenceConfidenceIfFits(
   }
 
   rationalePage.removeChild(inference);
+  inference.classList.remove("aptitude-inference-confidence-pdf--follows-content");
   return pages;
 }
 
