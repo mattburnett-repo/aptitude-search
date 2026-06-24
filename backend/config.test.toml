@@ -1,6 +1,6 @@
 [app]
 title = "aptitude-search-api"
-version = "1.0.0"
+version = "0.0.0"
 service = "aptitude-search-api"
 
 [cors]
@@ -12,7 +12,7 @@ allow_headers = ["*"]
 [llm.aptitude]
 model_key = "test-key"
 model = "test/aptitude-model"
-temperature = 0.3
+temperature = 0.0
 max_tokens = 8192
 
 [llm.job_discovery]
