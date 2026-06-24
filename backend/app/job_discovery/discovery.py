@@ -17,25 +17,18 @@ from app.job_discovery.tools import build_job_discovery_tools
 
 logger = logging.getLogger(__name__)
 
-_SKIP_SKILL_NAMES = frozenset(
-    {
-        "legacy modernization",
-        "mentoring",
-        "cross-functional communication",
-    }
-)
-
-_SENIORITY_TO_ROLE = {
-    "entry": "junior software engineer",
-    "mid": "software engineer",
-    "senior": "senior software engineer",
-    "staff": "staff software engineer",
-    "principal": "principal software engineer",
-    "executive": "engineering director",
+# Seniority modifiers only — never assume an occupational family (e.g. "software engineer").
+_SENIORITY_MODIFIER = {
+    "entry": "junior",
+    "mid": "",
+    "senior": "senior",
+    "staff": "staff",
+    "principal": "principal",
+    "executive": "director",
 }
 
 
-def _skill_names(items: object, *, limit: int) -> list[str]:
+def _profile_labels(items: object, *, limit: int) -> list[str]:
     names: list[str] = []
     item_list = as_object_list(items)
     if item_list is None:
@@ -49,7 +42,7 @@ def _skill_names(items: object, *, limit: int) -> list[str]:
                 label = str(raw).strip()
         elif item:
             label = str(item).strip()
-        if not label or label.lower() in _SKIP_SKILL_NAMES:
+        if not label:
             continue
         if label not in names:
             names.append(label)
@@ -58,8 +51,21 @@ def _skill_names(items: object, *, limit: int) -> list[str]:
     return names
 
 
-def _role_label(seniority_band: str) -> str:
-    return _SENIORITY_TO_ROLE.get(seniority_band, "software engineer")
+def _normalize_search_term(label: str) -> str:
+    """Compact a profile label into a web-search phrase."""
+    stripped = " ".join(label.replace("/", " ").split())
+    if "(" not in stripped:
+        return stripped
+    main, _, rest = stripped.partition("(")
+    main = main.strip()
+    rest = rest.rstrip(")").strip()
+    if rest:
+        return f"{main} {rest}".strip()
+    return main
+
+
+def _seniority_modifier(seniority_band: str) -> str:
+    return _SENIORITY_MODIFIER.get(seniority_band, "")
 
 
 def _location_tokens(constraints: Constraints) -> list[str]:
@@ -76,33 +82,146 @@ def _location_tokens(constraints: Constraints) -> list[str]:
     return tokens
 
 
+def _discovery_search_terms_from_plan(
+    role_family_plan: JsonObject,
+    *,
+    max_queries: int,
+) -> list[tuple[str, str]]:
+    """Round-robin search_terms across role families."""
+    families_raw = as_object_list(role_family_plan.get("recommended_role_families"))
+    if families_raw is None:
+        return []
+
+    per_family: list[list[str]] = []
+    for family in families_raw:
+        family_dict = as_object_dict(family)
+        if family_dict is None:
+            continue
+        terms = _profile_labels(family_dict.get("search_terms"), limit=max_queries)
+        if terms:
+            per_family.append(terms)
+
+    selected: list[tuple[str, str]] = []
+    seen: set[str] = set()
+    if not per_family:
+        return selected
+
+    index = 0
+    while len(selected) < max_queries:
+        added = False
+        for terms in per_family:
+            if index >= len(terms):
+                continue
+            label = terms[index]
+            if label not in seen:
+                seen.add(label)
+                selected.append(("role_family", label))
+                if len(selected) >= max_queries:
+                    break
+            added = True
+        if not added:
+            break
+        index += 1
+    return selected
+
+
+def _discovery_search_terms(
+    aptitude_profile: JsonObject,
+    *,
+    max_queries: int,
+    role_family_plan: JsonObject | None = None,
+) -> list[tuple[str, str]]:
+    """Return (source, term) pairs for discovery queries."""
+    if role_family_plan is not None:
+        plan_terms = _discovery_search_terms_from_plan(
+            role_family_plan,
+            max_queries=max_queries,
+        )
+        if plan_terms:
+            return plan_terms
+
+    terms: list[tuple[str, str]] = []
+    seen: set[str] = set()
+
+    def add(source: str, label: str) -> None:
+        if label in seen or len(terms) >= max_queries:
+            return
+        seen.add(label)
+        terms.append((source, label))
+
+    for label in _profile_labels(aptitude_profile.get("adjacent_roles"), limit=max_queries):
+        add("adjacent_roles", label)
+
+    if len(terms) < max_queries:
+        for label in _profile_labels(
+            aptitude_profile.get("domains"),
+            limit=max_queries - len(terms),
+        ):
+            add("domains", label)
+
+    if not terms:
+        for label in _profile_labels(
+            aptitude_profile.get("core_skills"),
+            limit=max_queries,
+        ):
+            add("core_skills", label)
+        if len(terms) < max_queries:
+            for label in _profile_labels(
+                aptitude_profile.get("secondary_skills"),
+                limit=max_queries - len(terms),
+            ):
+                add("secondary_skills", label)
+
+    return terms
+
+
+def _query_parts(
+    source: str,
+    term: str,
+    *,
+    seniority_modifier: str,
+    loc_tokens: list[str],
+) -> list[str]:
+    """Assemble a hiring-shaped query without hardcoding an occupational family."""
+    normalized = _normalize_search_term(term)
+    if source in {"role_family", "adjacent_roles", "domains"}:
+        return [normalized, *loc_tokens, "jobs"]
+    if seniority_modifier:
+        return [seniority_modifier, normalized, *loc_tokens, "jobs"]
+    return [normalized, *loc_tokens, "jobs"]
+
+
 def build_discovery_queries(
     aptitude_profile: JsonObject,
     constraints: Constraints,
     *,
+    role_family_plan: JsonObject | None = None,
     max_queries: int | None = None,
 ) -> list[str]:
-    """Build hiring-shaped search strings from profile skills and constraints."""
+    """Build hiring-shaped search strings from role families, profile, and constraints."""
     if max_queries is None:
         max_queries = config.job_discovery.discovery_query_max
 
-    skills = _skill_names(aptitude_profile.get("core_skills"), limit=max_queries)
-    if len(skills) < max_queries:
-        for name in _skill_names(
-            aptitude_profile.get("secondary_skills"),
-            limit=max_queries - len(skills),
-        ):
-            if name not in skills:
-                skills.append(name)
-
     seniority = str(aptitude_profile.get("seniority_band") or "unknown")
-    role = _role_label(seniority)
+    modifier = _seniority_modifier(seniority)
     loc_tokens = _location_tokens(constraints)
 
     queries: list[str] = []
-    for skill in skills[:max_queries]:
-        parts = [role, skill, *loc_tokens, "jobs"]
-        queries.append(" ".join(parts))
+    for source, term in _discovery_search_terms(
+        aptitude_profile,
+        max_queries=max_queries,
+        role_family_plan=role_family_plan,
+    ):
+        queries.append(
+            " ".join(
+                _query_parts(
+                    source,
+                    term,
+                    seniority_modifier=modifier,
+                    loc_tokens=loc_tokens,
+                )
+            )
+        )
     return queries
 
 
@@ -146,6 +265,7 @@ def run_job_discovery(
     aptitude_profile: JsonObject,
     constraints: Constraints,
     *,
+    role_family_plan: JsonObject | None = None,
     observed_urls: ToolObservedUrlRegistry | None = None,
     on_progress: ProgressCallback | None = None,
 ) -> list[FoundJob]:
@@ -153,7 +273,11 @@ def run_job_discovery(
     registry = observed_urls if observed_urls is not None else ToolObservedUrlRegistry()
     tool = build_job_discovery_tools(registry)[0]
 
-    queries = build_discovery_queries(aptitude_profile, constraints)
+    queries = build_discovery_queries(
+        aptitude_profile,
+        constraints,
+        role_family_plan=role_family_plan,
+    )
     if not queries:
         logger.warning("job_discovery built zero queries from profile")
         return []

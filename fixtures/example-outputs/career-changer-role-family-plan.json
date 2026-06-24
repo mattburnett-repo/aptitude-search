@@ -1,0 +1,77 @@
+{
+  "recommended_role_families": [
+    {
+      "role_family": "Solutions / Integration Engineering",
+      "fit_reason": "Repeated API integrations, warehouse systems, and client-facing portal delivery at Riverbend Logistics.",
+      "supporting_signals": [
+        "Solutions Engineer (integration-heavy products)",
+        "Thrives in transitional technical environments",
+        "Logistics / supply chain software"
+      ],
+      "work_modes": [
+        "customer integrations",
+        "technical discovery",
+        "API design"
+      ],
+      "search_terms": [
+        "solutions engineer",
+        "integration engineer",
+        "implementation engineer"
+      ],
+      "avoid_terms": [
+        "quota",
+        "cold calling",
+        "account executive"
+      ]
+    },
+    {
+      "role_family": "Platform / Internal Developer Experience",
+      "fit_reason": "CI/CD introduction, internal APIs, and mentoring indicate platform and internal-tools work.",
+      "supporting_signals": [
+        "Platform Engineer (internal tools / developer experience)",
+        "Pragmatic builder over specialist researcher"
+      ],
+      "work_modes": [
+        "developer experience",
+        "internal tooling",
+        "platform infrastructure"
+      ],
+      "search_terms": [
+        "platform engineer",
+        "developer experience engineer",
+        "internal tools engineer"
+      ],
+      "avoid_terms": [
+        "machine learning researcher",
+        "phd required"
+      ]
+    },
+    {
+      "role_family": "Modernization / Technical Program Delivery",
+      "fit_reason": "Led ColdFusion-to-Django migration and greenfield initiatives under shifting nonprofit requirements.",
+      "supporting_signals": [
+        "Technical Program Manager (modernization programs)",
+        "End-to-end ownership under ambiguity",
+        "High tolerance for ambiguity"
+      ],
+      "work_modes": [
+        "legacy migration",
+        "program delivery",
+        "stakeholder coordination"
+      ],
+      "search_terms": [
+        "technical program manager modernization",
+        "application modernization engineer"
+      ],
+      "avoid_terms": [
+        "pure sales",
+        "tier 1 support"
+      ]
+    }
+  ],
+  "rationale": [
+    "Profile emphasizes integration and modernization over narrow stack specialization.",
+    "Logistics and nonprofit domains support integration-heavy, resource-constrained work modes.",
+    "Adjacent roles from Stage 1 align with solutions, platform, and TPM-style modernization paths."
+  ]
+}

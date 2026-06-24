@@ -2,6 +2,7 @@ const API_BASE = (import.meta.env.VITE_API_URL ?? "/api").replace(/\/$/, "");
 
 export type PipelineResult = {
   aptitude_profile: unknown;
+  role_family_plan?: unknown;
   verified_matches: unknown;
 };
 

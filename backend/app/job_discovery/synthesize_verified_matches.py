@@ -18,7 +18,7 @@ from app.core import prompt_loader
 from app.core.config import config
 from app.job_discovery.context import labeled_names, build_stage2_synthesis_user_message
 from app.core.llm import complete_chat_json
-from app.core.json_types import FoundJob, JsonObject
+from app.core.json_types import FoundJob, JsonObject, as_object_dict, as_object_list
 from app.core.models import Constraints
 from app.core.validate import normalize_job_discovery_results
 
@@ -40,18 +40,45 @@ def _location_remote_phrase(constraints: Constraints) -> str:
 def _build_empty_search_plan(
     profile: JsonObject,
     constraints: Constraints,
+    *,
+    role_family_plan: JsonObject | None = None,
 ) -> list[str]:
     plan: list[str] = []
     seniority = profile.get("seniority_band", "unknown")
-    skills = labeled_names(profile.get("core_skills"))
     where = _location_remote_phrase(constraints)
 
-    if skills:
-        plan.append(
-            f"Searched for {seniority} roles matching core skills ({skills}) in {where}."
-        )
-    else:
-        plan.append(f"Searched for {seniority} roles in {where}.")
+    if role_family_plan is not None:
+        families = as_object_list(role_family_plan.get("recommended_role_families"))
+        family_names: list[str] = []
+        if families is not None:
+            for family in families:
+                family_dict = as_object_dict(family)
+                if family_dict is None:
+                    continue
+                name = family_dict.get("role_family")
+                if name:
+                    family_names.append(str(name))
+        if family_names:
+            plan.append(
+                f"Mapped aptitude to role families ({', '.join(family_names)}) and searched targeted titles in {where}."
+            )
+
+    strengths = labeled_names(profile.get("strengths"), limit=4)
+    if strengths:
+        plan.append(f"Ranked results by work-pattern fit ({strengths}).")
+
+    adjacent = labeled_names(profile.get("adjacent_roles"))
+    if adjacent:
+        plan.append(f"Explored adjacent role families: {adjacent}.")
+
+    if not plan:
+        skills = labeled_names(profile.get("core_skills"))
+        if skills:
+            plan.append(
+                f"Searched for {seniority} roles matching core skills ({skills}) in {where}."
+            )
+        else:
+            plan.append(f"Searched for {seniority} roles in {where}.")
 
     industries = [i.strip() for i in constraints.industries_include if i.strip()]
     if industries:
@@ -80,10 +107,16 @@ def _build_empty_search_plan(
 def empty_job_discovery_results(
     aptitude_profile: JsonObject,
     constraints: Constraints,
+    *,
+    role_family_plan: JsonObject | None = None,
 ) -> JsonObject:
     """Schema-valid job-discovery-results when discovery found no postings."""
     return {
-        "search_plan": _build_empty_search_plan(aptitude_profile, constraints),
+        "search_plan": _build_empty_search_plan(
+            aptitude_profile,
+            constraints,
+            role_family_plan=role_family_plan,
+        ),
         "results": [],
         "notes": [_EMPTY_NOTE],
     }
@@ -94,10 +127,15 @@ def synthesize_job_discovery_results(
     aptitude_profile: JsonObject,
     constraints: Constraints,
     found_jobs: list[FoundJob],
+    *,
+    role_family_plan: JsonObject | None = None,
 ) -> JsonObject:
     """Map ``found_jobs`` into normalized job-discovery-results dict."""
     user = build_stage2_synthesis_user_message(
-        aptitude_profile, constraints, found_jobs
+        aptitude_profile,
+        constraints,
+        found_jobs,
+        role_family_plan=role_family_plan,
     )
     result = normalize_job_discovery_results(
         complete_chat_json(

@@ -40,6 +40,12 @@ def stage1_fixture() -> dict[str, object]:
 
 
 @pytest.fixture
+def role_family_plan_fixture() -> dict[str, object]:
+    path = FIXTURES_DIR / "example-outputs" / "career-changer-role-family-plan.json"
+    return cast(dict[str, object], json.loads(path.read_text(encoding="utf-8")))
+
+
+@pytest.fixture
 def verified_matches_fixture() -> dict[str, object]:
     return {
         "search_plan": [

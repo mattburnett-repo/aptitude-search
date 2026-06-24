@@ -13,6 +13,7 @@ from app.core.validate import (
 )
 from app.job_discovery import (
     empty_job_discovery_results,
+    rank_and_filter_found_jobs,
     run_job_discovery,
     synthesize_job_discovery_results,
 )
@@ -22,6 +23,7 @@ from app.job_discovery.tool_observed_urls import (
 )
 from app.job_discovery.url_utils import filter_found_jobs
 from app.core.progress import ProgressCallback, emit_progress
+from app.role_family_plan import run_stage1_5
 
 logger = logging.getLogger(__name__)
 
@@ -56,6 +58,7 @@ def run_stage2(
     aptitude_profile: JsonObject,
     constraints: Constraints | None = None,
     *,
+    role_family_plan: JsonObject | None = None,
     on_progress: ProgressCallback | None = None,
 ) -> JsonObject:
     c = constraints or DEFAULT_CONSTRAINTS
@@ -68,6 +71,7 @@ def run_stage2(
     found_jobs = run_job_discovery(
         aptitude_profile,
         c,
+        role_family_plan=role_family_plan,
         observed_urls=tool_observed_urls,
         on_progress=on_progress,
     )
@@ -79,18 +83,38 @@ def run_stage2(
             logger.info("stage2 removed %s non-job row(s) from found_jobs", removed)
         found_jobs = kept
     if found_jobs:
+        emit_progress("Ranking by aptitude work-pattern fit…", on_progress=on_progress)
+        ranked = rank_and_filter_found_jobs(
+            found_jobs,
+            aptitude_profile,
+            role_family_plan=role_family_plan,
+        )
+        removed = len(found_jobs) - len(ranked)
+        if removed:
+            logger.info("stage2 aptitude_fit removed %s low-fit row(s)", removed)
+        found_jobs = ranked
+    if found_jobs:
         emit_progress(
             f"Found {len(found_jobs)} job posting(s). Synthesizing verified matches…",
             on_progress=on_progress,
         )
-        result = synthesize_job_discovery_results(aptitude_profile, c, found_jobs)
+        result = synthesize_job_discovery_results(
+            aptitude_profile,
+            c,
+            found_jobs,
+            role_family_plan=role_family_plan,
+        )
         result = filter_results_to_tool_observed_urls(result, tool_observed_urls)
     else:
         emit_progress(
             "No job postings found; preparing empty results…",
             on_progress=on_progress,
         )
-        result = empty_job_discovery_results(aptitude_profile, c)
+        result = empty_job_discovery_results(
+            aptitude_profile,
+            c,
+            role_family_plan=role_family_plan,
+        )
     emit_progress("Validating results…", on_progress=on_progress)
     validate_stage("jobDiscovery", result)
     emit_progress("Stage 2 complete.", on_progress=on_progress)
@@ -106,11 +130,16 @@ def run_pipeline(
 ) -> dict[str, JsonObject]:
     emit_progress("Starting pipeline…", on_progress=on_progress)
     aptitude_profile = run_stage1(resume, on_progress=on_progress)
+    role_family_plan = run_stage1_5(aptitude_profile, on_progress=on_progress)
     verified_matches = run_stage2(
-        aptitude_profile, constraints, on_progress=on_progress
+        aptitude_profile,
+        constraints,
+        role_family_plan=role_family_plan,
+        on_progress=on_progress,
     )
     emit_progress("Pipeline complete.", on_progress=on_progress)
     return {
         "aptitude_profile": aptitude_profile,
+        "role_family_plan": role_family_plan,
         "verified_matches": verified_matches,
     }

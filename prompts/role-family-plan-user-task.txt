@@ -1,0 +1,1 @@
+Analyze the aptitude profile and return the role family plan JSON. Ground every family in profile evidence (strengths, adjacent_roles, domains, working_style_signals). Include at least one non-obvious but justified role family.

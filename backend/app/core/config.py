@@ -46,6 +46,8 @@ class AptitudeLlmConfig(BaseModel):
 class JobDiscoveryConfig(BaseModel):
     url_filters_file: str
     discovery_query_max: int
+    aptitude_fit_min_score: int = 1
+    aptitude_fit_min_results: int = 2
 
     @field_validator("url_filters_file")
     @classmethod
@@ -63,6 +65,22 @@ class JobDiscoveryConfig(BaseModel):
     @field_validator("discovery_query_max")
     @classmethod
     def discovery_query_max_positive(cls, value: int, info: ValidationInfo) -> int:
+        if value < 1:
+            field = info.field_name or "field"
+            raise ValueError(f"job_discovery.{field} must be at least 1")
+        return value
+
+    @field_validator("aptitude_fit_min_score")
+    @classmethod
+    def aptitude_fit_min_score_non_negative(cls, value: int, info: ValidationInfo) -> int:
+        if value < 0:
+            field = info.field_name or "field"
+            raise ValueError(f"job_discovery.{field} must be non-negative")
+        return value
+
+    @field_validator("aptitude_fit_min_results")
+    @classmethod
+    def aptitude_fit_min_results_positive(cls, value: int, info: ValidationInfo) -> int:
         if value < 1:
             field = info.field_name or "field"
             raise ValueError(f"job_discovery.{field} must be at least 1")
@@ -116,14 +134,17 @@ class LlmConfig(BaseModel):
 
 class PromptsConfig(BaseModel):
     stage1_file: str
+    stage1_5_file: str = "02-role-family-plan.md"
     stage2_synthesis_file: str
     stage1_user_task_file: str = "stage1-agent-user-task.txt"
+    stage1_5_user_task_file: str = "role-family-plan-user-task.txt"
     stage2_synthesis_user_task_file: str = "stage2-synthesis-user-task.txt"
 
 
 class SchemasConfig(BaseModel):
     constraints: str
     aptitude_profile: str
+    role_family_plan: str = "role-family-plan.schema.json"
     job_discovery_results: str
 
 

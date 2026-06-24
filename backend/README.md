@@ -1,12 +1,14 @@
 # Aptitude Search API (Python / FastAPI)
 
-Orchestration for **Stage 1** (aptitude profile JSON, schema-validated) and **Stage 2** (profile-driven web search → synthesis LLM call → `verified_matches` JSON, schema-validated).
+Orchestration for **Stage 1** (aptitude profile), **Stage 1.5** (role family plan), and **Stage 2** (plan-driven search → aptitude fit ranking → synthesis → `verified_matches` JSON, schema-validated).
 
 **Hugging Face keys** in `config.toml`:
 
 - **Stage 1:** `[llm.aptitude].model_key` + `[llm.aptitude].model` — resume → aptitude profile (chat JSON).
-- **Stage 2 discovery:** Python builds queries from profile + constraints and runs `search_job_postings` per skill (`[job_discovery].discovery_query_max`). No LLM for discovery.
-- **Stage 2 synthesis:** `[llm.aptitude].model` + `[llm.job_discovery].temperature` — maps `found_jobs` to verified matches JSON.
+- **Stage 1.5:** same model/key — aptitude profile → role family plan (chat JSON).
+- **Stage 2 discovery:** Python builds queries from the role family plan `search_terms` (fallback: profile `adjacent_roles` / `domains` / skills) and runs `search_job_postings` (`[job_discovery].discovery_query_max`). No LLM for discovery.
+- **Stage 2 fit:** Python ranks/filters scraped jobs by work-pattern fit (`aptitude_fit.py`; `[job_discovery].aptitude_fit_min_score`). No LLM.
+- **Stage 2 synthesis:** `[llm.aptitude].model` + `[llm.job_discovery].temperature` — maps ranked `found_jobs` to verified matches JSON.
 
 See **[PROMPT-CONTRACT](../docs/PROMPT-CONTRACT.md)** for the full pipeline.
 

@@ -22,7 +22,7 @@ Keyword-based job search does a poor job of connecting people with roles that fi
 
 ## Product workflow
 
-**Opportunity discovery** in two stages — **[Stage 1](prompts/01-resume-to-aptitude-profile.md)** (profile) → **Stage 2** ([profile-driven discovery](docs/PROMPT-CONTRACT.md) + [synthesis](prompts/03-job-discovery-synthesis.md))
+**Opportunity discovery** in three LLM stages — **[Stage 1](prompts/01-resume-to-aptitude-profile.md)** (profile) → **[Stage 1.5](prompts/02-role-family-plan.md)** (role families) → **Stage 2** ([discovery + fit ranking](docs/PROMPT-CONTRACT.md) + [synthesis](prompts/03-job-discovery-synthesis.md))
 
 Steps: **[prompts/README.md](prompts/README.md)**
 
@@ -55,13 +55,13 @@ curl -s -X POST http://localhost:3001/v1/pipeline \
   -d @fixtures/pipeline-request-example.json
 ```
 
-Response: `aptitude_profile` (JSON) and `verified_matches` (discovered opportunities). See **[docs/PROMPT-CONTRACT.md](docs/PROMPT-CONTRACT.md)** for the pipeline.
+Response: `aptitude_profile`, `role_family_plan`, and `verified_matches` (discovered opportunities). See **[docs/PROMPT-CONTRACT.md](docs/PROMPT-CONTRACT.md)** for the pipeline.
 
 ## Repository layout
 
 ```
-prompts/          # 01 profile, 03 synthesis
-schemas/          # aptitude-profile, job-discovery-results, constraints
+prompts/          # 01 profile, 02 role families, 03 synthesis
+schemas/          # aptitude-profile, role-family-plan, job-discovery-results, constraints
 fixtures/         # sample resumes, pipeline-request-example.json, stage-1 golden output
 docs/             # WORKFLOW, TESTING, PROMPT-CONTRACT
 backend/          # FastAPI — stages 1 and 2

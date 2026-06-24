@@ -24,10 +24,12 @@ def _load_schema(name: str) -> JsonObject:
 def _build_validators() -> dict[str, Draft202012Validator]:
     constraints = _load_schema(config.schemas.constraints)
     aptitude = _load_schema(config.schemas.aptitude_profile)
+    role_family_plan = _load_schema(config.schemas.role_family_plan)
     job_discovery = _load_schema(config.schemas.job_discovery_results)
     store: dict[str, JsonObject] = {
         str(constraints["$id"]): constraints,
         str(aptitude["$id"]): aptitude,
+        str(role_family_plan["$id"]): role_family_plan,
         str(job_discovery["$id"]): job_discovery,
     }
     return {
@@ -35,6 +37,12 @@ def _build_validators() -> dict[str, Draft202012Validator]:
             aptitude,
             resolver=RefResolver.from_schema(  # pyright: ignore[reportDeprecated, reportUnknownMemberType]
                 aptitude, store=store
+            ),
+        ),
+        "roleFamilyPlan": Draft202012Validator(
+            role_family_plan,
+            resolver=RefResolver.from_schema(  # pyright: ignore[reportDeprecated, reportUnknownMemberType]
+                role_family_plan, store=store
             ),
         ),
         "constraints": Draft202012Validator(
@@ -267,6 +275,35 @@ def normalize_aptitude_profile(data: object) -> JsonObject:
 
     profile["confidence_map"] = _normalize_confidence_map(profile.get("confidence_map"))
     return profile
+
+
+def normalize_role_family_plan(data: object) -> JsonObject:
+    plan = as_object_dict(data)
+    if plan is None:
+        return {}
+
+    families = as_object_list(plan.get("recommended_role_families"))
+    if families is not None:
+        for family in families:
+            family_dict = as_object_dict(family)
+            if family_dict is None:
+                continue
+            for key in (
+                "supporting_signals",
+                "work_modes",
+                "search_terms",
+                "avoid_terms",
+            ):
+                items = as_object_list(family_dict.get(key))
+                if items is None:
+                    continue
+                family_dict[key] = [str(item).strip() for item in items if item]
+
+    rationale = as_object_list(plan.get("rationale"))
+    if rationale is not None:
+        plan["rationale"] = [str(item).strip() for item in rationale if item]
+
+    return plan
 
 
 def _build_match_description(item: JsonObject) -> str:

@@ -48,8 +48,37 @@ def compact_aptitude_profile_summary(profile: JsonObject) -> str:
     strengths = labeled_names(profile.get("strengths"), limit=6)
     if strengths:
         lines.append(f"strengths: {strengths}")
+    working_style = labeled_names(profile.get("working_style_signals"), limit=6)
+    if working_style:
+        lines.append(f"working_style_signals: {working_style}")
     if summary:
         lines.append(f"summary: {summary}")
+    return "\n".join(lines)
+
+
+def compact_role_family_plan_summary(plan: JsonObject) -> str:
+    """Short block describing mapped role families for synthesis."""
+    families_raw = as_object_list(plan.get("recommended_role_families"))
+    if families_raw is None:
+        return ""
+
+    lines: list[str] = []
+    for family in families_raw[:5]:
+        family_dict = as_object_dict(family)
+        if family_dict is None:
+            continue
+        role_family = family_dict.get("role_family")
+        fit_reason = family_dict.get("fit_reason")
+        work_modes = labeled_names(family_dict.get("work_modes"), limit=5)
+        search_terms = labeled_names(family_dict.get("search_terms"), limit=4)
+        if role_family:
+            lines.append(f"- {role_family}")
+        if isinstance(fit_reason, str) and fit_reason.strip():
+            lines.append(f"  fit: {fit_reason.strip()}")
+        if work_modes:
+            lines.append(f"  work_modes: {work_modes}")
+        if search_terms:
+            lines.append(f"  search_terms: {search_terms}")
     return "\n".join(lines)
 
 
@@ -57,14 +86,22 @@ def build_stage2_synthesis_user_message(
     aptitude_profile: JsonObject,
     constraints: Constraints,
     found_jobs: list[FoundJob],
+    *,
+    role_family_plan: JsonObject | None = None,
 ) -> str:
     compact = compact_aptitude_profile_summary(aptitude_profile)
     constraints_json = constraints.model_dump_json()
     jobs_json = json.dumps(found_jobs, indent=2)
     task = prompt_loader.user_task_stage2_synthesis()
+    role_family_block = ""
+    if role_family_plan is not None:
+        summary = compact_role_family_plan_summary(role_family_plan)
+        if summary:
+            role_family_block = f"\n\n<role_family_plan>\n{summary}\n</role_family_plan>"
     return (
         f"{task}\n\n"
-        f"<candidate_profile>\n{compact}\n</candidate_profile>\n\n"
+        f"<candidate_profile>\n{compact}\n</candidate_profile>"
+        f"{role_family_block}\n\n"
         f"<constraints>\n{constraints_json}\n</constraints>\n\n"
         f"<found_jobs>\n{jobs_json}\n</found_jobs>"
     )

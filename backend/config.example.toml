@@ -29,16 +29,21 @@ page_snippet_max_chars = 400  # max chars in body snippet per visited page
 [job_discovery]
 url_filters_file = "url-filters.toml"  # SERP/found_jobs skip lists (app/job_discovery/)
 discovery_query_max = 6  # max search_job_postings calls per pipeline run
+aptitude_fit_min_score = 1  # min work-pattern fit score to keep a found job
+aptitude_fit_min_results = 2  # keep at least this many jobs when none meet min_score
 
 [prompts]
 stage1_file = "01-resume-to-aptitude-profile.md"
+stage1_5_file = "02-role-family-plan.md"
 stage2_synthesis_file = "03-job-discovery-synthesis.md"
 stage1_user_task_file = "stage1-agent-user-task.txt"
+stage1_5_user_task_file = "role-family-plan-user-task.txt"
 stage2_synthesis_user_task_file = "stage2-synthesis-user-task.txt"
 
 [schemas]
 constraints = "constraints.schema.json"
 aptitude_profile = "aptitude-profile.schema.json"
+role_family_plan = "role-family-plan.schema.json"
 job_discovery_results = "job-discovery-results.schema.json"
 
 [paths]
@@ -49,3 +54,7 @@ fixtures_example_outputs_dir = "fixtures/example-outputs"
 [[fixtures.files]]
 name = "career-changer-mixed-stack-stage1.json"
 stage = "aptitudeProfile"
+
+[[fixtures.files]]
+name = "career-changer-role-family-plan.json"
+stage = "roleFamilyPlan"

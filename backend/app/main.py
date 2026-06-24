@@ -14,7 +14,7 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from starlette.types import ExceptionHandler
 
 from app.core.config import config
-from app.core.models import PipelineRequest, Stage1Request, Stage2Request
+from app.core.models import PipelineRequest, Stage1Request, Stage1_5Request, Stage2Request
 from app.core.request_context import (
     error_response_headers,
     RequestContextMiddleware,
@@ -23,6 +23,7 @@ from app.core.request_context import (
 from app.core.resume_io import parse_pipeline_body
 from app.core.stream_pipeline import stream_pipeline_response
 from app.pipeline import run_pipeline, run_stage1, run_stage2
+from app.role_family_plan import run_stage1_5
 
 logging.basicConfig(
     level=logging.INFO,
@@ -46,7 +47,7 @@ app = FastAPI(
     openapi_tags=[
         {"name": "Health", "Health check": "Liveness checks"},
         {"name": "Pipeline", "Full pipeline": "Full resume → aptitude → job search run"},
-        {"name": "Pipeline Stages", "Stages for pipeline": "Individual pipeline stages (1 and 2)"},
+        {"name": "Pipeline Stages", "Stages for pipeline": "Individual pipeline stages (1, 1.5, and 2)"},
     ],
 )
 
@@ -127,11 +128,17 @@ def stage1(body: Stage1Request):
     return {"aptitude_profile": run_stage1(body.resume)}
 
 
+@app.post("/v1/stages/1.5", tags=["Pipeline Stages"])
+def stage1_5(body: Stage1_5Request):
+    return {"role_family_plan": run_stage1_5(body.aptitude_profile)}
+
+
 @app.post("/v1/stages/2", tags=["Pipeline Stages"])
 def stage2(body: Stage2Request):
     return {
         "verified_matches": run_stage2(
             body.aptitude_profile,
             body.constraints,
+            role_family_plan=body.role_family_plan,
         )
     }

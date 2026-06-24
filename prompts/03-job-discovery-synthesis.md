@@ -13,8 +13,8 @@ You do not search the web. You do not invent postings beyond `found_jobs`.
 
 - **core_skills** — primary requirement matching only
 - **secondary_skills** — supporting match signal
-- **strengths** — work-pattern fit (not tools)
-- **adjacent_roles** — exploration bounds; do not override core_skills
+- **strengths** — work-pattern fit (primary for match_description when aptitude_fit_signals present)
+- **adjacent_roles** — exploration bounds; do not override strengths for fit narrative
 
 ---
 
@@ -41,7 +41,7 @@ Return **only** one `json`-language fenced code block.
 Conform to `schemas/job-discovery-results.schema.json`:
 
 - `search_plan` — string array of **3–4** items reflecting how discovery would have been approached from the profile
-- `results` — rows from `found_jobs` only; map `title`/`role` and `company`; write `match_description` per row; target **8+** when available; up to **20**
+- `results` — rows from `found_jobs` only; map `title`/`role` and `company`; write `match_description` per row citing work patterns when `aptitude_fit_signals` are present; target **8+** when available; up to **20**
 - `notes` — **1+** caveats (exclusions, sparse results, constraint effects)
 
 No extra top-level keys.

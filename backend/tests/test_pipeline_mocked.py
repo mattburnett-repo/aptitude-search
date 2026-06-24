@@ -31,16 +31,20 @@ def _passthrough_verified_results(
 
 @patch("app.pipeline.synthesize_job_discovery_results")
 @patch("app.pipeline.run_job_discovery")
+@patch("app.pipeline.run_stage1_5")
 @patch("app.pipeline.complete_chat_json")
 def test_run_pipeline_wires_stages_and_validates_output(
     mock_complete_chat_json: MagicMock,
+    mock_run_stage1_5: MagicMock,
     mock_run_job_discovery: MagicMock,
     mock_synthesize: MagicMock,
     stage1_fixture: dict[str, object],
+    role_family_plan_fixture: dict[str, object],
     verified_matches_fixture: dict[str, object],
     found_jobs: list[dict[str, object]],
 ) -> None:
     mock_complete_chat_json.return_value = stage1_fixture
+    mock_run_stage1_5.return_value = role_family_plan_fixture
     mock_run_job_discovery.return_value = found_jobs
     mock_synthesize.return_value = verified_matches_fixture
 
@@ -51,6 +55,7 @@ def test_run_pipeline_wires_stages_and_validates_output(
         result = run_pipeline("Jane Doe resume text", Constraints())
 
     validate_stage("aptitudeProfile", result["aptitude_profile"])
+    validate_stage("roleFamilyPlan", result["role_family_plan"])
     validate_stage("jobDiscovery", result["verified_matches"])
     verified_matches = result["verified_matches"]
     results_raw = verified_matches.get("results")
