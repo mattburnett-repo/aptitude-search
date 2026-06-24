@@ -75,4 +75,5 @@ frontend/         # MVP UI (Vite + React)
 
 ## Changelog
 
-**[docs/changelog/0.1.0.md](docs/changelog/0.1.0.md)** — release notes (current version: 0.1.0)
+- **[docs/changelog/0.2.0.md](docs/changelog/0.2.0.md)** — aptitude refinement (role families, work-pattern fit)
+- **[docs/changelog/0.1.0.md](docs/changelog/0.1.0.md)** — initial release
