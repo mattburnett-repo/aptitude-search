@@ -21,6 +21,7 @@ from app.core.llm import complete_chat_json
 from app.core.json_types import FoundJob, JsonObject, as_object_dict, as_object_list
 from app.core.models import Constraints
 from app.core.validate import normalize_job_discovery_results
+from app.job_discovery.tool_observed_urls import normalize_url
 
 _EMPTY_NOTE = (
     "No job postings were found via web search and page scraping "
@@ -103,6 +104,73 @@ def _build_empty_search_plan(
     return plan[:8]
 
 
+def _fallback_match_description(job: FoundJob) -> str:
+    signals = job.get("aptitude_fit_signals")
+    signal_list = as_object_list(signals)
+    if signal_list:
+        return f"Matched profile signals: {', '.join(str(s) for s in signal_list)}."
+    role = job.get("title") or job.get("role") or "role"
+    company = job.get("company") or "employer"
+    return f"Posting from discovery for {role} at {company}."
+
+
+def _result_row_from_found_job(job: FoundJob) -> JsonObject:
+    location = job.get("location")
+    row: JsonObject = {
+        "company": str(job.get("company") or "").strip(),
+        "role": str(job.get("title") or job.get("role") or "").strip(),
+        "url": str(job.get("url") or "").strip(),
+        "match_description": _fallback_match_description(job),
+    }
+    if isinstance(location, str) and location.strip():
+        row["location"] = location.strip()
+    return row
+
+
+def ensure_all_found_jobs_in_results(
+    result: JsonObject,
+    found_jobs: list[FoundJob],
+) -> JsonObject:
+    """Add any found_jobs rows the synthesis model omitted from results."""
+    results_raw = as_object_list(result.get("results"))
+    results: list[JsonObject] = []
+    if results_raw is not None:
+        for item in results_raw:
+            row = as_object_dict(item)
+            if row is not None:
+                results.append(row)
+    result["results"] = results
+
+    seen: set[str] = set()
+    for row in results:
+        url = row.get("url")
+        if isinstance(url, str) and url.strip():
+            seen.add(normalize_url(url))
+
+    added = 0
+    for job in found_jobs:
+        url = str(job.get("url") or "").strip()
+        if not url:
+            continue
+        normalized = normalize_url(url)
+        if normalized in seen:
+            continue
+        results.append(_result_row_from_found_job(job))
+        seen.add(normalized)
+        added += 1
+
+    if added:
+        notes = as_object_list(result.get("notes"))
+        if notes is None:
+            notes = []
+        notes.append(
+            f"Added {added} result(s) from found_jobs omitted by the synthesis model."
+        )
+        result["notes"] = notes
+
+    return result
+
+
 @traceable(run_type="chain", name="stage2_empty_results")
 def empty_job_discovery_results(
     aptitude_profile: JsonObject,
@@ -144,4 +212,4 @@ def synthesize_job_discovery_results(
             temperature=config.llm.job_discovery.temperature,
         )
     )
-    return result
+    return ensure_all_found_jobs_in_results(result, found_jobs)

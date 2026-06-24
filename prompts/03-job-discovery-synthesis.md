@@ -28,9 +28,7 @@ Each `results[].url` must appear in `found_jobs` exactly (URLs not in found_jobs
 
 ## DIVERSIFICATION RULES
 
-- Max 2 roles per company
-- Max 3 results per ATS/job-board domain
-- Include direct core-skill matches and justified adjacent-role explorations
+When **ordering** `results`, prefer variety (spread employers and job-board domains). **Do not omit** `found_jobs` rows for diversification—include every URL.
 
 ---
 
@@ -41,7 +39,7 @@ Return **only** one `json`-language fenced code block.
 Conform to `schemas/job-discovery-results.schema.json`:
 
 - `search_plan` — string array of **3–4** items reflecting how discovery would have been approached from the profile
-- `results` — rows from `found_jobs` only; map `title`/`role` and `company`; write `match_description` per row citing work patterns when `aptitude_fit_signals` are present; target **8+** when available; up to **20**
+- `results` — **one row per `found_jobs` entry**; include every URL from `found_jobs` (same count); map `title`/`role` and `company`; write `match_description` per row citing work patterns when `aptitude_fit_signals` are present
 - `notes` — **1+** caveats (exclusions, sparse results, constraint effects)
 
 No extra top-level keys.

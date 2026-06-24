@@ -98,8 +98,10 @@ def build_stage2_synthesis_user_message(
         summary = compact_role_family_plan_summary(role_family_plan)
         if summary:
             role_family_block = f"\n\n<role_family_plan>\n{summary}\n</role_family_plan>"
+    job_count = len(found_jobs)
     return (
         f"{task}\n\n"
+        f"found_jobs count: {job_count}. Return exactly {job_count} results rows—one per URL.\n\n"
         f"<candidate_profile>\n{compact}\n</candidate_profile>"
         f"{role_family_block}\n\n"
         f"<constraints>\n{constraints_json}\n</constraints>\n\n"
