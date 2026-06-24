@@ -72,3 +72,7 @@ frontend/         # MVP UI (Vite + React)
 
 - **[backend/README.md](backend/README.md)** — `POST /v1/pipeline`, server-configured Hugging Face key
 - **[frontend/README.md](frontend/README.md)** — local dev on port 5173
+
+## Changelog
+
+**[docs/changelog/0.1.0.md](docs/changelog/0.1.0.md)** — release notes (current version: 0.1.0)
