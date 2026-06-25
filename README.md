@@ -87,4 +87,4 @@ Source code, documentation, prompts, and schemas in this repository are **propri
 
 <p align="center"><a href="https://services.onetcenter.org/" title="This site incorporates information from O*NET Web Services. Click to learn more."><img src="https://www.onetcenter.org/image/link/onet-in-it.svg" width="130" height="60" alt="O*NET in-it"></a></p>
 
-The O*NET 30.3 database files under `data/download/db_30_3_mysql/` are licensed under [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://www.onetcenter.org/license_db.html) by the U.S. Department of Labor, Employment and Training Administration (USDOL/ETA). O*NET® is a trademark of USDOL/ETA. This project incorporates information from [O*NET Web Services](https://services.onetcenter.org/).
+The O\*NET 30.3 database files under `data/download/db_30_3_mysql/` are licensed under [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://www.onetcenter.org/license_db.html) by the U.S. Department of Labor, Employment and Training Administration (USDOL/ETA). O\*NET® is a trademark of USDOL/ETA. This project incorporates information from [O\*NET Web Services](https://services.onetcenter.org/).
