@@ -12,10 +12,10 @@ Related: [`onet-and-occupation-taxonomies.md`](./onet-and-occupation-taxonomies.
 
 ### Intended role
 
-O*NET is meant for **Layer A** — matching aptitude → *role semantics*, not job postings.
+O*NET is meant for **aptitude-to-jobtype matching** — matching aptitudes derived from the resume to job types, not live job postings.
 
 - **Stage 1** produces an aptitude profile.
-- **Layer A** (planned): embed profile vs a stable occupation index (O*NET + curated `role_family` descriptions).
+- **Aptitude-to-jobtype matching** (planned): embed profile vs a stable occupation index (O*NET + curated `role_family` descriptions).
 - **Stage 1.5** uses those matches to drive `search_terms` / `role_family_plan`.
 - **Stage 2** stays as-is: web search for live postings.
 
@@ -117,7 +117,7 @@ Large relationally, **small as a search index** (~1k embeddable documents).
 
 ### Fit for aptitude-search
 
-**Good for:** stable Layer A index, explainable matches, career-adjacent discovery, title normalization, finite embed-once corpus.
+**Good for:** stable aptitude-to-jobtype matching index, explainable matches, career-adjacent discovery, title normalization, finite embed-once corpus.
 
 **Not good for (alone):** live job listings, market-granular titles (“RevOps”, “DevEx”), ranking oracle without filtering, raw skills/abilities tables as primary embedding input (recreates keyword search in vector form).
 
@@ -137,7 +137,7 @@ Weight work activities + description over raw Skills/Abilities tables. Aligns wi
 1. **Title gap** — market titles may be missing or only alternate titles → curated overlay required
 2. **Generic clusters** — may over-index on “Software Developer” without curated families
 3. **Attribution** — required in public apps ([services.onetcenter.org/about](https://services.onetcenter.org/about))
-4. **Not a ranking oracle** — similarity suggests families; `avoid_terms`, constraints, Layer C still filter
+4. **Not a ranking oracle** — similarity suggests families; `avoid_terms`, constraints, posting fit ranking still filter
 
 ---
 
@@ -158,7 +158,7 @@ Weight work activities + description over raw Skills/Abilities tables. Aligns wi
 | Pull data locally | ✓ Start here — bulk download or local MySQL dump |
 | Vector database | ✓ But ~1,016 occupations is tiny; precomputed vectors + in-process cosine may suffice for v1 |
 | Embed Abilities | **→ Prefer occupation narrative** (description + work activities + titles), not Abilities table |
-| Refactor discovery queries | **→ Add Layer A matcher; feed `role_family_plan.search_terms`** — `discovery.py` may need no changes |
+| Refactor discovery queries | **→ Add aptitude-to-jobtype matcher; feed `role_family_plan.search_terms`** — `discovery.py` may need no changes |
 | Run existing search | ✓ Already wired — no work on Stage 2 machinery |
 
 Add **step 0: offline spike** before production wiring — ~30 occupations, embed, run career-changer profile, inspect top-10 vs fixture.
@@ -187,7 +187,7 @@ Stage 1.5 role family plan (augment LLM with O*NET matches, or replace search_te
 Stage 2 discovery (unchanged)
 ```
 
-**Option A (recommended):** Layer A between Stage 1 and 1.5.
+**Recommended placement:** aptitude-to-jobtype matching between Stage 1 and 1.5.
 
 **Option B:** Map top O*NET matches directly to `search_terms` via alternate titles; faster prototype; loses `work_modes` / `avoid_terms` unless added separately.
 
@@ -311,7 +311,7 @@ Small bridge tables (e.g. abilities ↔ work activities). Useful for explainabil
 
 **Not necessarily.** The same release ships tab-delimited `.txt` and other SQL dialects from [onetcenter.org/database.html](https://www.onetcenter.org/database.html). For an embedding spike, many workflows **skip MySQL** and parse TSV or extract from SQL once. MySQL is useful for ad-hoc SQL exploration; overhead if you only need a one-time JSONL corpus.
 
-### Minimal subset for Layer A ETL
+### Minimal subset for aptitude-to-jobtype matching ETL
 
 | Priority | SQL files |
 |----------|-----------|
@@ -330,7 +330,7 @@ Before touching the live pipeline:
 2. Pull ~30 occupations relevant to career-changer fixtures (Software Developers, Computer Systems Analysts, Management Analysts, etc.) plus non-tech controls.
 3. Build embedding text from description + work activities (join `03` + `28` + `01`).
 4. Run offline: career-changer profile vs corpus → inspect top-10.
-5. Compare to hand-written career-changer role-family-plan fixture — if they agree, wire Layer A; if not, fix embedding input or add curated rows.
+5. Compare to hand-written career-changer role-family-plan fixture — if they agree, wire aptitude-to-jobtype matching; if not, fix embedding input or add curated rows.
 
 Validates “what to point embeddings at” without API-in-the-hot-path or full 45-table import.
 

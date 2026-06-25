@@ -300,29 +300,29 @@ If both sides aren't describing **the same kind of thing** (work mode, role sema
 
 Your own doc already lands on the same split: job text + LLM extraction + optional taxonomy normalization — not "embed the whole internet."
 
-### A practical architecture (layered)
+### A practical architecture (three stages)
 
-Don't pick one target. Use **three layers**, each with a different corpus:
+Don't pick one target. Use **three stages**, each with a different corpus:
 
-    Layer A — "What kinds of work fit this person?"
+    Aptitude-to-jobtype matching — "What kinds of work fit this person?"
       Embed: aptitude profile (summary + strengths + work modes + domains)
       Search against: role-family archetypes + O*NET occupations (small, stable index)
       Output: top-K role families / occupations + explainable scores
 
-    Layer B — "Find live openings in those families"
+    Job discovery — "Find live openings in those families"
       Not vector search — targeted keyword/search API using family-specific titles
       (vector search is bad at freshness; job boards are)
 
-    Layer C — "Which of these postings actually fit?"
+    Posting fit ranking — "Which of these postings actually fit?"
       Embed: extracted role profile per posting (responsibilities-first, not req laundry list)
       Compare to aptitude embedding(s)
       Re-rank found_jobs before returning
 
-Layer A answers your unknown: **point aptitude embeddings at role semantics, not at job postings.**
+Aptitude-to-jobtype matching answers your unknown: **point aptitude embeddings at job types, not at job postings.**
 
-Layer C answers "which of these 40 scraped results matter?" — a small, per-run vector compare is cheap and high-value.
+Posting fit ranking answers "which of these 40 scraped results matter?" — a small, per-run vector compare is cheap and high-value.
 
-Trying to skip A and C and build a global posting index is usually where job-matching startups burn time.
+Trying to skip aptitude-to-jobtype matching and posting fit ranking and build a global posting index is usually where job-matching startups burn time.
 
 ### What to embed on the aptitude side
 
@@ -341,7 +341,7 @@ Multi-vector fusion (strengths vs skills vs domains) often beats one blob — le
 
 ### What to embed on the role side (the corpus)
 
-For a **stable index** (Layer A), each item should look like the role-family JSON in `aptitude-embedding-summary.md`:
+For a **stable index** (aptitude-to-jobtype matching), each item should look like the role-family JSON in `aptitude-embedding-summary.md`:
 
     role_family: Solutions / Implementation (integration-heavy)
     work_modes: customer integrations, API design, technical discovery
@@ -352,7 +352,7 @@ Embed the narrative + work_modes + typical responsibilities — **not** a skill 
 
 O*NET gives you ~1,000 occupations for free as a bootstrap corpus. Your curated role families sit on top for market-relevant granularity (Platform Engineer, RevOps, etc.).
 
-For **per-posting** compare (Layer C), embed extracted:
+For **per-posting** compare (posting fit ranking), embed extracted:
 
 - Responsibilities / outcomes
 - Collaboration pattern
@@ -376,7 +376,7 @@ From your doc — still the right test:
 
 > Can aptitude signals identify role families that produce **better discovery** than skill keywords alone?
 
-You can test Layer A **without** a vector DB:
+You can test aptitude-to-jobtype matching **without** a vector DB:
 
 1. Take 20–50 hand-curated role-family descriptions (+ O*NET samples)
 2. Embed aptitude profiles from your fixtures

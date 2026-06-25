@@ -10,10 +10,10 @@ Notes from an initial design conversation (June 2026) on using O*NET in aptitude
 
 ### Intended role
 
-O*NET is meant for **Layer A** — matching aptitude → *role semantics*, not job postings.
+O*NET is meant for **aptitude-to-jobtype matching** — matching aptitudes derived from the resume to job types, not live job postings.
 
 - **Stage 1** produces an aptitude profile.
-- **Layer A** (planned): embed profile vs a stable occupation index (O*NET + curated `role_family` descriptions).
+- **Aptitude-to-jobtype matching** (planned): embed profile vs a stable occupation index (O*NET + curated `role_family` descriptions).
 - **Stage 1.5** uses those matches to drive `search_terms` / `role_family_plan`.
 - **Stage 2** stays as-is: web search for live postings.
 
@@ -209,7 +209,7 @@ It’s **large in relational terms**, but **small as a search index** (~1k embed
 
 ### Good for
 
-- Stable **“other side”** for aptitude → role matching (Layer A)
+- Stable **“other side”** for aptitude → job type matching (aptitude-to-jobtype matching)
 - **Explainable** matches (“aligned with work activities X, Y”)
 - **Career-adjacent** discovery across industries, not just tech
 - **Title normalization** for scraped job postings
@@ -247,7 +247,7 @@ Bulk download → ETL → `data/occupations/onet_corpus.jsonl` → precomputed e
 1. **Title gap** — “Solutions Engineer”, “RevOps”, “Developer Experience” may only appear as alternate titles or not at all → curated overlay required.
 2. **Generic clusters** — without curated families, embeddings may over-index on “Software Developer”.
 3. **Attribution** — O*NET requires credit/link in public apps ([services.onetcenter.org/about](https://services.onetcenter.org/about)).
-4. **Not a ranking oracle** — similarity suggests families; `avoid_terms`, constraints, and Layer C still do the filtering.
+4. **Not a ranking oracle** — similarity suggests families; `avoid_terms`, constraints, and posting fit ranking still do the filtering.
 
 ---
 
@@ -259,7 +259,7 @@ Before touching the live pipeline:
 2. Pull ~30 occupations relevant to career-changer fixtures (Software Developers, Computer Systems Analysts, Management Analysts, etc.) plus a few non-tech controls.
 3. Build embedding text from description + work activities.
 4. Run offline: career-changer profile vs corpus → inspect top-10.
-5. Compare to the hand-written career-changer-role-family-plan fixture — if they agree, wire Layer A; if not, fix embedding input or add curated rows.
+5. Compare to the hand-written career-changer-role-family-plan fixture — if they agree, wire aptitude-to-jobtype matching; if not, fix embedding input or add curated rows.
 
 That validates “what to point embeddings at” without committing to API-in-the-hot-path.
 
@@ -267,7 +267,7 @@ That validates “what to point embeddings at” without committing to API-in-th
 
 ## Related docs
 
-- [`onet-and-occupation-taxonomies.md`](./onet-and-occupation-taxonomies.md) — Layer A integration plan
+- [`onet-and-occupation-taxonomies.md`](./onet-and-occupation-taxonomies.md) — aptitude-to-jobtype matching integration plan
 - [`aptitude-embedding-summary.md`](./aptitude-embedding-summary.md) — semantic matching direction
 - [`../v0.2.0/aptitude_refinement/next-steps.md`](../v0.2.0/aptitude_refinement/next-steps.md)
 - [`../v0.2.0/aptitude_refinement/conversation-aptitude-matching-direction.md`](../v0.2.0/aptitude_refinement/conversation-aptitude-matching-direction.md)

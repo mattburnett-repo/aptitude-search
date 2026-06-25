@@ -1,4 +1,4 @@
-# Layer A matching edge: Stage 1 aptitude ↔ O*NET occupations
+# Aptitude-to-jobtype matching edge: Stage 1 aptitude ↔ O*NET occupations
 
 Where the vector-matching boundary sits in a large O*NET schema, and which fields participate on each side. Complements [`onet-and-occupation-taxonomies.md`](./onet-and-occupation-taxonomies.md) and [`aptitude-embedding-summary.md`](./aptitude-embedding-summary.md).
 
@@ -11,7 +11,8 @@ Where the vector-matching boundary sits in a large O*NET schema, and which field
 Not every table row. Not every rating. **~1,016 occupation nodes** on the O*NET side; **one composed profile** on the aptitude side per pipeline run.
 
 ```
-Stage 1 AptitudeProfile          Layer A (vector)          O*NET occupation
+Stage 1 AptitudeProfile          aptitude-to-jobtype          O*NET occupation
+                                 matching (vector)
 ────────────────────────         ────────────────          ──────────────────
 strengths                    ──►  embed as prose    ◄──►  description
 working_style_signals              (one vector)            + top work activities
@@ -178,6 +179,6 @@ Embed the career-changer aptitude doc (`fixtures/example-outputs/career-changer-
 - [`onet-and-occupation-taxonomies.md`](./onet-and-occupation-taxonomies.md) — integration plan, what to embed
 - [`aptitude-embedding-summary.md`](./aptitude-embedding-summary.md) — semantic matching direction
 - [`../v0.2.0/aptitude_refinement/next-steps.md`](../v0.2.0/aptitude_refinement/next-steps.md) — definitions of done
-- [`../v0.2.0/aptitude_refinement/conversation-aptitude-matching-direction.md`](../v0.2.0/aptitude_refinement/conversation-aptitude-matching-direction.md) — Layer A / B / C framing
+- [`../v0.2.0/aptitude_refinement/conversation-aptitude-matching-direction.md`](../v0.2.0/aptitude_refinement/conversation-aptitude-matching-direction.md) — aptitude-to-jobtype matching / job discovery / posting fit ranking framing
 
 Tools: `data/load-onet-postgres.sh`, `data/smoke_onet_postgres.py`, `data/explore_onet_occupation.py`

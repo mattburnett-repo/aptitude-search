@@ -22,7 +22,7 @@ MAINTENANCE_DATABASE = os.environ.get("ONET_PGMAINTENANCE_DB", "postgres")
 EXPECTED_OCCUPATION_COUNT = 1016
 EXPECTED_TABLE_COUNT = 45
 
-# Spot-check row counts for large / Layer A tables (O*NET 30.3).
+# Spot-check row counts for large / aptitude-to-jobtype matching tables (O*NET 30.3).
 EXPECTED_ROW_COUNTS: dict[str, int] = {
     "content_model_reference": 3006,
     "occupation_data": EXPECTED_OCCUPATION_COUNT,
@@ -33,7 +33,7 @@ EXPECTED_ROW_COUNTS: dict[str, int] = {
     "gwas_to_iwas_to_dwas": 2087,
 }
 
-LAYER_A_TABLES = (
+APTITUDE_TO_JOBTYPE_MATCHING_TABLES = (
     "occupation_data",
     "content_model_reference",
     "work_activities",
@@ -162,17 +162,25 @@ def check_row_counts() -> list[CheckResult]:
     return results
 
 
-def check_layer_a_tables_present() -> CheckResult:
+def check_aptitude_to_jobtype_matching_tables_present() -> CheckResult:
     names = set(
         _run_psql_tuples(
             "SELECT tablename FROM pg_tables WHERE schemaname = 'public';",
             database=EXPECTED_DATABASE,
         )
     )
-    missing = [t for t in LAYER_A_TABLES if t not in names]
+    missing = [t for t in APTITUDE_TO_JOBTYPE_MATCHING_TABLES if t not in names]
     if missing:
-        return CheckResult("Layer A tables", False, f"missing: {', '.join(missing)}")
-    return CheckResult("Layer A tables", True, ", ".join(LAYER_A_TABLES))
+        return CheckResult(
+            "aptitude-to-jobtype matching tables",
+            False,
+            f"missing: {', '.join(missing)}",
+        )
+    return CheckResult(
+        "aptitude-to-jobtype matching tables",
+        True,
+        ", ".join(APTITUDE_TO_JOBTYPE_MATCHING_TABLES),
+    )
 
 
 def check_software_developers_sample() -> CheckResult:
@@ -220,7 +228,7 @@ def run_checks() -> int:
                 check_connection(),
                 check_occupation_count(),
                 check_public_table_count(),
-                check_layer_a_tables_present(),
+                check_aptitude_to_jobtype_matching_tables_present(),
                 check_software_developers_sample(),
             ]
         )

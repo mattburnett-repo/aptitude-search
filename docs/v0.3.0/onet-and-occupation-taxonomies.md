@@ -1,6 +1,6 @@
-# O*NET and occupation taxonomies for Layer A matching
+# O*NET and occupation taxonomies for aptitude-to-jobtype matching
 
-Yes — for Layer A (aptitude → role semantics), O*NET or a similar taxonomy is the right kind of “other side of the embedding,” not job postings. The project docs already point there; nothing in the codebase wires it up yet.
+Yes — for aptitude-to-jobtype matching (aptitude → job types), O*NET or a similar taxonomy is the right kind of “other side of the embedding,” not job postings. The project docs already point there; nothing in the codebase wires it up yet.
 
 ## Why O*NET fits this project
 
@@ -39,7 +39,7 @@ Use at runtime for: “given this job title, what SOC code is closest?” (cross
 
 - Periodic bulk release (API tracks current DB, e.g. 30.x)
 - Good for: build a static embedding corpus once, version it in repo or data/, no runtime dependency
-- This is what you want for Layer A matching in POST /v1/pipeline
+- This is what you want for aptitude-to-jobtype matching in POST /v1/pipeline
 
 Practical pattern: bulk download → ETL script → data/occupations/onet_corpus.jsonl → precomputed embeddings → cosine search offline or in-process.
 
@@ -61,15 +61,15 @@ Weight work activities + description higher than raw “Skills” tables. That a
 
 Stage 1 (aptitude profile)
     ↓ embed work-pattern fields
-Layer A: similarity vs [O*NET corpus + curated role_families]
+Aptitude-to-jobtype matching: similarity vs [O*NET corpus + curated role_families]
     ↓ top-K occupations + your curated families
 Stage 1.5 (augment or replace LLM plan)
     ↓ search_terms from matched titles + curated typical_titles
-Stage 2 discovery (unchanged — keyword/search API)
+Stage 2 job discovery (unchanged — keyword/search API)
     ↓
-Layer C: re-rank scraped postings (optional next)
+Posting fit ranking: re-rank scraped postings (optional next)
 
-O*NET is not a job board — it answers “what kinds of work fit?” Layer B (live search) stays DuckDuckGo/scrape.
+O*NET is not a job board — it answers “what kinds of work fit?” Job discovery (live search) stays DuckDuckGo/scrape.
 
 ## Alternatives / complements
 
@@ -86,7 +86,7 @@ For a US-first MVP, O*NET + curated role_families is the recommended stack. ESCO
 1. Title gap — “Solutions Engineer”, “RevOps”, “Developer Experience” may only appear as alternate titles or not at all → curated overlay required.
 2. Generic clusters — without curated families, embeddings may over-index on “Software Developer” → the pass/fail test in next-steps.md still applies.
 3. Attribution — O*NET requires credit/link in public apps (see https://services.onetcenter.org/about).
-4. Not a ranking oracle — similarity suggests families; avoid_terms, constraints, and Layer C still do the filtering.
+4. Not a ranking oracle — similarity suggests families; avoid_terms, constraints, and posting fit ranking still do the filtering.
 
 ## Smallest sensible first step
 
@@ -96,13 +96,13 @@ Before touching the live pipeline:
 2. Pull ~30 occupations relevant to career-changer fixtures (Software Developers, Computer Systems Analysts, Management Analysts, etc.) plus a few non-tech controls.
 3. Build embedding text from description + work activities.
 4. Run offline: career-changer profile vs corpus → inspect top-10.
-5. Compare to the hand-written career-changer-role-family-plan.json fixture — if they agree, wire Layer A; if not, fix embedding input or add curated rows.
+5. Compare to the hand-written career-changer-role-family-plan.json fixture — if they agree, wire aptitude-to-jobtype matching; if not, fix embedding input or add curated rows.
 
 That validates “what to point embeddings at” without committing to API-in-the-hot-path.
 
 ## Bottom line
 
-O*NET (or ESCO) is the right stable semantic index for Layer A. Use bulk/cached data for embeddings, API mainly for title crosswalk and exploration. Keep curated role families as the market-relevant layer on top — O*NET alone won’t give you “Platform Engineer” fidelity.
+O*NET (or ESCO) is the right stable semantic index for aptitude-to-jobtype matching. Use bulk/cached data for embeddings, API mainly for title crosswalk and exploration. Keep curated role families as the market-relevant layer on top — O*NET alone won’t give you “Platform Engineer” fidelity.
 
 ## Related docs
 
