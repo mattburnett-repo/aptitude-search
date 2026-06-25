@@ -77,3 +77,10 @@ frontend/         # MVP UI (Vite + React)
 
 - **[docs/changelog/0.2.0.md](docs/changelog/0.2.0.md)** — aptitude refinement (role families, work-pattern fit)
 - **[docs/changelog/0.1.0.md](docs/changelog/0.1.0.md)** — initial release
+
+---
+
+Licensing and Attribution:
+
+<p style="text-align: center"><a href="https://services.onetcenter.org/" title="This site incorporates information from O*NET Web Services. Click to learn more."><img src="https://www.onetcenter.org/image/link/onet-in-it.svg" style="width: 130px; height: 60px; border: none" alt="O*NET in-it"></a></p>
+<p>This site incorporates information from <a href="https://services.onetcenter.org/">O*NET Web Services</a> by the U.S. Department of Labor, Employment and Training Administration (USDOL/ETA). O*NET&reg; is a trademark of USDOL/ETA.</p>
