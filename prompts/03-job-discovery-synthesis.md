@@ -1,4 +1,4 @@
-# Prompt 2b — Job Discovery Synthesis (Schema-Strict)
+# Prompt 3 — Job Discovery Synthesis (Schema-Strict)
 
 ## ROLE
 You are a labor-market verification system.

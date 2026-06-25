@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Smoke-test Stage 2 discovery (profile-driven queries). Run from backend/."""
+"""Smoke-test Stage 3 discovery (profile-driven queries). Run from backend/."""
 
 import json
 import sys

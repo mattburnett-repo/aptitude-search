@@ -22,7 +22,7 @@ Keyword-based job search does a poor job of connecting people with roles that fi
 
 ## Product workflow
 
-**Opportunity discovery** in three LLM stages — **[Stage 1](prompts/01-resume-to-aptitude-profile.md)** (profile) → **[Stage 1.5](prompts/02-role-family-plan.md)** (role families) → **Stage 2** ([discovery + fit ranking](docs/PROMPT-CONTRACT.md) + [synthesis](prompts/03-job-discovery-synthesis.md))
+**Opportunity discovery** in three LLM stages — **[Stage 1](prompts/01-resume-to-aptitude-profile.md)** (profile) → **[Stage 2](prompts/02-role-family-plan.md)** (role families) → **Stage 3** ([discovery + fit ranking](docs/PROMPT-CONTRACT.md) + [synthesis](prompts/03-job-discovery-synthesis.md))
 
 Steps: **[prompts/README.md](prompts/README.md)**
 

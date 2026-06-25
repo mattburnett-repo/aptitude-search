@@ -134,11 +134,11 @@ class LlmConfig(BaseModel):
 
 class PromptsConfig(BaseModel):
     stage1_file: str
-    stage1_5_file: str = "02-role-family-plan.md"
-    stage2_synthesis_file: str
+    stage2_file: str = "02-role-family-plan.md"
+    stage3_synthesis_file: str
     stage1_user_task_file: str = "stage1-agent-user-task.txt"
-    stage1_5_user_task_file: str = "role-family-plan-user-task.txt"
-    stage2_synthesis_user_task_file: str = "stage2-synthesis-user-task.txt"
+    stage2_user_task_file: str = "role-family-plan-user-task.txt"
+    stage3_synthesis_user_task_file: str = "stage3-synthesis-user-task.txt"
 
 
 class SchemasConfig(BaseModel):

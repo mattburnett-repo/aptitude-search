@@ -8,7 +8,7 @@ from app.core.json_types import JsonObject
 from app.core.models import Constraints
 from app.core.validate import validate_stage
 from app.job_discovery.tool_observed_urls import ToolObservedUrlRegistry
-from app.pipeline import run_pipeline, run_stage2
+from app.pipeline import run_pipeline, run_stage3
 
 
 @pytest.fixture
@@ -31,11 +31,11 @@ def _passthrough_verified_results(
 
 @patch("app.pipeline.synthesize_job_discovery_results")
 @patch("app.pipeline.run_job_discovery")
-@patch("app.pipeline.run_stage1_5")
+@patch("app.pipeline.run_stage2")
 @patch("app.pipeline.complete_chat_json")
 def test_run_pipeline_wires_stages_and_validates_output(
     mock_complete_chat_json: MagicMock,
-    mock_run_stage1_5: MagicMock,
+    mock_run_stage2: MagicMock,
     mock_run_job_discovery: MagicMock,
     mock_synthesize: MagicMock,
     stage1_fixture: dict[str, object],
@@ -44,7 +44,7 @@ def test_run_pipeline_wires_stages_and_validates_output(
     found_jobs: list[dict[str, object]],
 ) -> None:
     mock_complete_chat_json.return_value = stage1_fixture
-    mock_run_stage1_5.return_value = role_family_plan_fixture
+    mock_run_stage2.return_value = role_family_plan_fixture
     mock_run_job_discovery.return_value = found_jobs
     mock_synthesize.return_value = verified_matches_fixture
 
@@ -66,7 +66,7 @@ def test_run_pipeline_wires_stages_and_validates_output(
 
 @patch("app.pipeline.empty_job_discovery_results")
 @patch("app.pipeline.run_job_discovery", return_value=[])
-def test_run_stage2_returns_empty_results_when_discovery_finds_nothing(
+def test_run_stage3_returns_empty_results_when_discovery_finds_nothing(
     _mock_discovery: MagicMock,
     mock_empty_results: MagicMock,
     stage1_fixture: dict[str, object],
@@ -82,6 +82,6 @@ def test_run_stage2_returns_empty_results_when_discovery_finds_nothing(
     }
     mock_empty_results.return_value = empty
 
-    result = run_stage2(stage1_fixture, Constraints())
+    result = run_stage3(stage1_fixture, Constraints())
     validate_stage("jobDiscovery", result)
     assert result["results"] == []

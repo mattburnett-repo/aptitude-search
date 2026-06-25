@@ -2,7 +2,7 @@
 
 ## Normal path (end-to-end)
 
-Run the stack and call the pipeline — Stage 1 and Stage 2 run automatically with schema validation on every response.
+Run the stack and call the pipeline — Stages 1, 2, and 3 run automatically with schema validation on every response.
 
 - **UI:** [frontend/README.md](../frontend/README.md) — `npm run dev` on port 5173
 - **API:** [backend/README.md](../backend/README.md) — Swagger at `http://localhost:3001/docs` → `POST /v1/pipeline`
@@ -29,9 +29,9 @@ cd backend && pip install -r requirements-dev.txt && pytest
 cd backend && .venv/bin/python scripts/validate_fixtures.py
 ```
 
-Validates `fixtures/example-outputs/career-changer-mixed-stack-stage1.json` against `aptitude-profile.schema.json` only. There is no committed golden Stage 2 output — Stage 2 quality is judged when running the live pipeline (above).
+Validates `fixtures/example-outputs/career-changer-mixed-stack-stage1.json` against `aptitude-profile.schema.json` only. There is no committed golden Stage 3 output — Stage 3 quality is judged when running the live pipeline (above).
 
-**Stage 2 discovery smoke** (live web search; optional):
+**Stage 3 discovery smoke** (live web search; optional):
 
 ```bash
 cd backend && .venv/bin/python scripts/smoke_job_discovery.py
@@ -49,7 +49,7 @@ Use when changing Prompt 1, discovery queries, URL filters, or synthesis — not
 - [ ] At least one non-obvious `adjacent_roles` entry
 - [ ] `rationale` present and readable
 
-### Stage 2
+### Stage 3
 
 - [ ] `search_plan` reflects profile and constraints (not a single ATS/board host)
 - [ ] `results` use diverse employers (≤2 per company, ≤3 per board domain)
@@ -57,13 +57,13 @@ Use when changing Prompt 1, discovery queries, URL filters, or synthesis — not
 - [ ] At most 20 results; no padding
 - [ ] `notes` has meaningful caveats (exclusions, limits, sparse results)
 
-Stage 2 should reflect current postings from web search (`search_job_postings`), not model memory alone.
+Stage 3 should reflect current postings from web search (`search_job_postings`), not model memory alone.
 
 ---
 
 ## Models and config
 
-- **Stage 1 + synthesis:** `[llm.aptitude].model` and `[llm.aptitude].model_key`
+- **Stage 1 + Stage 3 synthesis:** `[llm.aptitude].model` and `[llm.aptitude].model_key`
 - **Discovery tools + synthesis temperature:** `[llm.job_discovery]` (search/scrape limits, `temperature`)
 - **Query budget:** `[job_discovery].discovery_query_max`
 

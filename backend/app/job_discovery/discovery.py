@@ -1,4 +1,4 @@
-"""Stage 2a discovery: profile-driven queries + search_job_postings."""
+"""Stage 3 discovery: profile-driven queries + search_job_postings."""
 
 from __future__ import annotations
 

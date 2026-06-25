@@ -1,4 +1,4 @@
-"""Compact Stage 2 inputs for synthesis LLM context."""
+"""Compact Stage 3 inputs for synthesis LLM context."""
 
 import json
 
@@ -82,7 +82,7 @@ def compact_role_family_plan_summary(plan: JsonObject) -> str:
     return "\n".join(lines)
 
 
-def build_stage2_synthesis_user_message(
+def build_stage3_synthesis_user_message(
     aptitude_profile: JsonObject,
     constraints: Constraints,
     found_jobs: list[FoundJob],
@@ -92,7 +92,7 @@ def build_stage2_synthesis_user_message(
     compact = compact_aptitude_profile_summary(aptitude_profile)
     constraints_json = constraints.model_dump_json()
     jobs_json = json.dumps(found_jobs, indent=2)
-    task = prompt_loader.user_task_stage2_synthesis()
+    task = prompt_loader.user_task_stage3_synthesis()
     role_family_block = ""
     if role_family_plan is not None:
         summary = compact_role_family_plan_summary(role_family_plan)

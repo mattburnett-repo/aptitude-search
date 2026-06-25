@@ -2,13 +2,13 @@
 
 Continuous notes from a June 2026 conversation on using O*NET in aptitude-search: project fit, what the dataset provides, proposed implementation steps, and the local MySQL dump layout.
 
-Related: [`onet-and-occupation-taxonomies.md`](./onet-and-occupation-taxonomies.md) (integration plan), [`aptitude-embedding-summary.md`](./aptitude-embedding-summary.md) (semantic matching direction), [`onet_NOTES.md`](./onet_NOTES.md) (links and intro).
+Related: `[onet-and-occupation-taxonomies.md](./onet-and-occupation-taxonomies.md)` (integration plan), `[aptitude-embedding-summary.md](./aptitude-embedding-summary.md)` (semantic matching direction), `[onet_NOTES.md](./onet_NOTES.md)` (links and intro).
 
 ---
 
-## 1. O*NET in this project today
+## 1. O*NET in this project todays
 
-**Documented, not implemented.** The repo has a clear plan in `onet-and-occupation-taxonomies.md`; there is no O*NET code, config, or committed `data/` corpus yet (`data/*` is gitignored). The changelog calls this out explicitly.
+**Documented, not implemented.** The repo has a clear plan in `onet-and-occupation-taxonomies.md`; there is no O*NET code, config, or committed `data/` corpus yet (`data/`* is gitignored). The changelog calls this out explicitly.
 
 ### Intended role
 
@@ -16,8 +16,8 @@ O*NET is meant for **aptitude-to-jobtype matching** — matching aptitudes deriv
 
 - **Stage 1** produces an aptitude profile.
 - **Aptitude-to-jobtype matching** (planned): embed profile vs a stable occupation index (O*NET + curated `role_family` descriptions).
-- **Stage 1.5** uses those matches to drive `search_terms` / `role_family_plan`.
-- **Stage 2** stays as-is: web search for live postings.
+- **Stage 2** uses those matches to drive `search_terms` / `role_family_plan`.
+- **Stage 3** stays as-is: web search for live postings.
 
 O*NET answers “what kinds of work fit?” Job discovery answers “what’s open right now?”
 
@@ -32,10 +32,10 @@ O*NET answers “what kinds of work fit?” Job discovery answers “what’s op
 
 ### What exists in code today
 
-- **`role_family_plan`** is real: LLM-generated in Stage 1.5, used in discovery query planning and fit scoring (`aptitude_fit.py`, `discovery.py`).
+- `**role_family_plan*`* is real: LLM-generated in Stage 2, used in discovery query planning and fit scoring (`aptitude_fit.py`, `discovery.py`).
 - No O*NET API key in config, no occupation data store, no embedding index.
 
-Discovery does not search O*NET directly. It searches the **web** using short hiring-shaped strings built from `search_terms` on the role family plan (`backend/app/job_discovery/discovery.py`). O*NET embeddings sit **upstream**: aptitude profile → vector match → occupation titles / alternate titles → those become (or feed) `search_terms` → existing Stage 2 runs unchanged.
+Discovery does not search O*NET directly. It searches the **web** using short hiring-shaped strings built from `search_terms` on the role family plan (`backend/app/job_discovery/discovery.py`). O*NET embeddings sit **upstream**: aptitude profile → vector match → occupation titles / alternate titles → those become (or feed) `search_terms` → existing Stage 3 runs unchanged.
 
 ---
 
@@ -43,13 +43,15 @@ Discovery does not search O*NET directly. It searches the **web** using short hi
 
 O*NET (Occupational Information Network) is a **US government occupational research database** — not a job board, not live hiring data. It describes ~1,000 standardized occupations and what work in each one typically involves.
 
-| | |
-|---|---|
-| **Sponsor** | US Dept. of Labor (ETA) |
-| **Purpose** | Shared vocabulary for describing jobs, workers, and labor-market context |
+
+|              |                                                                           |
+| ------------ | ------------------------------------------------------------------------- |
+| **Sponsor**  | US Dept. of Labor (ETA)                                                   |
+| **Purpose**  | Shared vocabulary for describing jobs, workers, and labor-market context  |
 | **Taxonomy** | **O*NET-SOC** — roughly **1,016 occupations** (current release: **30.3**) |
-| **Updates** | Quarterly data refreshes; major content-model changes periodically |
-| **License** | Bulk database is **CC BY 4.0** (free to use with attribution) |
+| **Updates**  | Quarterly data refreshes; major content-model changes periodically        |
+| **License**  | Bulk database is **CC BY 4.0** (free to use with attribution)             |
+
 
 Think of it as a **structured encyclopedia of occupations**, not a feed of open roles.
 
@@ -57,11 +59,13 @@ Official overview: [O*NET Content Model](https://www.onetcenter.org/content.html
 
 ### Mental model: Worker → Job → Market
 
-| Dimension | What it covers |
-|-----------|----------------|
-| **Worker** | Traits, requirements, experience needed to do the work |
-| **Job** | What the work actually involves day-to-day |
+
+| Dimension  | What it covers                                          |
+| ---------- | ------------------------------------------------------- |
+| **Worker** | Traits, requirements, experience needed to do the work  |
+| **Job**    | What the work actually involves day-to-day              |
 | **Market** | Wages, outlook, demand (lighter than BLS in some areas) |
+
 
 Everything hangs off the **Content Model** — a hierarchy of variables with definitions, scales, and occupation-level ratings.
 
@@ -79,7 +83,7 @@ Per occupation:
 ### About the worker
 
 - **Abilities** (~52): reasoning, verbal, spatial, dexterity — importance/level per occupation
-- **Skills**: Essential (~10), Transferable (~25), Software (~8,750 tools; Hot Technologies, In Demand flags)
+- **Skills**: Essential (~~10), Transferable (~~25), Software (~8,750 tools; Hot Technologies, In Demand flags)
 - **Knowledge** (~33 domains)
 - **Education & experience**: typical level, certifications, apprenticeship, OJT
 - **Career interests**: RIASEC + 41 specific interest areas (new in 30.x)
@@ -105,13 +109,15 @@ Relationship tables connect abilities, skills, and work styles to work activitie
 
 ### Scale (release 30.3)
 
-| Asset | Approx. size |
-|-------|----------------|
-| Occupations | ~1,016 |
-| Job/alternate titles | ~57,000 |
-| Task statements | ~19,000 |
-| Work activity ratings | ~73,000 |
-| Software skill linkages | ~31,800 |
+
+| Asset                   | Approx. size |
+| ----------------------- | ------------ |
+| Occupations             | ~1,016       |
+| Job/alternate titles    | ~57,000      |
+| Task statements         | ~19,000      |
+| Work activity ratings   | ~73,000      |
+| Software skill linkages | ~31,800      |
+
 
 Large relationally, **small as a search index** (~1k embeddable documents).
 
@@ -153,13 +159,15 @@ Weight work activities + description over raw Skills/Abilities tables. Aligns wi
 
 ### Adjusted sequence
 
-| Step | Verdict |
-|------|---------|
-| Pull data locally | ✓ Start here — bulk download or local MySQL dump |
-| Vector database | ✓ But ~1,016 occupations is tiny; precomputed vectors + in-process cosine may suffice for v1 |
-| Embed Abilities | **→ Prefer occupation narrative** (description + work activities + titles), not Abilities table |
+
+| Step                       | Verdict                                                                                                          |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Pull data locally          | ✓ Start here — bulk download or local MySQL dump                                                                 |
+| Vector database            | ✓ But ~1,016 occupations is tiny; precomputed vectors + in-process cosine may suffice for v1                     |
+| Embed Abilities            | **→ Prefer occupation narrative** (description + work activities + titles), not Abilities table                  |
 | Refactor discovery queries | **→ Add aptitude-to-jobtype matcher; feed `role_family_plan.search_terms`** — `discovery.py` may need no changes |
-| Run existing search | ✓ Already wired — no work on Stage 2 machinery |
+| Run existing search        | ✓ Already wired — no work on Stage 3 machinery                                                                   |
+
 
 Add **step 0: offline spike** before production wiring — ~30 occupations, embed, run career-changer profile, inspect top-10 vs fixture.
 
@@ -183,24 +191,26 @@ Stage 1 aptitude profile
   → embed profile
   → vector search O*NET corpus
   → top-K occupations + alternate titles
-Stage 1.5 role family plan (augment LLM with O*NET matches, or replace search_terms source)
-Stage 2 discovery (unchanged)
+Stage 2 role family plan (augment LLM with O*NET matches, or replace search_terms source)
+Stage 3 discovery (unchanged)
 ```
 
-**Recommended placement:** aptitude-to-jobtype matching between Stage 1 and 1.5.
+**Recommended placement:** aptitude-to-jobtype matching between Stage 1 and 2.
 
 **Option B:** Map top O*NET matches directly to `search_terms` via alternate titles; faster prototype; loses `work_modes` / `avoid_terms` unless added separately.
 
-Stage 1.5 today also produces `work_modes`, `avoid_terms`, and `fit_reason` — used by `aptitude_fit.py`. Pragmatic path: **O*NET drives `search_terms`; keep 1.5 (or lighter rules) for work_modes/avoid_terms** until embedding corpus is validated.
+Stage 2 today also produces `work_modes`, `avoid_terms`, and `fit_reason` — used by `aptitude_fit.py`. Pragmatic path: **O*NET drives `search_terms`; keep Stage 2 (or lighter rules) for work_modes/avoid_terms** until embedding corpus is validated.
 
 ### Minimal files for first ETL subset
 
-| File (tab or SQL) | Why |
-|-------------------|-----|
-| Occupation Data | Title, SOC code, description |
+
+| File (tab or SQL)                         | Why                                                  |
+| ----------------------------------------- | ---------------------------------------------------- |
+| Occupation Data                           | Title, SOC code, description                         |
 | Work Activities + Content Model Reference | Top-rated activities per occupation (names via join) |
-| Job Titles | Alternate/lay titles for search_terms |
-| Related Occupations | Adjacent-role expansion |
+| Job Titles                                | Alternate/lay titles for search_terms                |
+| Related Occupations                       | Adjacent-role expansion                              |
+
 
 ---
 
@@ -233,62 +243,72 @@ Rating tables use a **long/narrow** shape: one row per `(occupation, element, sc
 
 ### How the 45 files group
 
-| Files | Role |
-|-------|------|
+
+| Files     | Role                                                                     |
+| --------- | ------------------------------------------------------------------------ |
 | **01–11** | Reference / taxonomy — content model tree, scales, categories, job zones |
-| **12–30** | Occupation × element ratings — main fact tables |
-| **31–33** | Work-activity hierarchy — GWA → IWA → DWA, tasks → DWA |
-| **34–37** | Occupation relationships & titles |
-| **38–45** | Cross-domain linkages — abilities/skills/styles → activities/context |
+| **12–30** | Occupation × element ratings — main fact tables                          |
+| **31–33** | Work-activity hierarchy — GWA → IWA → DWA, tasks → DWA                   |
+| **34–37** | Occupation relationships & titles                                        |
+| **38–45** | Cross-domain linkages — abilities/skills/styles → activities/context     |
+
 
 ### Reference tables (load first — others FK to them)
 
-| File | Table | Purpose |
-|------|-------|---------|
-| `01_content_model_reference.sql` | `content_model_reference` | `element_id` → name + description (Abilities, Work Activities, …) |
-| `02_job_zone_reference.sql` | `job_zone_reference` | Job Zones 1–5 definitions |
-| `04_scales_reference.sql` | `scales_reference` | Scale codes (`IM` = Importance, `LV` = Level, …) |
-| `05`, `06`, `07`, `09`, `10`, `11` | Category/anchor tables | Education, training, task/context category defs |
+
+| File                               | Table                     | Purpose                                                           |
+| ---------------------------------- | ------------------------- | ----------------------------------------------------------------- |
+| `01_content_model_reference.sql`   | `content_model_reference` | `element_id` → name + description (Abilities, Work Activities, …) |
+| `02_job_zone_reference.sql`        | `job_zone_reference`      | Job Zones 1–5 definitions                                         |
+| `04_scales_reference.sql`          | `scales_reference`        | Scale codes (`IM` = Importance, `LV` = Level, …)                  |
+| `05`, `06`, `07`, `09`, `10`, `11` | Category/anchor tables    | Education, training, task/context category defs                   |
+
 
 ### Core spine
 
-| File | Table | ~Size | Purpose |
-|------|-------|-------|---------|
+
+| File                     | Table             | ~Size  | Purpose                                               |
+| ------------------------ | ----------------- | ------ | ----------------------------------------------------- |
 | `03_occupation_data.sql` | `occupation_data` | 348 KB | **~1,016 occupations** — SOC code, title, description |
-| `21_job_zones.sql` | `job_zones` | 119 KB | Prep level (1–5) per occupation |
+| `21_job_zones.sql`       | `job_zones`       | 119 KB | Prep level (1–5) per occupation                       |
+
 
 ### Occupation rating tables
 
 Each links `onetsoc_code` + `element_id` + `scale_id` → `data_value`:
 
-| File | Content |
-|------|---------|
-| `12_abilities.sql` | Natural aptitudes (~26 MB) |
-| `13_education.sql` | Typical education |
-| `14_training_and_experience.sql` | OJT, apprenticeship, experience |
-| `15_career_interest_types.sql` | RIASEC profiles |
-| `16_specific_interest_areas.sql` | 41 finer interest areas |
-| `22_knowledge.sql` | Knowledge domains |
-| `23_software_skills.sql` | Named tools/technologies |
-| `24_essential_skills.sql` | Reading, critical thinking, … |
-| `25_transferable_skills.sql` | Systems analysis, programming, … |
-| `26_task_statements.sql` | Task text per occupation |
-| `27_task_ratings.sql` | **~45 MB** — frequency/importance per task |
-| `28_work_activities.sql` | Work activity ratings (~21 MB) |
-| `29_work_context.sql` | **~91 MB** — physical/social job context |
-| `30_work_styles.sql` | Personality-at-work traits |
+
+| File                             | Content                                    |
+| -------------------------------- | ------------------------------------------ |
+| `12_abilities.sql`               | Natural aptitudes (~26 MB)                 |
+| `13_education.sql`               | Typical education                          |
+| `14_training_and_experience.sql` | OJT, apprenticeship, experience            |
+| `15_career_interest_types.sql`   | RIASEC profiles                            |
+| `16_specific_interest_areas.sql` | 41 finer interest areas                    |
+| `22_knowledge.sql`               | Knowledge domains                          |
+| `23_software_skills.sql`         | Named tools/technologies                   |
+| `24_essential_skills.sql`        | Reading, critical thinking, …              |
+| `25_transferable_skills.sql`     | Systems analysis, programming, …           |
+| `26_task_statements.sql`         | Task text per occupation                   |
+| `27_task_ratings.sql`            | **~45 MB** — frequency/importance per task |
+| `28_work_activities.sql`         | Work activity ratings (~21 MB)             |
+| `29_work_context.sql`            | **~91 MB** — physical/social job context   |
+| `30_work_styles.sql`             | Personality-at-work traits                 |
+
 
 ### Hierarchy & titles
 
-| File | Purpose |
-|------|---------|
-| `31_gwas_to_iwas.sql` | General → Intermediate work activities |
-| `32_gwas_to_iwas_to_dwas.sql` | Full GWA/IWA/DWA tree |
-| `33_tasks_to_dwas.sql` | Maps tasks to detailed work activities |
-| `34_emerging_tasks.sql` | Proposed future tasks |
-| `35_related_occupations.sql` | 10 primary + 10 supplemental related SOCs |
-| `36_job_titles.sql` | **~57k alternate/lay titles** |
-| `37_sample_of_reported_titles.sql` | Survey-reported titles |
+
+| File                               | Purpose                                   |
+| ---------------------------------- | ----------------------------------------- |
+| `31_gwas_to_iwas.sql`              | General → Intermediate work activities    |
+| `32_gwas_to_iwas_to_dwas.sql`      | Full GWA/IWA/DWA tree                     |
+| `33_tasks_to_dwas.sql`             | Maps tasks to detailed work activities    |
+| `34_emerging_tasks.sql`            | Proposed future tasks                     |
+| `35_related_occupations.sql`       | 10 primary + 10 supplemental related SOCs |
+| `36_job_titles.sql`                | **~57k alternate/lay titles**             |
+| `37_sample_of_reported_titles.sql` | Survey-reported titles                    |
+
 
 ### Linkage tables (38–45)
 
@@ -313,12 +333,14 @@ Small bridge tables (e.g. abilities ↔ work activities). Useful for explainabil
 
 ### Minimal subset for aptitude-to-jobtype matching ETL
 
-| Priority | SQL files |
-|----------|-----------|
-| **Must have** | `03`, `01`, `28` |
-| **Very useful** | `36`, `35` |
-| **Nice later** | `26`, `30`, `15` |
+
+| Priority           | SQL files             |
+| ------------------ | --------------------- |
+| **Must have**      | `03`, `01`, `28`      |
+| **Very useful**    | `36`, `35`            |
+| **Nice later**     | `26`, `30`, `15`      |
 | **Skip initially** | `29`, `27`, `38`–`45` |
+
 
 ---
 
@@ -338,8 +360,9 @@ Validates “what to point embeddings at” without API-in-the-hot-path or full 
 
 ## Related docs
 
-- [`onet-and-occupation-taxonomies.md`](./onet-and-occupation-taxonomies.md)
-- [`onet-conversation-notes.md`](./onet-conversation-notes.md) — earlier snapshot of sections 1–2
-- [`aptitude-embedding-summary.md`](./aptitude-embedding-summary.md)
-- [`../v0.2.0/aptitude_refinement/next-steps.md`](../v0.2.0/aptitude_refinement/next-steps.md)
-- [`../v0.2.0/aptitude_refinement/conversation-aptitude-matching-direction.md`](../v0.2.0/aptitude_refinement/conversation-aptitude-matching-direction.md)
+- `[onet-and-occupation-taxonomies.md](./onet-and-occupation-taxonomies.md)`
+- `[onet-conversation-notes.md](./onet-conversation-notes.md)` — earlier snapshot of sections 1–2
+- `[aptitude-embedding-summary.md](./aptitude-embedding-summary.md)`
+- `[../v0.2.0/aptitude_refinement/next-steps.md](../v0.2.0/aptitude_refinement/next-steps.md)`
+- `[../v0.2.0/aptitude_refinement/conversation-aptitude-matching-direction.md](../v0.2.0/aptitude_refinement/conversation-aptitude-matching-direction.md)`
+

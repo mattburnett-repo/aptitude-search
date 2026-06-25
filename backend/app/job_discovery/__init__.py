@@ -1,8 +1,8 @@
-"""Stage 2 job discovery: profile-driven search, tools, and synthesis context."""
+"""Stage 3 job discovery: profile-driven search, tools, and synthesis context."""
 
 from app.job_discovery.aptitude_fit import rank_and_filter_found_jobs
 from app.job_discovery.context import (
-    build_stage2_synthesis_user_message,
+    build_stage3_synthesis_user_message,
     compact_aptitude_profile_summary,
 )
 from app.job_discovery.discovery import (
@@ -20,7 +20,7 @@ from app.job_discovery.tool_observed_urls import (
 
 __all__ = [
     "ToolObservedUrlRegistry",
-    "build_stage2_synthesis_user_message",
+    "build_stage3_synthesis_user_message",
     "compact_aptitude_profile_summary",
     "empty_job_discovery_results",
     "filter_results_to_tool_observed_urls",

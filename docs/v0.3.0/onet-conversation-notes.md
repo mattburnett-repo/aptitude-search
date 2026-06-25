@@ -14,8 +14,8 @@ O*NET is meant for **aptitude-to-jobtype matching** — matching aptitudes deriv
 
 - **Stage 1** produces an aptitude profile.
 - **Aptitude-to-jobtype matching** (planned): embed profile vs a stable occupation index (O*NET + curated `role_family` descriptions).
-- **Stage 1.5** uses those matches to drive `search_terms` / `role_family_plan`.
-- **Stage 2** stays as-is: web search for live postings.
+- **Stage 2** uses those matches to drive `search_terms` / `role_family_plan`.
+- **Stage 3** stays as-is: web search for live postings.
 
 O*NET answers “what kinds of work fit?” Job discovery answers “what’s open right now?”
 
@@ -30,7 +30,7 @@ O*NET answers “what kinds of work fit?” Job discovery answers “what’s op
 
 ### What exists in code today
 
-- **`role_family_plan`** is real: LLM-generated in Stage 1.5, used in discovery query planning and fit scoring (`aptitude_fit.py`, `discovery.py`).
+- **`role_family_plan`** is real: LLM-generated in Stage 2, used in discovery query planning and fit scoring (`aptitude_fit.py`, `discovery.py`).
 - No O*NET API key in config, no occupation data store, no embedding index.
 
 ### Practical takeaway

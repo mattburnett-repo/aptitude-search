@@ -8,7 +8,7 @@ A short, actionable plan distilled from the aptitude-matching direction discussi
 
 **Stop searching on skills; start searching on the roles the profile already says the person could do — then explain and filter results using work patterns, not tool lists.**
 
-Today `adjacent_roles` drive discovery when no role family plan is present; the full pipeline runs **Stage 1.5** to produce a formal role family plan that drives `search_terms`, `work_modes`, and `avoid_terms`.
+Today `adjacent_roles` drive discovery when no role family plan is present; the full pipeline runs **Stage 2** to produce a formal role family plan that drives `search_terms`, `work_modes`, and `avoid_terms`.
 
 ---
 
@@ -37,7 +37,7 @@ If a change doesn't move at least one of these, it's probably not worth doing ye
 ## What comes after (in order)
 
 1. **Rank/filter scraped jobs** — **done** (`backend/app/job_discovery/aptitude_fit.py`). Uses `strengths`, `working_style_signals`, and role-family `work_modes` / `avoid_terms`. Config: `aptitude_fit_min_score`, `aptitude_fit_min_results`.
-2. **Role-family plan** — **done** (Stage 1.5: `prompts/02-role-family-plan.md`, `schemas/role-family-plan.schema.json`, `POST /v1/stages/1.5`). Discovery uses plan `search_terms` when present.
+2. **Role-family plan** — **done** (Stage 2: `prompts/02-role-family-plan.md`, `schemas/role-family-plan.schema.json`, `POST /v1/stages/2`). Discovery uses plan `search_terms` when present.
 3. **Embeddings** — not started. Point aptitude vectors at role semantics (curated role families + occupation taxonomies), not raw job postings.
 
 ---

@@ -1,4 +1,4 @@
-"""Stage 2 discovery tools (composite search + scrape per query)."""
+"""Stage 3 discovery tools (composite search + scrape per query)."""
 
 from __future__ import annotations
 

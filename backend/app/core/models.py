@@ -41,11 +41,11 @@ class Stage1Request(BaseModel):
     resume: str
 
 
-class Stage1_5Request(BaseModel):
+class Stage2Request(BaseModel):
     aptitude_profile: dict[str, object]
 
 
-class Stage2Request(BaseModel):
+class Stage3Request(BaseModel):
     aptitude_profile: dict[str, object]
     role_family_plan: dict[str, object] | None = None
     constraints: Constraints | None = None

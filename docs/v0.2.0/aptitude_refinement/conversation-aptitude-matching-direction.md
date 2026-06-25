@@ -237,7 +237,7 @@ Otherwise "aptitude + constraints" is mostly cosmetic.
 
 If you want one change that proves the concept without rebuilding everything:
 
-**Add Stage 1.5 (role-family plan) and switch discovery to use its `search_terms`.**
+**Add Stage 2 (role-family plan) and switch discovery to use its `search_terms`.**
 
 Keep synthesis as-is initially. Compare runs on the same resume:
 

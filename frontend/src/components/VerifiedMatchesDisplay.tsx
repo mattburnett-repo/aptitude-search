@@ -119,7 +119,7 @@ export function VerifiedMatchesDisplay({ matches }: VerifiedMatchesDisplayProps)
   if (!isVerifiedMatches(matches)) {
     return (
       <details className="collapsible-section" open>
-        <summary>Stage 2 — Verified matches</summary>
+        <summary>Stage 3 — Verified matches</summary>
         <VerifiedSaveAsPdfToolbar matchesRef={matchesRef} />
         <div ref={matchesRef} className="collapsible-section-body verified-matches">
           <pre className="aptitude-raw-pre">{JSON.stringify(matches, null, 2)}</pre>
@@ -130,7 +130,7 @@ export function VerifiedMatchesDisplay({ matches }: VerifiedMatchesDisplayProps)
 
   return (
     <details className="collapsible-section" open>
-      <summary>Stage 2 — Verified matches</summary>
+      <summary>Stage 3 — Verified matches</summary>
       <VerifiedSaveAsPdfToolbar matchesRef={matchesRef} />
       <div className="collapsible-section-body">
         <div ref={matchesRef} className="verified-matches">

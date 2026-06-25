@@ -1,4 +1,4 @@
-"""Stage 2b: synthesize verified_matches from discovery found_jobs.
+"""Stage 3 synthesis: map ranked found_jobs → verified_matches JSON.
 
 After discovery collects compact job rows via web search and page scraping,
 this module runs a single Hugging Face chat call to map those rows plus the
@@ -6,7 +6,7 @@ fixed aptitude profile and constraints into schema-strict
 ``job-discovery-results`` JSON (``search_plan``, ``results``, ``notes``).
 
 The model does not search the web here; it only formats and verifies postings
-already in ``found_jobs``. ``pipeline.run_stage2`` may still drop result URLs
+already in ``found_jobs``. ``pipeline.run_stage3`` may still drop result URLs
 that never appeared in tool output (see ``tool_observed_urls.py``).
 """
 
@@ -16,7 +16,7 @@ from langsmith import traceable  # pyright: ignore[reportUnknownVariableType]
 
 from app.core import prompt_loader
 from app.core.config import config
-from app.job_discovery.context import labeled_names, build_stage2_synthesis_user_message
+from app.job_discovery.context import labeled_names, build_stage3_synthesis_user_message
 from app.core.llm import complete_chat_json
 from app.core.json_types import FoundJob, JsonObject, as_object_dict, as_object_list
 from app.core.models import Constraints
@@ -171,7 +171,7 @@ def ensure_all_found_jobs_in_results(
     return result
 
 
-@traceable(run_type="chain", name="stage2_empty_results")
+@traceable(run_type="chain", name="stage3_empty_results")
 def empty_job_discovery_results(
     aptitude_profile: JsonObject,
     constraints: Constraints,
@@ -190,7 +190,7 @@ def empty_job_discovery_results(
     }
 
 
-@traceable(run_type="chain", name="stage2_synthesis")
+@traceable(run_type="chain", name="stage3_synthesis")
 def synthesize_job_discovery_results(
     aptitude_profile: JsonObject,
     constraints: Constraints,
@@ -199,7 +199,7 @@ def synthesize_job_discovery_results(
     role_family_plan: JsonObject | None = None,
 ) -> JsonObject:
     """Map ``found_jobs`` into normalized job-discovery-results dict."""
-    user = build_stage2_synthesis_user_message(
+    user = build_stage3_synthesis_user_message(
         aptitude_profile,
         constraints,
         found_jobs,
@@ -207,7 +207,7 @@ def synthesize_job_discovery_results(
     )
     result = normalize_job_discovery_results(
         complete_chat_json(
-            prompt_loader.system_prompt_stage2_synthesis(),
+            prompt_loader.system_prompt_stage3_synthesis(),
             user,
             temperature=config.llm.job_discovery.temperature,
         )

@@ -34,11 +34,11 @@ aptitude_fit_min_results = 2
 
 [prompts]
 stage1_file = "01-resume-to-aptitude-profile.md"
-stage1_5_file = "02-role-family-plan.md"
-stage2_synthesis_file = "03-job-discovery-synthesis.md"
+stage2_file = "02-role-family-plan.md"
+stage3_synthesis_file = "03-job-discovery-synthesis.md"
 stage1_user_task_file = "stage1-agent-user-task.txt"
-stage1_5_user_task_file = "role-family-plan-user-task.txt"
-stage2_synthesis_user_task_file = "stage2-synthesis-user-task.txt"
+stage2_user_task_file = "role-family-plan-user-task.txt"
+stage3_synthesis_user_task_file = "stage3-synthesis-user-task.txt"
 
 [schemas]
 constraints = "constraints.schema.json"

@@ -23,7 +23,7 @@ def test_stream_pipeline_emits_progress_and_result(
     ) -> dict[str, object]:
         if on_progress:
             on_progress("Stage 1 starting")
-            on_progress("Stage 2 starting")
+            on_progress("Stage 3 starting")
         return {
             "aptitude_profile": stage1_fixture,
             "verified_matches": verified_matches_fixture,

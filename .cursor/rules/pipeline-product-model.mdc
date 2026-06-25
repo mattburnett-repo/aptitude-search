@@ -1,5 +1,5 @@
 ---
-description: Canonical product model for the two-stage pipeline and Stage 2 job search
+description: Canonical product model for the three-stage pipeline and Stage 3 job search
 alwaysApply: true
 ---
 
@@ -9,14 +9,14 @@ Authoritative detail: `docs/PROMPT-CONTRACT.md` (Product model section).
 
 ## Do not misstate
 
-- **Stage 2 is job search.** `POST /v1/pipeline` runs Stage 1 then Stage 2 with no manual step. `verified_matches` is the search result.
-- The API **searches the web** for open postings via Stage 2 discovery (profile-driven `search_job_postings` in `discovery.py`), then synthesizes schema-strict results (`prompts/03-job-discovery-synthesis.md`). See `backend/app/pipeline.py` and `docs/PROMPT-CONTRACT.md`.
+- **Stage 3 is job search.** `POST /v1/pipeline` runs Stage 1 → Stage 2 → Stage 3 with no manual step. `verified_matches` is the search result.
+- The API **searches the web** for open postings via Stage 3 discovery (profile-driven `search_job_postings` in `discovery.py`), then synthesizes schema-strict results (`prompts/03-job-discovery-synthesis.md`). See `backend/app/pipeline.py` and `docs/PROMPT-CONTRACT.md`.
 - Do **not** tell users the API path is "draft only" or that "only Cursor Agent can browse" as the primary story.
 
 ## Optional nuance (implementation, not user-facing)
 
-- Stage 2a discovery: `discovery.py` + `search_job_postings` (DuckDuckGo, URL filters, scrape) — no LLM for query planning.
-- Stage 2b is a synthesis chat call (`[llm.aptitude].model`, `[llm.job_discovery].temperature`) — not a separate jobs API wired in Python.
+- Stage 3 discovery: `discovery.py` + `search_job_postings` (DuckDuckGo, URL filters, scrape) — no LLM for query planning.
+- Stage 3 synthesis is a chat call (`[llm.aptitude].model`, `[llm.job_discovery].temperature`) — not a separate jobs API wired in Python.
 - The API jsonschema-validates `verified_matches` against `job-discovery-results.schema.json`.
 
 ## Testing

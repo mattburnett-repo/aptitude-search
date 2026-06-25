@@ -70,15 +70,15 @@ def test_stage1_returns_mocked_profile(
     assert response.json()["aptitude_profile"]["seniority_band"] == "senior"
 
 
-@patch("app.main.run_stage2")
-def test_stage2_returns_mocked_matches(
-    mock_run_stage2: MagicMock,
+@patch("app.main.run_stage3")
+def test_stage3_returns_mocked_matches(
+    mock_run_stage3: MagicMock,
     client: TestClient,
     verified_matches_fixture: dict[str, object],
 ):
-    mock_run_stage2.return_value = verified_matches_fixture
+    mock_run_stage3.return_value = verified_matches_fixture
     response = client.post(
-        "/v1/stages/2",
+        "/v1/stages/3",
         json={"aptitude_profile": {"seniority_band": "senior"}, "constraints": None},
     )
     assert response.status_code == 200

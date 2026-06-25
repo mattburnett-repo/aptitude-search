@@ -11,7 +11,7 @@ O*NET gives you a finite, stable, explainable corpus (~1,000 SOC occupations) wi
 - skills / knowledge / abilities (use carefully — easy to fall back into keyword land)
 - interest/work-style dimensions (optional later)
 
-That maps cleanly onto what the pipeline already produces in Stage 1.5:
+That maps cleanly onto what the pipeline already produces in Stage 2:
 
 | Your role_family plan | O*NET equivalent |
 |-----------------------|------------------|
@@ -63,9 +63,9 @@ Stage 1 (aptitude profile)
     ↓ embed work-pattern fields
 Aptitude-to-jobtype matching: similarity vs [O*NET corpus + curated role_families]
     ↓ top-K occupations + your curated families
-Stage 1.5 (augment or replace LLM plan)
+Stage 2 (augment or replace LLM plan)
     ↓ search_terms from matched titles + curated typical_titles
-Stage 2 job discovery (unchanged — keyword/search API)
+Stage 3 job discovery (unchanged — keyword/search API)
     ↓
 Posting fit ranking: re-rank scraped postings (optional next)
 

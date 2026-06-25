@@ -14,17 +14,17 @@ def system_prompt_stage1() -> str:
     return load_system_prompt(config.prompts.stage1_file)
 
 
-def system_prompt_stage2_synthesis() -> str:
-    return load_system_prompt(config.prompts.stage2_synthesis_file)
+def system_prompt_stage3_synthesis() -> str:
+    return load_system_prompt(config.prompts.stage3_synthesis_file)
 
 
 def system_prompt_role_family_plan() -> str:
-    return load_system_prompt(config.prompts.stage1_5_file)
+    return load_system_prompt(config.prompts.stage2_file)
 
 
-def system_prompt_stage2() -> str:
+def system_prompt_stage3() -> str:
     """Alias for synthesis prompt (schema JSON phase)."""
-    return system_prompt_stage2_synthesis()
+    return system_prompt_stage3_synthesis()
 
 
 def _load_user_task_file(filename: str) -> str:
@@ -37,10 +37,10 @@ def user_task_stage1() -> str:
 
 
 def user_task_role_family_plan() -> str:
-    """Runtime user message preamble for Stage 1.5 (profile → role family plan JSON)."""
-    return _load_user_task_file(config.prompts.stage1_5_user_task_file)
+    """Runtime user message preamble for Stage 2 (profile → role family plan JSON)."""
+    return _load_user_task_file(config.prompts.stage2_user_task_file)
 
 
-def user_task_stage2_synthesis() -> str:
-    """Runtime user message preamble for the Stage 2 synthesis LLM call."""
-    return _load_user_task_file(config.prompts.stage2_synthesis_user_task_file)
+def user_task_stage3_synthesis() -> str:
+    """Runtime user message preamble for the Stage 3 synthesis LLM call."""
+    return _load_user_task_file(config.prompts.stage3_synthesis_user_task_file)

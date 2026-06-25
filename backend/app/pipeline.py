@@ -23,7 +23,7 @@ from app.job_discovery.tool_observed_urls import (
 )
 from app.job_discovery.url_utils import filter_found_jobs
 from app.core.progress import ProgressCallback, emit_progress
-from app.role_family_plan import run_stage1_5
+from app.role_family_plan import run_stage2
 
 logger = logging.getLogger(__name__)
 
@@ -53,8 +53,8 @@ def run_stage1(
     return result
 
 
-@traceable(run_type="chain", name="stage2")
-def run_stage2(
+@traceable(run_type="chain", name="stage3")
+def run_stage3(
     aptitude_profile: JsonObject,
     constraints: Constraints | None = None,
     *,
@@ -65,7 +65,7 @@ def run_stage2(
     validate_stage("constraints", c.model_dump())
     tool_observed_urls = ToolObservedUrlRegistry()
     emit_progress(
-        "Stage 2: Searching the web for job postings…",
+        "Stage 3: Searching the web for job postings…",
         on_progress=on_progress,
     )
     found_jobs = run_job_discovery(
@@ -80,7 +80,7 @@ def run_stage2(
         kept = filter_found_jobs(found_jobs)
         removed = len(found_jobs) - len(kept)
         if removed:
-            logger.info("stage2 removed %s non-job row(s) from found_jobs", removed)
+            logger.info("stage3 removed %s non-job row(s) from found_jobs", removed)
         found_jobs = kept
     if found_jobs:
         emit_progress("Ranking by aptitude work-pattern fit…", on_progress=on_progress)
@@ -91,7 +91,7 @@ def run_stage2(
         )
         removed = len(found_jobs) - len(ranked)
         if removed:
-            logger.info("stage2 aptitude_fit removed %s low-fit row(s)", removed)
+            logger.info("stage3 aptitude_fit removed %s low-fit row(s)", removed)
         found_jobs = ranked
     if found_jobs:
         emit_progress(
@@ -117,7 +117,7 @@ def run_stage2(
         )
     emit_progress("Validating results…", on_progress=on_progress)
     validate_stage("jobDiscovery", result)
-    emit_progress("Stage 2 complete.", on_progress=on_progress)
+    emit_progress("Stage 3 complete.", on_progress=on_progress)
     return result
 
 
@@ -130,8 +130,8 @@ def run_pipeline(
 ) -> dict[str, JsonObject]:
     emit_progress("Starting pipeline…", on_progress=on_progress)
     aptitude_profile = run_stage1(resume, on_progress=on_progress)
-    role_family_plan = run_stage1_5(aptitude_profile, on_progress=on_progress)
-    verified_matches = run_stage2(
+    role_family_plan = run_stage2(aptitude_profile, on_progress=on_progress)
+    verified_matches = run_stage3(
         aptitude_profile,
         constraints,
         role_family_plan=role_family_plan,

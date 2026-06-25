@@ -88,7 +88,7 @@ Work activities: Programming, Analyzing Data, Thinking Creatively, ...
 Alternate titles: Application Developer, Software Engineer, ...
 ```
 
-**~1,016 vectors**, stored e.g. in `occupation_embeddings` (Stage 2 — not implemented yet).
+**~1,016 vectors**, stored e.g. in `occupation_embeddings` (not implemented yet).
 
 ---
 
@@ -112,15 +112,15 @@ Vector search returns **SOC codes + scores**. Relational data does the rest:
 
 | After match | O*NET table | Pipeline use |
 |-------------|-------------|--------------|
-| Search strings | `job_titles` | `search_terms` → Stage 2 |
+| Search strings | `job_titles` | `search_terms` → Stage 3 |
 | Adjacent roles | `related_occupations` | Expand / diversify families |
 | Explain fit | top `work_activities` names | `fit_reason`, `work_modes` |
 | Filter bad modes | low-scoring activities or context | `avoid_terms` |
 | Seniority check | `job_zones` | Optional filter |
 
-Stage 1.5 LLM can **augment** this (curated role families, market titles) rather than being replaced on day one.
+Stage 2 LLM can **augment** this (curated role families, market titles) rather than being replaced on day one.
 
-Maps to existing Stage 1.5 plan fields ([`onet-and-occupation-taxonomies.md`](./onet-and-occupation-taxonomies.md)):
+Maps to existing Stage 2 plan fields ([`onet-and-occupation-taxonomies.md`](./onet-and-occupation-taxonomies.md)):
 
 | role_family plan | O*NET equivalent |
 |------------------|------------------|

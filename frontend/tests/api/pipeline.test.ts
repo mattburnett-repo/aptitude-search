@@ -19,7 +19,7 @@ describe("runPipelineStream", () => {
       vi.fn().mockResolvedValue(
         mockNdjsonStreamResponse([
           JSON.stringify({ type: "progress", message: "Stage 1 starting" }),
-          JSON.stringify({ type: "progress", message: "Stage 2 starting" }),
+          JSON.stringify({ type: "progress", message: "Stage 3 starting" }),
           JSON.stringify({ type: "result", data: resultPayload }),
         ])
       )
@@ -34,7 +34,7 @@ describe("runPipelineStream", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ resume: "text" }),
     });
-    expect(progress).toEqual(["Stage 1 starting", "Stage 2 starting"]);
+    expect(progress).toEqual(["Stage 1 starting", "Stage 3 starting"]);
     expect(result).toEqual(resultPayload);
   });
 

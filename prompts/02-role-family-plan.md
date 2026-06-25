@@ -1,4 +1,4 @@
-# Prompt 1.5 — Aptitude Profile → Role Family Plan (Schema-Strict)
+# Prompt 2 — Aptitude Profile → Role Family Plan (Schema-Strict)
 
 ## ROLE
 You are a career work-mode mapping system.
