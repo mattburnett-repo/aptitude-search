@@ -12,6 +12,7 @@
   <a href="frontend/README.md"><img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite"/></a>
   <a href="frontend/README.md"><img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript"/></a>
   <a href="schemas/"><img src="https://img.shields.io/badge/JSON%20Schema-20232A?style=for-the-badge&logo=json&logoColor=white" alt="JSON Schema"/></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Proprietary-red?style=for-the-badge" alt="License: Proprietary"/></a>
 </p>
 
 # aptitude-search
@@ -64,7 +65,7 @@ prompts/          # 01 profile, 02 role families, 03 synthesis
 schemas/          # aptitude-profile, role-family-plan, job-discovery-results, constraints
 fixtures/         # sample resumes, pipeline-request-example.json, stage-1 golden output
 docs/             # WORKFLOW, TESTING, PROMPT-CONTRACT
-backend/          # FastAPI — stages 1 and 2
+backend/          # FastAPI — pipeline stages 1–3
 frontend/         # MVP UI (Vite + React)
 ```
 
@@ -78,9 +79,12 @@ frontend/         # MVP UI (Vite + React)
 - **[docs/changelog/0.2.0.md](docs/changelog/0.2.0.md)** — aptitude refinement (role families, work-pattern fit)
 - **[docs/changelog/0.1.0.md](docs/changelog/0.1.0.md)** — initial release
 
----
+## License
 
-Licensing and Attribution:
+Source code, documentation, prompts, and schemas in this repository are **proprietary**. See [LICENSE](LICENSE). All rights reserved — no use, copying, or distribution without prior written permission.
 
-<p style="text-align: center"><a href="https://services.onetcenter.org/" title="This site incorporates information from O*NET Web Services. Click to learn more."><img src="https://www.onetcenter.org/image/link/onet-in-it.svg" style="width: 130px; height: 60px; border: none" alt="O*NET in-it"></a></p>
-<p>This site incorporates information from <a href="https://services.onetcenter.org/">O*NET Web Services</a> by the U.S. Department of Labor, Employment and Training Administration (USDOL/ETA). O*NET&reg; is a trademark of USDOL/ETA.</p>
+## Third-party data
+
+<p align="center"><a href="https://services.onetcenter.org/" title="This site incorporates information from O*NET Web Services. Click to learn more."><img src="https://www.onetcenter.org/image/link/onet-in-it.svg" width="130" height="60" alt="O*NET in-it"></a></p>
+
+The O*NET 30.3 database files under `data/download/db_30_3_mysql/` are licensed under [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://www.onetcenter.org/license_db.html) by the U.S. Department of Labor, Employment and Training Administration (USDOL/ETA). O*NET® is a trademark of USDOL/ETA. This project incorporates information from [O*NET Web Services](https://services.onetcenter.org/).
