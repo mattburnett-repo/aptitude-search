@@ -22,3 +22,4 @@ config.toml
 # Other
 output/*
 data/**/*.zip
+db/*
