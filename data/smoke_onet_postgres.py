@@ -4,7 +4,7 @@
 Run from repo root:
   python data/smoke_onet_postgres.py
 
-Env (same as load script): ONET_PGDATABASE, PGHOST, PGPORT, PGUSER, PGPASSWORD, etc.
+Env: PGHOST, PGPORT, PGUSER, PGPASSWORD, etc. Database: backend/config.toml [onet].database.
 """
 
 from __future__ import annotations
@@ -15,8 +15,14 @@ import subprocess
 import sys
 from collections.abc import Sequence
 from dataclasses import dataclass
+from pathlib import Path
 
-EXPECTED_DATABASE = os.environ.get("ONET_PGDATABASE", "onet_30_3_local_full")
+BACKEND_DIR = Path(__file__).resolve().parent.parent / "backend"
+sys.path.insert(0, str(BACKEND_DIR))
+
+from app.core.config import config  # noqa: E402
+
+EXPECTED_DATABASE = config.onet.database
 MAINTENANCE_DATABASE = os.environ.get("ONET_PGMAINTENANCE_DB", "postgres")
 
 EXPECTED_OCCUPATION_COUNT = 1016

@@ -16,7 +16,9 @@ temperature = 0.3  # modest variation in profile interpretation
 max_tokens = 8192  # Stage 1 JSON output cap; raise if responses truncate
 
 [llm.job_discovery]
-temperature = 0.0  # synthesis JSON temperature ([llm.aptitude] provides model + key)
+model_key = ""  # required: Hugging Face key for Stage 3 synthesis
+model = ""  # Stage 3: found_jobs → verified_matches JSON
+temperature = 0.0  # synthesis JSON temperature
 visit_max_output_length = 8000  # max chars fetched per page scrape
 search_max_results = 10  # DuckDuckGo results per search query
 search_scrape_max = 3  # max posting URLs scraped per search_job_postings call
@@ -25,6 +27,19 @@ search_rate_limit = 1.0  # min seconds between searches; omit or set null to dis
 page_summary_max_chars = 1500  # max chars returned per visited page
 page_bullet_max_count = 8  # max bullet points extracted per visited page
 page_snippet_max_chars = 400  # max chars in body snippet per visited page
+
+[embedding]
+model_key = ""  # required: Hugging Face key for occupation + aptitude vectors
+model = ""  # e.g. BAAI/bge-large-en-v1.5
+dimensions = 1024
+
+[onet]
+host = ""       # e.g. dpg-xxxxx.oregon-postgres.render.com
+port = 5432
+database = ""   # Postgres database with O*NET + occupation_embeddings
+user = ""
+password = ""
+sslmode = "require"
 
 [job_discovery]
 url_filters_file = "url-filters.toml"  # SERP/found_jobs skip lists (app/job_discovery/)

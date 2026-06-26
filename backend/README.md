@@ -8,7 +8,7 @@ Orchestration for **Stage 1** (aptitude profile), **Stage 2** (role family plan)
 - **Stage 2:** same model/key — aptitude profile → role family plan (chat JSON).
 - **Stage 3 discovery:** Python builds queries from the role family plan `search_terms` (fallback: profile `adjacent_roles` / `domains` / skills) and runs `search_job_postings` (`[job_discovery].discovery_query_max`). No LLM for discovery.
 - **Stage 3 fit:** Python ranks/filters scraped jobs by work-pattern fit (`aptitude_fit.py`; `[job_discovery].aptitude_fit_min_score`). No LLM.
-- **Stage 3 synthesis:** `[llm.aptitude].model` + `[llm.job_discovery].temperature` — maps ranked `found_jobs` to verified matches JSON.
+- **Stage 3 synthesis:** `[llm.job_discovery].model_key` + `[llm.job_discovery].model` + `[llm.job_discovery].temperature` — maps ranked `found_jobs` to verified matches JSON.
 
 See **[PROMPT-CONTRACT](../docs/PROMPT-CONTRACT.md)** for the full pipeline.
 
@@ -66,7 +66,7 @@ During tests, `conftest.py` then swaps in `config.test.toml` so runs stay mocked
 | POST | `/v1/stages/2` | `{ "aptitude_profile" }` | `{ "role_family_plan" }` |
 | POST | `/v1/stages/3` | `{ "aptitude_profile", "role_family_plan"?, "constraints"? }` | `{ "verified_matches" }` |
 
-POST routes use the server-configured Hugging Face key and model from `[llm.aptitude]` in `config.toml` (Stage 3 discovery is Python-only; synthesis reuses the aptitude model).
+POST routes use Hugging Face keys/models from `[llm.aptitude]` (Stages 1–2) and `[llm.job_discovery]` (Stage 3 synthesis) in `config.toml` (Stage 3 discovery is Python-only).
 
 `constraints` matches `schemas/constraints.schema.json` (location, remote_preference, salary_min, industries_include/exclude).
 

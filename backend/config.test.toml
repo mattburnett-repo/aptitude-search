@@ -16,6 +16,8 @@ temperature = 0.0
 max_tokens = 8192
 
 [llm.job_discovery]
+model_key = "test-key"
+model = "test/job-discovery-synthesis-model"
 temperature = 0.0
 visit_max_output_length = 8000
 search_max_results = 10
@@ -25,6 +27,19 @@ search_rate_limit = 1.0
 page_summary_max_chars = 1500
 page_bullet_max_count = 8
 page_snippet_max_chars = 400
+
+[embedding]
+model_key = "test-key"
+model = "test/embedding-model"
+dimensions = 1024
+
+[onet]
+host = "localhost"
+port = 5432
+database = "onet_test"
+user = "test"
+password = "test"
+sslmode = "disable"
 
 [job_discovery]
 url_filters_file = "url-filters.toml"

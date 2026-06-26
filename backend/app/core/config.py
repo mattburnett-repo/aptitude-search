@@ -88,6 +88,8 @@ class JobDiscoveryConfig(BaseModel):
 
 
 class JobDiscoveryLlmConfig(BaseModel):
+    model_key: str
+    model: str
     temperature: float
     visit_max_output_length: int
     search_max_results: int
@@ -97,6 +99,15 @@ class JobDiscoveryLlmConfig(BaseModel):
     page_summary_max_chars: int
     page_bullet_max_count: int
     page_snippet_max_chars: int
+
+    @field_validator("model_key", "model")
+    @classmethod
+    def string_must_be_set(cls, value: str, info: ValidationInfo) -> str:
+        stripped = value.strip()
+        if not stripped:
+            field = info.field_name or "field"
+            raise ValueError(f"llm.job_discovery.{field} must be set in config.toml")
+        return stripped
 
     @field_validator(
         "visit_max_output_length",
@@ -124,6 +135,55 @@ class JobDiscoveryLlmConfig(BaseModel):
             raise ValueError(
                 f"llm.job_discovery.{field} must be positive or omitted (null) to disable"
             )
+        return value
+
+
+class EmbeddingConfig(BaseModel):
+    model_key: str
+    model: str
+    dimensions: int
+
+    @field_validator("model_key", "model")
+    @classmethod
+    def string_must_be_set(cls, value: str, info: ValidationInfo) -> str:
+        stripped = value.strip()
+        if not stripped:
+            field = info.field_name or "field"
+            raise ValueError(f"embedding.{field} must be set in config.toml")
+        return stripped
+
+    @field_validator("dimensions")
+    @classmethod
+    def dimensions_positive(cls, value: int, info: ValidationInfo) -> int:
+        if value < 1:
+            field = info.field_name or "field"
+            raise ValueError(f"embedding.{field} must be at least 1")
+        return value
+
+
+class OnetConfig(BaseModel):
+    host: str
+    port: int = 5432
+    database: str
+    user: str
+    password: str
+    sslmode: str = "require"
+
+    @field_validator("host", "database", "user", "password")
+    @classmethod
+    def string_must_be_set(cls, value: str, info: ValidationInfo) -> str:
+        stripped = value.strip()
+        if not stripped:
+            field = info.field_name or "field"
+            raise ValueError(f"onet.{field} must be set in config.toml")
+        return stripped
+
+    @field_validator("port")
+    @classmethod
+    def port_positive(cls, value: int, info: ValidationInfo) -> int:
+        if value < 1:
+            field = info.field_name or "field"
+            raise ValueError(f"onet.{field} must be at least 1")
         return value
 
 
@@ -167,6 +227,8 @@ class Config(BaseModel):
     app: AppConfig
     cors: CorsConfig
     llm: LlmConfig
+    embedding: EmbeddingConfig
+    onet: OnetConfig
     job_discovery: JobDiscoveryConfig
     prompts: PromptsConfig
     schemas: SchemasConfig

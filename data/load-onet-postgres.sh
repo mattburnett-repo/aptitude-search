@@ -2,21 +2,28 @@
 # Load O*NET 30.3 MySQL-format SQL dumps into PostgreSQL (01..45, FK-safe order).
 #
 # Wipes public schema by default, then loads all tables. Patches files 31–32 for
-# Postgres (O*NET FKs reference content_model_reference.element_name, which has
-# no UNIQUE constraint in the upstream dump).
+# Postgres (O*NET FKs reference no UNIQUE constraint in the upstream dump).
+# On success, creates occupation_embeddings (empty) and runs build_occupation_embeddings.py.
 #
 # Usage:
 #   ./data/load-onet-postgres.sh
-#   ONET_PGDATABASE=my_db ./data/load-onet-postgres.sh
+#   ONET_SKIP_EMBED=1 ./data/load-onet-postgres.sh   # load O*NET only, skip Hugging Face embed
 #   ONET_RESET_SCHEMA=0 ./data/load-onet-postgres.sh   # append without wipe
 #   ONET_VERBOSE=1 ./data/load-onet-postgres.sh        # show every INSERT line
 #   ONET_LOG_FILE=data/onet-load.log ./data/load-onet-postgres.sh
+#
+# Database name: backend/config.toml [onet].database (via data/onet-database.sh)
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 SQL_DIR="${ONET_SQL_DIR:-${SCRIPT_DIR}/download/db_30_3_mysql}"
-PGDATABASE="${ONET_PGDATABASE:-onet_30_3_local_full}"
+PGDATABASE="$("${SCRIPT_DIR}/onet-database.sh")"
+PYTHON="${REPO_ROOT}/backend/.venv/bin/python"
+if [[ ! -x "$PYTHON" ]]; then
+  PYTHON=python3
+fi
 LOG_FILE="${ONET_LOG_FILE:-}"
 RESET_SCHEMA="${ONET_RESET_SCHEMA:-1}"
 PSQL_QUIET=(-q)
@@ -45,6 +52,7 @@ echo "sql dir:  $SQL_DIR"
 echo "files:    $SQL_COUNT"
 echo "reset:    $RESET_SCHEMA"
 echo
+
 
 if [[ "$RESET_SCHEMA" == "1" ]]; then
   echo "wiping public schema..."
@@ -96,6 +104,19 @@ while IFS= read -r file; do
 done < <(find "$SQL_DIR" -maxdepth 1 -name '[0-9]*.sql' | sort -V)
 
 echo
+"${SCRIPT_DIR}/ingest/create-occupation-embeddings-table.sh"
+
+if [[ "${ONET_SKIP_EMBED:-}" != "1" ]]; then
+  echo
+  echo "==> build_occupation_embeddings.py"
+  "$PYTHON" "${SCRIPT_DIR}/ingest/build_occupation_embeddings.py"
+else
+  echo
+  echo "embed step skipped (ONET_SKIP_EMBED=1)"
+fi
+
+echo
 echo "done. verify with:"
+echo "  python data/smoke_onet_postgres.py"
 echo "  psql -d $PGDATABASE -c \"SELECT COUNT(*) FROM occupation_data;\""
-echo "  psql -d $PGDATABASE -c \"\\\\dt\""
+echo "  psql -d $PGDATABASE -c \"SELECT COUNT(*) FROM occupation_embeddings;\""

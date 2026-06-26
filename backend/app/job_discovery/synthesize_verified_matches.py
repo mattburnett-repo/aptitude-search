@@ -17,7 +17,7 @@ from langsmith import traceable  # pyright: ignore[reportUnknownVariableType]
 from app.core import prompt_loader
 from app.core.config import config
 from app.job_discovery.context import labeled_names, build_stage3_synthesis_user_message
-from app.core.llm import complete_chat_json
+from app.core.llm import complete_job_discovery_chat_json
 from app.core.json_types import FoundJob, JsonObject, as_object_dict, as_object_list
 from app.core.models import Constraints
 from app.core.validate import normalize_job_discovery_results
@@ -206,7 +206,7 @@ def synthesize_job_discovery_results(
         role_family_plan=role_family_plan,
     )
     result = normalize_job_discovery_results(
-        complete_chat_json(
+        complete_job_discovery_chat_json(
             prompt_loader.system_prompt_stage3_synthesis(),
             user,
             temperature=config.llm.job_discovery.temperature,

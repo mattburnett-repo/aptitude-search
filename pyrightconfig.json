@@ -3,11 +3,27 @@
 // executionEnvironments tells the type checker to resolve `from app...` imports
 // from backend/ (same layout as `uvicorn app.main:app` run from that directory).
 {
+  "include": [
+    "backend/app",
+    "backend/scripts",
+    "backend/tests",
+    "data/ingest",
+    "data/smoke_onet_postgres.py"
+  ],
   "executionEnvironments": [
     {
       "root": "backend",
       "pythonVersion": "3.12"
+    },
+    {
+      "root": "data/ingest",
+      "extraPaths": ["backend"],
+      "pythonVersion": "3.12"
+    },
+    {
+      "root": "data",
+      "extraPaths": ["backend"],
+      "pythonVersion": "3.12"
     }
-  ],
-  "include": ["backend/app", "backend/scripts", "backend/tests"]
+  ]
 }

@@ -132,9 +132,9 @@ Maps to existing Stage 2 plan fields ([`onet-and-occupation-taxonomies.md`](./on
 
 ---
 
-## Explore queries → layers of the occupation document
+## Occupation document layers (SQL sources)
 
-From `data/explore_onet_occupation.py` — each query is a **layer** of the occupation-side document, not a separate match target:
+Each query pattern is a **layer** of the occupation-side document, not a separate match target:
 
 1. `COUNT occupation_data` → corpus size (~1016)
 2. `occupation_data` row → title + description backbone
@@ -181,4 +181,4 @@ Embed the career-changer aptitude doc (`fixtures/example-outputs/career-changer-
 - [`../v0.2.0/aptitude_refinement/next-steps.md`](../v0.2.0/aptitude_refinement/next-steps.md) — definitions of done
 - [`../v0.2.0/aptitude_refinement/conversation-aptitude-matching-direction.md`](../v0.2.0/aptitude_refinement/conversation-aptitude-matching-direction.md) — aptitude-to-jobtype matching / job discovery / posting fit ranking framing
 
-Tools: `data/load-onet-postgres.sh`, `data/smoke_onet_postgres.py`, `data/explore_onet_occupation.py`
+Tools: `data/load-onet-postgres.sh`, `data/smoke_onet_postgres.py`, `data/ingest/build_occupation_embeddings.py`
