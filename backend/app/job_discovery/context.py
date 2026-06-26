@@ -5,25 +5,7 @@ import json
 from app.core import prompt_loader
 from app.core.json_types import FoundJob, JsonObject, as_object_dict, as_object_list
 from app.core.models import Constraints
-
-
-def labeled_names(items: object, *, limit: int = 8) -> str:
-    """Pull names from a profile list and join them (e.g. skills → "Python, Django, Vue")."""
-    names: list[str] = []
-    item_list = as_object_list(items)
-    if item_list is None:
-        return ", ".join(names)
-    for item in item_list:
-        item_dict = as_object_dict(item)
-        if item_dict is not None:
-            label = item_dict.get("name") or item_dict.get("label")
-            if label:
-                names.append(str(label))
-        elif item:
-            names.append(str(item))
-        if len(names) >= limit:
-            break
-    return ", ".join(names)
+from app.core.profile_text import labeled_names
 
 
 def compact_aptitude_profile_summary(profile: JsonObject) -> str:

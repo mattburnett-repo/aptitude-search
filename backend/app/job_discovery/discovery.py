@@ -11,6 +11,7 @@ from langsmith import traceable  # pyright: ignore[reportUnknownVariableType]
 from app.core.config import config
 from app.core.json_types import FoundJob, JsonObject, JsonValue, as_object_dict, as_object_list
 from app.core.models import Constraints
+from app.core.profile_text import profile_labels
 from app.core.progress import ProgressCallback, emit_progress
 from app.job_discovery.tool_observed_urls import ToolObservedUrlRegistry
 from app.job_discovery.tools import build_job_discovery_tools
@@ -26,29 +27,6 @@ _SENIORITY_MODIFIER = {
     "principal": "principal",
     "executive": "director",
 }
-
-
-def _profile_labels(items: object, *, limit: int) -> list[str]:
-    names: list[str] = []
-    item_list = as_object_list(items)
-    if item_list is None:
-        return names
-    for item in item_list:
-        label: str | None = None
-        item_dict = as_object_dict(item)
-        if item_dict is not None:
-            raw = item_dict.get("name") or item_dict.get("label")
-            if raw:
-                label = str(raw).strip()
-        elif item:
-            label = str(item).strip()
-        if not label:
-            continue
-        if label not in names:
-            names.append(label)
-        if len(names) >= limit:
-            break
-    return names
 
 
 def _normalize_search_term(label: str) -> str:
@@ -97,7 +75,7 @@ def _discovery_search_terms_from_plan(
         family_dict = as_object_dict(family)
         if family_dict is None:
             continue
-        terms = _profile_labels(family_dict.get("search_terms"), limit=max_queries)
+        terms = profile_labels(family_dict.get("search_terms"), limit=max_queries)
         if terms:
             per_family.append(terms)
 
@@ -149,24 +127,24 @@ def _discovery_search_terms(
         seen.add(label)
         terms.append((source, label))
 
-    for label in _profile_labels(aptitude_profile.get("adjacent_roles"), limit=max_queries):
+    for label in profile_labels(aptitude_profile.get("adjacent_roles"), limit=max_queries):
         add("adjacent_roles", label)
 
     if len(terms) < max_queries:
-        for label in _profile_labels(
+        for label in profile_labels(
             aptitude_profile.get("domains"),
             limit=max_queries - len(terms),
         ):
             add("domains", label)
 
     if not terms:
-        for label in _profile_labels(
+        for label in profile_labels(
             aptitude_profile.get("core_skills"),
             limit=max_queries,
         ):
             add("core_skills", label)
         if len(terms) < max_queries:
-            for label in _profile_labels(
+            for label in profile_labels(
                 aptitude_profile.get("secondary_skills"),
                 limit=max_queries - len(terms),
             ):

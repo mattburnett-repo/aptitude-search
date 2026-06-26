@@ -7,6 +7,7 @@ import re
 
 from app.core.config import config
 from app.core.json_types import FoundJob, JsonObject, as_object_dict, as_object_list
+from app.core.profile_text import profile_labels
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +62,7 @@ _WRONG_MODE_PHRASES = frozenset(
 
 
 def _significant_tokens(phrase: str) -> list[str]:
-    tokens = re.findall(r"[a-z0-9]+", phrase.lower())
+    tokens: list[str] = re.findall(r"[a-z0-9]+", phrase.lower())
     return [token for token in tokens if len(token) >= 4 and token not in _STOP_WORDS]
 
 
@@ -74,21 +75,6 @@ def _phrase_hits(text: str, phrase: str) -> bool:
         return False
     hits = sum(1 for token in tokens if token in text)
     return hits >= min(2, len(tokens))
-
-
-def _profile_labels(items: object) -> list[str]:
-    labels: list[str] = []
-    item_list = as_object_list(items)
-    if item_list is None:
-        return labels
-    for item in item_list:
-        item_dict = as_object_dict(item)
-        if item_dict is None:
-            continue
-        raw = item_dict.get("label") or item_dict.get("name")
-        if raw:
-            labels.append(str(raw).strip())
-    return labels
 
 
 def _collect_avoid_terms(role_family_plan: JsonObject | None) -> list[str]:
@@ -178,17 +164,17 @@ def score_job_aptitude_fit(
     score = 0
     signals: list[str] = []
 
-    for label in _profile_labels(aptitude_profile.get("strengths")):
+    for label in profile_labels(aptitude_profile.get("strengths")):
         if _phrase_hits(text, label):
             score += 3
             signals.append(f"strength:{label}")
 
-    for label in _profile_labels(aptitude_profile.get("working_style_signals")):
+    for label in profile_labels(aptitude_profile.get("working_style_signals")):
         if _phrase_hits(text, label):
             score += 3
             signals.append(f"working_style:{label}")
 
-    for label in _profile_labels(aptitude_profile.get("adjacent_roles")):
+    for label in profile_labels(aptitude_profile.get("adjacent_roles")):
         if _phrase_hits(text, label):
             score += 4
             signals.append(f"adjacent_role:{label}")
