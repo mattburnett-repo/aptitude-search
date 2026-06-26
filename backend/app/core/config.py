@@ -186,6 +186,18 @@ class OnetConfig(BaseModel):
             raise ValueError(f"onet.{field} must be at least 1")
         return value
 
+    def conninfo(self) -> str:
+        from psycopg.conninfo import make_conninfo
+
+        return make_conninfo(
+            host=self.host,
+            port=self.port,
+            dbname=self.database,
+            user=self.user,
+            password=self.password,
+            sslmode=self.sslmode,
+        )
+
 
 class LlmConfig(BaseModel):
     aptitude: AptitudeLlmConfig

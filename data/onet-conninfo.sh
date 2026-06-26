@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Print [onet].database from config.toml so shell scripts use the same DB name as Python.
+# Print libpq conninfo from backend/config.toml [onet] for psql and shell scripts.
 #
-# Usage: PGDATABASE="$(data/onet-database.sh)"
+# Usage: ONET_CONNINFO="$("${SCRIPT_DIR}/onet-conninfo.sh")"
 
 set -euo pipefail
 
@@ -20,5 +20,5 @@ import sys
 sys.path.insert(0, os.environ["BACKEND_DIR"])
 from app.core.config import config
 
-print(config.onet.database)
+print(config.onet.conninfo())
 '

@@ -4,12 +4,11 @@
 Run from repo root:
   python data/smoke_onet_postgres.py
 
-Env: PGHOST, PGPORT, PGUSER, PGPASSWORD, etc. Database: backend/config.toml [onet].database.
+Env: backend/config.toml [onet] for Postgres connection.
 """
 
 from __future__ import annotations
 
-import os
 import shutil
 import subprocess
 import sys
@@ -22,8 +21,8 @@ sys.path.insert(0, str(BACKEND_DIR))
 
 from app.core.config import config  # noqa: E402
 
+ONET_CONNINFO = config.onet.conninfo()
 EXPECTED_DATABASE = config.onet.database
-MAINTENANCE_DATABASE = os.environ.get("ONET_PGMAINTENANCE_DB", "postgres")
 
 EXPECTED_OCCUPATION_COUNT = 1016
 EXPECTED_TABLE_COUNT = 45
@@ -64,10 +63,10 @@ def _psql_base_args() -> list[str]:
 def _run_psql(
     sql: str,
     *,
-    database: str,
+    conninfo: str = ONET_CONNINFO,
     capture: bool = True,
 ) -> subprocess.CompletedProcess[str]:
-    cmd = [*_psql_base_args(), "-d", database, "-c", sql]
+    cmd = [*_psql_base_args(), "-d", conninfo, "-c", sql]
     return subprocess.run(
         cmd,
         check=False,
@@ -76,8 +75,8 @@ def _run_psql(
     )
 
 
-def _run_psql_tuples(sql: str, *, database: str) -> list[str]:
-    cmd = [*_psql_base_args(), "-d", database, "-t", "-A", "-c", sql]
+def _run_psql_tuples(sql: str, *, conninfo: str = ONET_CONNINFO) -> list[str]:
+    cmd = [*_psql_base_args(), "-d", conninfo, "-t", "-A", "-c", sql]
     result = subprocess.run(cmd, check=False, text=True, capture_output=True)
     if result.returncode != 0:
         raise RuntimeError(result.stderr.strip() or f"psql failed: {sql[:80]}")
@@ -92,31 +91,31 @@ def check_psql_available() -> CheckResult:
 
 
 def check_database_exists() -> CheckResult:
-    rows = _run_psql_tuples(
-        f"SELECT 1 FROM pg_database WHERE datname = '{EXPECTED_DATABASE}';",
-        database=MAINTENANCE_DATABASE,
-    )
-    if rows == ["1"]:
-        return CheckResult("database exists", True, EXPECTED_DATABASE)
+    rows = _run_psql_tuples("SELECT current_database();")
+    if rows == [EXPECTED_DATABASE]:
+        return CheckResult("database", True, EXPECTED_DATABASE)
     return CheckResult(
-        "database exists",
+        "database",
         False,
-        f"{EXPECTED_DATABASE!r} not in pg_database (connect via {MAINTENANCE_DATABASE})",
+        f"connected as {rows!r}, expected {EXPECTED_DATABASE!r}",
     )
 
 
 def check_connection() -> CheckResult:
-    result = _run_psql("SELECT 1 AS ok;", database=EXPECTED_DATABASE)
+    result = _run_psql("SELECT 1 AS ok;")
     if result.returncode != 0:
         detail = (result.stderr or result.stdout or "connection failed").strip()
         return CheckResult("connection", False, detail)
-    return CheckResult("connection", True, f"connected to {EXPECTED_DATABASE}")
+    return CheckResult(
+        "connection",
+        True,
+        f"{config.onet.host}:{config.onet.port}/{EXPECTED_DATABASE}",
+    )
 
 
 def check_occupation_count() -> CheckResult:
     rows = _run_psql_tuples(
         "SELECT COUNT(*) FROM occupation_data;",
-        database=EXPECTED_DATABASE,
     )
     if len(rows) != 1 or not rows[0].isdigit():
         return CheckResult("occupation_data count", False, f"unexpected output: {rows!r}")
@@ -137,7 +136,6 @@ def check_occupation_count() -> CheckResult:
 def check_public_table_count() -> CheckResult:
     rows = _run_psql_tuples(
         "SELECT COUNT(*) FROM pg_tables WHERE schemaname = 'public';",
-        database=EXPECTED_DATABASE,
     )
     count = int(rows[0])
     if count != EXPECTED_TABLE_COUNT:
@@ -154,7 +152,6 @@ def check_row_counts() -> list[CheckResult]:
     for table, expected in EXPECTED_ROW_COUNTS.items():
         rows = _run_psql_tuples(
             f"SELECT COUNT(*) FROM {table};",
-            database=EXPECTED_DATABASE,
         )
         count = int(rows[0])
         ok = count == expected
@@ -172,7 +169,6 @@ def check_aptitude_to_jobtype_matching_tables_present() -> CheckResult:
     names = set(
         _run_psql_tuples(
             "SELECT tablename FROM pg_tables WHERE schemaname = 'public';",
-            database=EXPECTED_DATABASE,
         )
     )
     missing = [t for t in APTITUDE_TO_JOBTYPE_MATCHING_TABLES if t not in names]
@@ -196,7 +192,6 @@ def check_software_developers_sample() -> CheckResult:
         FROM occupation_data
         WHERE onetsoc_code = '15-1252.00';
         """,
-        database=EXPECTED_DATABASE,
     )
     if rows != ["Software Developers"]:
         return CheckResult(
@@ -211,7 +206,6 @@ def print_dt_listing() -> None:
     print("\n--- public tables (psql \\dt equivalent) ---")
     result = _run_psql(
         r"\dt public.*",
-        database=EXPECTED_DATABASE,
         capture=True,
     )
     if result.returncode != 0:
@@ -230,8 +224,8 @@ def run_checks() -> int:
 
         checks.extend(
             [
-                check_database_exists(),
                 check_connection(),
+                check_database_exists(),
                 check_occupation_count(),
                 check_public_table_count(),
                 check_aptitude_to_jobtype_matching_tables_present(),
@@ -250,7 +244,7 @@ def run_checks() -> int:
 
 
 def _report(checks: Sequence[CheckResult]) -> int:
-    print(f"O*NET Postgres smoke test — database: {EXPECTED_DATABASE}\n")
+    print(f"O*NET Postgres smoke test — {config.onet.host}/{EXPECTED_DATABASE}\n")
     failed = 0
     for check in checks:
         status = "PASS" if check.ok else "FAIL"

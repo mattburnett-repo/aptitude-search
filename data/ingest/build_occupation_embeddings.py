@@ -9,8 +9,7 @@ Prerequisites:
 Run from repo root (or via data/load-onet-postgres.sh after O*NET load):
   python data/ingest/build_occupation_embeddings.py
 
-Env: PGHOST, PGPORT, PGUSER, PGPASSWORD (libpq). Database name from backend/config.toml [onet].database.
-Optional: ONET_EMBED_BATCH_SIZE (default 16)
+Env: ONET_EMBED_BATCH_SIZE (default 16). Postgres: backend/config.toml [onet].
 """
 
 from __future__ import annotations
@@ -32,6 +31,7 @@ BACKEND_DIR = REPO_ROOT / "backend"
 sys.path.insert(0, str(BACKEND_DIR))
 
 from app.core.config import config  # noqa: E402
+from app.core.onet_db import connect  # noqa: E402
 
 CREATE_TABLE_SCRIPT = INGEST_DIR / "create-occupation-embeddings-table.sh"
 OCCUPATION_PROFILE_SQL = INGEST_DIR / "occupation_profile_from_onet.sql"
@@ -217,17 +217,16 @@ def _insert_rows(
 
 def main() -> None:
     embedding = config.embedding
-    database = config.onet.database
+    onet = config.onet
 
-    print(f"database: {database}")
+    print(f"postgres: {onet.host}:{onet.port}/{onet.database}")
     print(f"model:    {embedding.model}")
     print(f"dims:     {embedding.dimensions}")
     print()
 
     _ensure_table()
 
-    conninfo = f"dbname={database}"
-    with psycopg.connect(conninfo) as conn:
+    with connect() as conn:
         profiles = _fetch_profiles(conn)
         if not profiles:
             raise SystemExit("occupation profile query returned no occupations")

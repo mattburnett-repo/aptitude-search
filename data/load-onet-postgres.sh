@@ -12,18 +12,24 @@
 #   ONET_VERBOSE=1 ./data/load-onet-postgres.sh        # show every INSERT line
 #   ONET_LOG_FILE=data/onet-load.log ./data/load-onet-postgres.sh
 #
-# Database name: backend/config.toml [onet].database (via data/onet-database.sh)
+# Connection: backend/config.toml [onet] (via data/onet-conninfo.sh)
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 SQL_DIR="${ONET_SQL_DIR:-${SCRIPT_DIR}/download/db_30_3_mysql}"
-PGDATABASE="$("${SCRIPT_DIR}/onet-database.sh")"
 PYTHON="${REPO_ROOT}/backend/.venv/bin/python"
 if [[ ! -x "$PYTHON" ]]; then
   PYTHON=python3
 fi
+ONET_CONNINFO="$("${SCRIPT_DIR}/onet-conninfo.sh")"
+ONET_CONNINFO_LABEL="$("${PYTHON}" -c "
+import sys
+sys.path.insert(0, '${REPO_ROOT}/backend')
+from app.core.config import config
+print(f'{config.onet.host}:{config.onet.port}/{config.onet.database}')
+")"
 LOG_FILE="${ONET_LOG_FILE:-}"
 RESET_SCHEMA="${ONET_RESET_SCHEMA:-1}"
 PSQL_QUIET=(-q)
@@ -47,7 +53,7 @@ if [[ "$SQL_COUNT" -eq 0 ]]; then
   exit 1
 fi
 
-echo "database: $PGDATABASE"
+echo "postgres: $ONET_CONNINFO_LABEL"
 echo "sql dir:  $SQL_DIR"
 echo "files:    $SQL_COUNT"
 echo "reset:    $RESET_SCHEMA"
@@ -56,7 +62,7 @@ echo
 
 if [[ "$RESET_SCHEMA" == "1" ]]; then
   echo "wiping public schema..."
-  psql "${PSQL_QUIET[@]}" -v ON_ERROR_STOP=1 -d "$PGDATABASE" \
+  psql "${PSQL_QUIET[@]}" -v ON_ERROR_STOP=1 -d "$ONET_CONNINFO" \
     -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
   echo
 fi
@@ -92,9 +98,9 @@ run_psql() {
     echo "    (postgres FK patch applied)"
   fi
   if [[ -n "$LOG_FILE" ]]; then
-    patch_sql_for_postgres "$file" | psql "${PSQL_QUIET[@]}" -v ON_ERROR_STOP=1 -d "$PGDATABASE" >>"$LOG_FILE" 2>&1
+    patch_sql_for_postgres "$file" | psql "${PSQL_QUIET[@]}" -v ON_ERROR_STOP=1 -d "$ONET_CONNINFO" >>"$LOG_FILE" 2>&1
   else
-    patch_sql_for_postgres "$file" | psql "${PSQL_QUIET[@]}" -v ON_ERROR_STOP=1 -d "$PGDATABASE"
+    patch_sql_for_postgres "$file" | psql "${PSQL_QUIET[@]}" -v ON_ERROR_STOP=1 -d "$ONET_CONNINFO"
   fi
 }
 
@@ -118,5 +124,6 @@ fi
 echo
 echo "done. verify with:"
 echo "  python data/smoke_onet_postgres.py"
-echo "  psql -d $PGDATABASE -c \"SELECT COUNT(*) FROM occupation_data;\""
-echo "  psql -d $PGDATABASE -c \"SELECT COUNT(*) FROM occupation_embeddings;\""
+echo "  ONET_CONNINFO=\$(./data/onet-conninfo.sh)"
+echo "  psql -d \"\$ONET_CONNINFO\" -c \"SELECT COUNT(*) FROM occupation_data;\""
+echo "  psql -d \"\$ONET_CONNINFO\" -c \"SELECT COUNT(*) FROM occupation_embeddings;\""
