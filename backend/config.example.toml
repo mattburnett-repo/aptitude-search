@@ -41,6 +41,11 @@ user = ""
 password = ""
 sslmode = "require"
 
+[onet_matching]
+enabled = true    # required; set false to skip O*NET vector search before Stage 2
+top_k = 8         # required
+min_similarity = 0.0  # required
+
 [job_discovery]
 url_filters_file = "url-filters.toml"  # SERP/found_jobs skip lists (app/job_discovery/)
 discovery_query_max = 6  # max search_job_postings calls per pipeline run

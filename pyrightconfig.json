@@ -7,7 +7,7 @@
     "backend/app",
     "backend/scripts",
     "backend/tests",
-    "data/ingest",
+    "data/embed",
     "data/smoke_onet_postgres.py"
   ],
   "executionEnvironments": [
@@ -16,7 +16,7 @@
       "pythonVersion": "3.12"
     },
     {
-      "root": "data/ingest",
+      "root": "data/embed",
       "extraPaths": ["backend"],
       "pythonVersion": "3.12"
     },

@@ -6,7 +6,7 @@ Notes from an initial design conversation (June 2026) on using O*NET in aptitude
 
 ## O*NET in this project today
 
-**Documented, not implemented.** The repo has a clear plan in `onet-and-occupation-taxonomies.md`; there is no O*NET code, config, or `data/` corpus yet. The changelog calls this out explicitly.
+**Implemented (offline data pipeline).** O*NET 30.3 loads into Postgres via `data/load-onet-postgres.sh`; occupation vectors are built by `data/embed/build_occupation_embeddings.py`. Entry point: [`data/README.md`](../../data/README.md). Integration plan: [`onet-and-occupation-taxonomies.md`](./onet-and-occupation-taxonomies.md).
 
 ### Intended role
 

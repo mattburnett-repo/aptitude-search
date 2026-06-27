@@ -1,5 +1,8 @@
 # SERP and found_jobs URL filters for Stage 3 job discovery.
 # Edit lists here; loaded via config.toml [job_discovery].url_filters_file (relative to this package).
+#
+# skip_domains: exact hostname match (after stripping www.), e.g. medium.com blocks www.medium.com only.
+# skip_domain_suffixes: hostname equals entry or ends with ".entry", e.g. linkedin.com blocks ca.linkedin.com.
 
 skip_domains = [
   "baeldung.com",
@@ -14,7 +17,6 @@ skip_domains = [
   "freecodecamp.org",
   "geeksforgeeks.org",
   "hashnode.dev",
-  "linkedin.com",
   "medium.com",
   "react.dev",
   "reddit.com",
@@ -27,6 +29,11 @@ skip_domains = [
   "w3schools.com",
   "wikipedia.org",
   "youtube.com",
+]
+
+# Skip things like ca.linkedin.com
+skip_domain_suffixes = [
+  "linkedin.com",
 ]
 
 skip_path_markers = [

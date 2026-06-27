@@ -5,7 +5,7 @@ This module is not UI-only. It holds:
   Shared (both paths):
     flatten_embedding, normalize_embedding, embed_texts, vector_literal, …
 
-  Offline occupation corpus (called from data/ingest/build_occupation_embeddings.py):
+  Offline occupation corpus (called from data/embed/build_occupation_embeddings.py):
     embed_all_texts — O*NET occupation_profile text, no BGE query prefix.
 
   UI / pipeline runtime (called from pipeline after Stage 1):
@@ -34,6 +34,14 @@ from app.core.profile_text import labeled_names
 
 def _embedding_client() -> InferenceClient:
     return InferenceClient(api_key=config.embedding.model_key)
+
+
+def _coerce_hf_embedding(raw: object) -> object:
+    """HF InferenceClient returns np.ndarray when numpy is installed."""
+    tolist = getattr(raw, "tolist", None)
+    if callable(tolist):
+        return tolist()
+    return raw
 
 
 def _as_float_list(value: object) -> list[float] | None:
@@ -65,6 +73,7 @@ def _mean_pool_rows(rows: list[list[float]], *, expected_dim: int) -> list[float
 
 def flatten_embedding(raw: object, *, expected_dim: int) -> list[float]:
     """Normalize HF feature_extraction response shapes to a single vector."""
+    raw = _coerce_hf_embedding(raw)
     flat = _as_float_list(raw)
     if flat is not None:
         vector = flat
@@ -92,14 +101,14 @@ def _parse_embeddings(
     expected_dim: int,
     expected_count: int,
 ) -> list[list[float]]:
+    raw = _coerce_hf_embedding(raw)
     if expected_count == 1:
         return [flatten_embedding(raw, expected_dim=expected_dim)]
 
-    matrix = _as_float_matrix(raw)
-    if matrix is not None and len(matrix) == expected_count:
-        return [flatten_embedding(item, expected_dim=expected_dim) for item in matrix]
+    if isinstance(raw, list) and len(raw) == expected_count:
+        return [flatten_embedding(item, expected_dim=expected_dim) for item in raw]
 
-    length: int | str = len(cast(list[object], raw)) if isinstance(raw, list) else "n/a"
+    length: int | str = len(raw) if isinstance(raw, list) else "n/a"
     raise ValueError(f"batch embedding response length {length} != {expected_count}")
 
 
@@ -122,7 +131,7 @@ def embed_texts(
     texts: list[str],
     dimensions: int,
 ) -> list[list[float]]:
-    """Call HF feature_extraction; used by both ingest and embed_aptitude_profile."""
+    """Call HF feature_extraction; used by both embed and embed_aptitude_profile."""
     raw = cast(
         object,
         client.feature_extraction(texts, model=model),  # pyright: ignore[reportUnknownMemberType]
@@ -131,7 +140,7 @@ def embed_texts(
     return [normalize_embedding(vector) for vector in vectors]
 
 
-# --- Offline: occupation corpus ingest (not UI) ---
+# --- Offline: occupation corpus embed (not UI) ---
 
 
 def embed_all_texts(
@@ -142,7 +151,7 @@ def embed_all_texts(
     dimensions: int,
     batch_size: int,
 ) -> list[list[float]]:
-    """Batch embed passage texts (occupation corpus ingest; no BGE query prefix)."""
+    """Batch embed passage texts (occupation corpus embed; no BGE query prefix)."""
     vectors: list[list[float]] = []
     total = len(texts)
     for start in range(0, total, batch_size):

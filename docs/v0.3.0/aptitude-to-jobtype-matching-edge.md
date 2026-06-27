@@ -181,4 +181,4 @@ Embed the career-changer aptitude doc (`fixtures/example-outputs/career-changer-
 - [`../v0.2.0/aptitude_refinement/next-steps.md`](../v0.2.0/aptitude_refinement/next-steps.md) — definitions of done
 - [`../v0.2.0/aptitude_refinement/conversation-aptitude-matching-direction.md`](../v0.2.0/aptitude_refinement/conversation-aptitude-matching-direction.md) — aptitude-to-jobtype matching / job discovery / posting fit ranking framing
 
-Tools: `data/load-onet-postgres.sh`, `data/smoke_onet_postgres.py`, `data/ingest/build_occupation_embeddings.py`
+Tools: `data/load-onet-postgres.sh`, `data/smoke_onet_postgres.py`, `data/embed/build_occupation_embeddings.py`

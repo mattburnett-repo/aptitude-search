@@ -161,6 +161,28 @@ class EmbeddingConfig(BaseModel):
         return value
 
 
+class OnetMatchingConfig(BaseModel):
+    enabled: bool
+    top_k: int
+    min_similarity: float
+
+    @field_validator("top_k")
+    @classmethod
+    def top_k_positive(cls, value: int, info: ValidationInfo) -> int:
+        if value < 1:
+            field = info.field_name or "field"
+            raise ValueError(f"onet_matching.{field} must be at least 1")
+        return value
+
+    @field_validator("min_similarity")
+    @classmethod
+    def min_similarity_in_range(cls, value: float, info: ValidationInfo) -> float:
+        if value < 0.0 or value > 1.0:
+            field = info.field_name or "field"
+            raise ValueError(f"onet_matching.{field} must be between 0 and 1")
+        return value
+
+
 class OnetConfig(BaseModel):
     host: str
     port: int = 5432
@@ -241,6 +263,7 @@ class Config(BaseModel):
     llm: LlmConfig
     embedding: EmbeddingConfig
     onet: OnetConfig
+    onet_matching: OnetMatchingConfig
     job_discovery: JobDiscoveryConfig
     prompts: PromptsConfig
     schemas: SchemasConfig

@@ -22,4 +22,8 @@ config.toml
 # Other
 output/*
 data/**/*.zip
+data/download/*
+!data/download/README.md
+data/onet-load.log
+data/**/*.dump
 db/*

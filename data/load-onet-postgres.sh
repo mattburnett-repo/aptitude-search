@@ -8,6 +8,7 @@
 # Usage:
 #   ./data/load-onet-postgres.sh
 #   ONET_SKIP_EMBED=1 ./data/load-onet-postgres.sh   # load O*NET only, skip Hugging Face embed
+#   ONET_EMBED_ONLY=1 ./data/load-onet-postgres.sh   # load embed-required tables only (~18% of INSERTs)
 #   ONET_RESET_SCHEMA=0 ./data/load-onet-postgres.sh   # append without wipe
 #   ONET_VERBOSE=1 ./data/load-onet-postgres.sh        # show every INSERT line
 #   ONET_LOG_FILE=data/onet-load.log ./data/load-onet-postgres.sh
@@ -32,7 +33,19 @@ print(f'{config.onet.host}:{config.onet.port}/{config.onet.database}')
 ")"
 LOG_FILE="${ONET_LOG_FILE:-}"
 RESET_SCHEMA="${ONET_RESET_SCHEMA:-1}"
+EMBED_ONLY="${ONET_EMBED_ONLY:-0}"
 PSQL_QUIET=(-q)
+
+# FK-safe subset for occupation_profile_from_onet.sql (see data/docs/onet-embedding-required-tables.md).
+EMBED_ONLY_SQL_FILES=(
+  01_content_model_reference.sql
+  03_occupation_data.sql
+  04_scales_reference.sql
+  12_abilities.sql
+  24_essential_skills.sql
+  25_transferable_skills.sql
+  36_job_titles.sql
+)
 
 if [[ "${ONET_VERBOSE:-}" == "1" ]]; then
   PSQL_QUIET=()
@@ -55,7 +68,11 @@ fi
 
 echo "postgres: $ONET_CONNINFO_LABEL"
 echo "sql dir:  $SQL_DIR"
-echo "files:    $SQL_COUNT"
+if [[ "$EMBED_ONLY" == "1" ]]; then
+  echo "mode:     embed-only (${#EMBED_ONLY_SQL_FILES[@]} files)"
+else
+  echo "files:    $SQL_COUNT"
+fi
 echo "reset:    $RESET_SCHEMA"
 echo
 
@@ -104,20 +121,35 @@ run_psql() {
   fi
 }
 
-while IFS= read -r file; do
-  echo "==> $(basename "$file")"
-  run_psql "$file"
-done < <(find "$SQL_DIR" -maxdepth 1 -name '[0-9]*.sql' | sort -V)
+load_sql_files() {
+  if [[ "$EMBED_ONLY" == "1" ]]; then
+    local name
+    for name in "${EMBED_ONLY_SQL_FILES[@]}"; do
+      local file="${SQL_DIR}/${name}"
+      if [[ ! -f "$file" ]]; then
+        echo "error: embed-only file not found: $file" >&2
+        exit 1
+      fi
+      echo "==> ${name}"
+      run_psql "$file"
+    done
+    return
+  fi
+
+  while IFS= read -r file; do
+    echo "==> $(basename "$file")"
+    run_psql "$file"
+  done < <(find "$SQL_DIR" -maxdepth 1 -name '[0-9]*.sql' | sort -V)
+}
+
+load_sql_files
 
 echo
-"${SCRIPT_DIR}/ingest/create-occupation-embeddings-table.sh"
-
 if [[ "${ONET_SKIP_EMBED:-}" != "1" ]]; then
-  echo
   echo "==> build_occupation_embeddings.py"
-  "$PYTHON" "${SCRIPT_DIR}/ingest/build_occupation_embeddings.py"
+  "$PYTHON" "${SCRIPT_DIR}/embed/build_occupation_embeddings.py"
 else
-  echo
+  "${SCRIPT_DIR}/embed/create-occupation-embeddings-table.sh"
   echo "embed step skipped (ONET_SKIP_EMBED=1)"
 fi
 

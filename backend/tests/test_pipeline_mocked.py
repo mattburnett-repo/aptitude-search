@@ -9,6 +9,7 @@ from app.core.models import Constraints
 from app.core.validate import validate_stage
 from app.job_discovery.tool_observed_urls import ToolObservedUrlRegistry
 from app.pipeline import run_pipeline, run_stage3
+from app.role_family_plan import Stage2Result
 
 
 @pytest.fixture
@@ -44,7 +45,9 @@ def test_run_pipeline_wires_stages_and_validates_output(
     found_jobs: list[dict[str, object]],
 ) -> None:
     mock_complete_chat_json.return_value = stage1_fixture
-    mock_run_stage2.return_value = role_family_plan_fixture
+    mock_run_stage2.return_value = Stage2Result(
+        role_family_plan=role_family_plan_fixture,
+    )
     mock_run_job_discovery.return_value = found_jobs
     mock_synthesize.return_value = verified_matches_fixture
 

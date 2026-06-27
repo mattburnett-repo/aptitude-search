@@ -15,13 +15,27 @@ Requires `[llm.aptitude].model_key` in `backend/config.toml`. See [PROMPT-CONTRA
 
 ## Automated checks (offline, no live LLM)
 
-**Unit/integration tests** (mocked; no network):
+**Backend unit/integration tests** (mocked; no network):
 
 ```bash
 cd backend && pip install -r requirements-dev.txt && pytest
 ```
 
 `conftest.py` swaps in `config.test.toml` during tests.
+
+**Frontend unit tests** (Vitest + Testing Library; no network):
+
+```bash
+cd frontend && npm ci && npm test
+```
+
+Typecheck and production build (also run in CI):
+
+```bash
+cd frontend && npm run build
+```
+
+GitHub Actions: **Backend tests** (`backend-tests.yml`) and **Frontend tests** (`frontend-tests.yml`) on path-filtered push/PR.
 
 **Stage 1 golden fixture:**
 

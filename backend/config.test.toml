@@ -41,6 +41,11 @@ user = "test"
 password = "test"
 sslmode = "disable"
 
+[onet_matching]
+enabled = false
+top_k = 8
+min_similarity = 0.0
+
 [job_discovery]
 url_filters_file = "url-filters.toml"
 discovery_query_max = 6

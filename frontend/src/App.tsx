@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AptitudeProfileDisplay } from "./components/AptitudeProfileDisplay";
+import { OccupationMatchesDisplay } from "./components/OccupationMatchesDisplay";
+import { RoleFamilyPlanDisplay } from "./components/RoleFamilyPlanDisplay";
 import {
   defaultConstraints,
   OptionalConstraints,
@@ -111,8 +113,8 @@ export default function App() {
         <li>Upload resume file, or copy/paste.</li>
         <li>Click &apos;Go&apos;.</li>
         <li>
-          LLMs will assess aptitudes based on resume contents, then run job
-          searches based on these aptitudes.
+          LLMs assess aptitudes from your resume; O*NET matching and a role
+          family plan guide job search.
         </li>
       </ul>
 
@@ -142,6 +144,8 @@ export default function App() {
       {result && (
         <>
           <AptitudeProfileDisplay profile={result.aptitude_profile} />
+          <OccupationMatchesDisplay matches={result.occupation_matches} />
+          <RoleFamilyPlanDisplay plan={result.role_family_plan} />
           <VerifiedMatchesDisplay matches={result.verified_matches} />
         </>
       )}

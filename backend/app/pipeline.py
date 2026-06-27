@@ -130,16 +130,19 @@ def run_pipeline(
 ) -> dict[str, JsonObject]:
     emit_progress("Starting pipeline…", on_progress=on_progress)
     aptitude_profile = run_stage1(resume, on_progress=on_progress)
-    role_family_plan = run_stage2(aptitude_profile, on_progress=on_progress)
+    stage2 = run_stage2(aptitude_profile, on_progress=on_progress)
     verified_matches = run_stage3(
         aptitude_profile,
         constraints,
-        role_family_plan=role_family_plan,
+        role_family_plan=stage2.role_family_plan,
         on_progress=on_progress,
     )
     emit_progress("Pipeline complete.", on_progress=on_progress)
     return {
         "aptitude_profile": aptitude_profile,
-        "role_family_plan": role_family_plan,
+        "role_family_plan": stage2.role_family_plan,
+        "occupation_matches": [
+            match.to_json() for match in stage2.occupation_matches
+        ],
         "verified_matches": verified_matches,
     }

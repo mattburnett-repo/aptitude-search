@@ -86,6 +86,10 @@ def should_skip_job_title(title: str) -> bool:
     return any(phrase in title_lower for phrase in filters.skip_title_phrases)
 
 
+def _host_matches_domain_suffix(host: str, domain: str) -> bool:
+    return host == domain or host.endswith(f".{domain}")
+
+
 def should_skip_search_result(href: str, *, title: str = "") -> bool:
     """True when a SERP row is unlikely to be a job or careers posting."""
     filters = load_url_filters()
@@ -104,6 +108,12 @@ def should_skip_search_result(href: str, *, title: str = "") -> bool:
     path_lower = (parsed.path or "").lower()
 
     if host in filters.skip_domains:
+        return True
+
+    if any(
+        _host_matches_domain_suffix(host, domain)
+        for domain in filters.skip_domain_suffixes
+    ):
         return True
 
     if host == "github.com" and not any(

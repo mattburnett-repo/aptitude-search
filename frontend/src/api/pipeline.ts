@@ -1,8 +1,15 @@
 const API_BASE = (import.meta.env.VITE_API_URL ?? "/api").replace(/\/$/, "");
 
+export type OccupationMatch = {
+  onetsoc_code: string;
+  title: string;
+  score: number;
+};
+
 export type PipelineResult = {
   aptitude_profile: unknown;
-  role_family_plan?: unknown;
+  role_family_plan: unknown;
+  occupation_matches: OccupationMatch[];
   verified_matches: unknown;
 };
 

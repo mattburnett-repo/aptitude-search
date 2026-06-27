@@ -6,9 +6,9 @@ Related: `[onet-and-occupation-taxonomies.md](./onet-and-occupation-taxonomies.m
 
 ---
 
-## 1. O*NET in this project todays
+## 1. O*NET in this project today
 
-**Documented, not implemented.** The repo has a clear plan in `onet-and-occupation-taxonomies.md`; there is no O*NET code, config, or committed `data/` corpus yet (`data/`* is gitignored). The changelog calls this out explicitly.
+**Implemented (offline data pipeline).** O*NET 30.3 loads into Postgres via `data/load-onet-postgres.sh`; occupation vectors are built by `data/embed/build_occupation_embeddings.py`. Entry point: [`data/README.md`](../../data/README.md). Integration plan: `onet-and-occupation-taxonomies.md`.
 
 ### Intended role
 
@@ -32,8 +32,9 @@ O*NET answers “what kinds of work fit?” Job discovery answers “what’s op
 
 ### What exists in code today
 
-- `**role_family_plan*`* is real: LLM-generated in Stage 2, used in discovery query planning and fit scoring (`aptitude_fit.py`, `discovery.py`).
-- No O*NET API key in config, no occupation data store, no embedding index.
+- **`role_family_plan`** is real: LLM-generated in Stage 2, used in discovery query planning and fit scoring (`aptitude_fit.py`, `discovery.py`).
+- **O*NET Postgres load + occupation embeddings:** `data/load-onet-postgres.sh`, `data/embed/build_occupation_embeddings.py`, `[onet]` and `[embedding]` in `backend/config.toml`.
+- **Pipeline wiring** of embed search against `occupation_embeddings` may still be in progress; see `aptitude-to-jobtype-matching-edge.md`.
 
 Discovery does not search O*NET directly. It searches the **web** using short hiring-shaped strings built from `search_terms` on the role family plan (`backend/app/job_discovery/discovery.py`). O*NET embeddings sit **upstream**: aptitude profile → vector match → occupation titles / alternate titles → those become (or feed) `search_terms` → existing Stage 3 runs unchanged.
 
@@ -216,7 +217,7 @@ Stage 2 today also produces `work_modes`, `avoid_terms`, and `fit_reason` — us
 
 ## 4. O*NET 30.3 MySQL dump (`data/download/db_30_3_mysql/`)
 
-Local path (gitignored): `data/download/db_30_3_mysql/` — **45 MySQL-format SQL scripts**, ~284 MB uncompressed. Official docs: [O*NET 30.3 MySQL dictionary](https://www.onetcenter.org/dictionary/30.3/mysql/).
+Local path (not in git): `data/download/db_30_3_mysql/` — **45 MySQL-format SQL scripts**, ~284 MB uncompressed. Download: [data/download/README.md](../../data/download/README.md). Official docs: [O*NET 30.3 MySQL dictionary](https://www.onetcenter.org/dictionary/30.3/mysql/).
 
 **Yes — each file creates one table and bulk-loads it with `INSERT` rows.** Together they are the full O*NET 30.3 relational database.
 

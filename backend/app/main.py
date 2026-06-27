@@ -22,6 +22,7 @@ from app.core.request_context import (
 )
 from app.core.resume_io import parse_pipeline_body
 from app.core.stream_pipeline import stream_pipeline_response
+from app.onet.match import matches_to_json
 from app.pipeline import run_pipeline, run_stage1, run_stage3
 from app.role_family_plan import run_stage2
 
@@ -130,7 +131,11 @@ def stage1(body: Stage1Request):
 
 @app.post("/v1/stages/2", tags=["Pipeline Stages"])
 def stage2(body: Stage2Request):
-    return {"role_family_plan": run_stage2(body.aptitude_profile)}
+    result = run_stage2(body.aptitude_profile)
+    return {
+        "role_family_plan": result.role_family_plan,
+        "occupation_matches": matches_to_json(list(result.occupation_matches)),
+    }
 
 
 @app.post("/v1/stages/3", tags=["Pipeline Stages"])

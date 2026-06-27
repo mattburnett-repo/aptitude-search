@@ -514,6 +514,95 @@ button.theme-toggle:hover {
   letter-spacing: 0.03em;
 }
 
+.stage2-lead {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  color: var(--color-muted);
+}
+
+.stage2-empty {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.occupation-match-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.occupation-match-item {
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--color-field-border);
+}
+
+.occupation-match-item:last-child {
+  border-bottom: none;
+}
+
+.occupation-match-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.occupation-match-title {
+  font-weight: 600;
+}
+
+.occupation-match-score {
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted);
+}
+
+.occupation-match-code {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+
+.role-family-plan {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.role-family-card + .role-family-card {
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-field-border);
+}
+
+.role-family-fit-reason {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+}
+
+.role-family-tags {
+  margin-top: 0.5rem;
+}
+
+.role-family-tags-label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.role-family-tag-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.9rem;
+}
+
+.role-family-tag-list li + li {
+  margin-top: 0.15rem;
+}
+
 .aptitude-item-list,
 .aptitude-rationale,
 .aptitude-confidence-map {
@@ -875,4 +964,57 @@ button.theme-toggle:hover {
 .verified-matches.verified-matches--pdf-export .confidence-low {
   color: #a50e0e;
   background: #fce8e6;
+}
+
+/* PDF export: role family plan — light, high-contrast rendering */
+.role-family-plan.role-family-plan--pdf-export {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  color: #202124;
+  background: #ffffff;
+}
+
+.role-family-plan.role-family-plan--pdf-export .aptitude-section-title,
+.role-family-plan.role-family-plan--pdf-export .role-family-tags-label {
+  color: #3c4043;
+}
+
+.role-family-plan.role-family-plan--pdf-export .role-family-fit-reason,
+.role-family-plan.role-family-plan--pdf-export .role-family-tag-list,
+.role-family-plan.role-family-plan--pdf-export .aptitude-rationale li {
+  color: #202124;
+}
+
+.role-family-plan.role-family-plan--pdf-export .role-family-card + .role-family-card,
+.role-family-plan.role-family-plan--pdf-export .aptitude-rationale-section {
+  border-top-color: #dadce0;
+}
+
+.role-family-plan.role-family-plan--pdf-export .aptitude-rationale li::before {
+  color: #202124;
+}
+
+/* PDF export: O*NET occupation matches — light, high-contrast rendering */
+.occupation-matches.occupation-matches--pdf-export {
+  color: #202124;
+  background: #ffffff;
+}
+
+.occupation-matches.occupation-matches--pdf-export .stage2-lead {
+  margin: 0 0 0.75rem;
+  color: #3c4043;
+}
+
+.occupation-matches.occupation-matches--pdf-export .occupation-match-title {
+  color: #202124;
+}
+
+.occupation-matches.occupation-matches--pdf-export .occupation-match-score,
+.occupation-matches.occupation-matches--pdf-export .occupation-match-code {
+  color: #3c4043;
+}
+
+.occupation-matches.occupation-matches--pdf-export .occupation-match-item {
+  border-bottom-color: #dadce0;
 }

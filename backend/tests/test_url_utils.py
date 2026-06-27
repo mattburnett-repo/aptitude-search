@@ -52,6 +52,12 @@ def test_should_skip_search_result_filters_list_pages():
         )
         is True
     )
+    assert (
+        should_skip_search_result(
+            "https://ca.linkedin.com/jobs/full-stack-developer-jobs-toronto-on"
+        )
+        is True
+    )
     assert should_skip_search_result("https://www.ziprecruiter.com/Jobs/Remote") is True
     assert should_skip_search_result("https://www.upwork.com/freelance-jobs/") is True
 

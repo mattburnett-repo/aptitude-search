@@ -1,0 +1,121 @@
+name: O*NET Postgres smoke test
+
+# Manual integration test against a Postgres instance with O*NET already loaded.
+# Configure repository secrets or vars before running:
+#   ONET_HOST, ONET_PORT, ONET_DATABASE, ONET_USER, ONET_PASSWORD, ONET_SSLMODE
+
+on:
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements-dev.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Write config.toml from secrets
+        env:
+          ONET_HOST: ${{ secrets.ONET_HOST }}
+          ONET_PORT: ${{ secrets.ONET_PORT }}
+          ONET_DATABASE: ${{ secrets.ONET_DATABASE }}
+          ONET_USER: ${{ secrets.ONET_USER }}
+          ONET_PASSWORD: ${{ secrets.ONET_PASSWORD }}
+          ONET_SSLMODE: ${{ secrets.ONET_SSLMODE }}
+        run: |
+          if [[ -z "$ONET_HOST" || -z "$ONET_DATABASE" ]]; then
+            echo "Set ONET_* repository secrets before running this workflow." >&2
+            exit 1
+          fi
+          cat > config.toml <<EOF
+          [app]
+          title = "aptitude-search-api"
+          version = "1.0.0"
+          service = "aptitude-search-api"
+
+          [cors]
+          allow_origins = ["http://localhost:5173"]
+          allow_credentials = true
+          allow_methods = ["*"]
+          allow_headers = ["*"]
+
+          [llm.aptitude]
+          model_key = "ci-placeholder"
+          model = "ci-placeholder"
+          temperature = 0.3
+          max_tokens = 8192
+
+          [llm.job_discovery]
+          model_key = "ci-placeholder"
+          model = "ci-placeholder"
+          temperature = 0.0
+          visit_max_output_length = 8000
+          search_max_results = 10
+          search_scrape_max = 3
+          search_snippet_max_chars = 300
+          page_summary_max_chars = 1500
+          page_bullet_max_count = 8
+          page_snippet_max_chars = 400
+
+          [embedding]
+          model_key = "ci-placeholder"
+          model = "BAAI/bge-large-en-v1.5"
+          dimensions = 1024
+
+          [onet_matching]
+          enabled = false
+          top_k = 8
+          min_similarity = 0.0
+
+          [onet]
+          host = "${ONET_HOST}"
+          port = ${ONET_PORT:-5432}
+          database = "${ONET_DATABASE}"
+          user = "${ONET_USER}"
+          password = "${ONET_PASSWORD}"
+          sslmode = "${ONET_SSLMODE:-require}"
+
+          [job_discovery]
+          url_filters_file = "url-filters.toml"
+          discovery_query_max = 6
+          aptitude_fit_min_score = 1
+          aptitude_fit_min_results = 2
+
+          [prompts]
+          stage1_file = "01-resume-to-aptitude-profile.md"
+          stage2_file = "02-role-family-plan.md"
+          stage3_synthesis_file = "03-job-discovery-synthesis.md"
+          stage1_user_task_file = "stage1-agent-user-task.txt"
+          stage2_user_task_file = "role-family-plan-user-task.txt"
+          stage3_synthesis_user_task_file = "stage3-synthesis-user-task.txt"
+
+          [schemas]
+          constraints = "constraints.schema.json"
+          aptitude_profile = "aptitude-profile.schema.json"
+          role_family_plan = "role-family-plan.schema.json"
+          job_discovery_results = "job-discovery-results.schema.json"
+
+          [paths]
+          prompts_dir = "prompts"
+          schemas_dir = "schemas"
+          fixtures_example_outputs_dir = "fixtures/example-outputs"
+          EOF
+
+      - name: Install psql client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Run O*NET smoke test
+        run: ONET_SMOKE_TEST=1 pytest tests/test_onet_smoke.py -v

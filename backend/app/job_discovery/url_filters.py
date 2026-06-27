@@ -16,6 +16,7 @@ _JOB_DISCOVERY_DIR = Path(__file__).resolve().parent
 @dataclass(frozen=True)
 class UrlFilters:
     skip_domains: frozenset[str]
+    skip_domain_suffixes: tuple[str, ...]
     skip_path_markers: tuple[str, ...]
     skip_listing_path_markers: tuple[str, ...]
     skip_listing_path_markers_case_sensitive: tuple[str, ...]
@@ -41,6 +42,12 @@ def load_url_filters() -> UrlFilters:
         data = tomllib.load(f)
     return UrlFilters(
         skip_domains=frozenset(_as_str_list(data.get("skip_domains"), field="skip_domains")),
+        skip_domain_suffixes=tuple(
+            _as_str_list(
+                data.get("skip_domain_suffixes"),
+                field="skip_domain_suffixes",
+            )
+        ),
         skip_path_markers=tuple(
             _as_str_list(data.get("skip_path_markers"), field="skip_path_markers")
         ),

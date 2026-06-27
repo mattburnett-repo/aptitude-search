@@ -6,6 +6,8 @@ import { runPipelineStream } from "../../src/api/pipeline";
 import { readFileAsBase64 } from "../../src/lib/readFileAsBase64";
 import { usePipeline } from "../../src/hooks/usePipeline";
 import stage1Profile from "../../../fixtures/example-outputs/career-changer-mixed-stack-stage1.json";
+import roleFamilyPlan from "../../../fixtures/example-outputs/career-changer-role-family-plan.json";
+import occupationMatches from "../fixtures/sample-occupation-matches.json";
 import verifiedMatches from "../fixtures/sample-verified-matches.json";
 
 vi.mock("../../src/api/pipeline", () => ({
@@ -24,6 +26,8 @@ describe("usePipeline", () => {
   it("posts text resume and constraints, then stores the result", async () => {
     const pipelineResult = {
       aptitude_profile: stage1Profile,
+      role_family_plan: roleFamilyPlan,
+      occupation_matches: occupationMatches,
       verified_matches: verifiedMatches,
     };
     vi.mocked(runPipelineStream).mockImplementation(async (_body, onProgress) => {
@@ -65,6 +69,8 @@ describe("usePipeline", () => {
     vi.mocked(readFileAsBase64).mockResolvedValue("encoded-pdf");
     vi.mocked(runPipelineStream).mockResolvedValue({
       aptitude_profile: stage1Profile,
+      role_family_plan: roleFamilyPlan,
+      occupation_matches: occupationMatches,
       verified_matches: verifiedMatches,
     });
 
