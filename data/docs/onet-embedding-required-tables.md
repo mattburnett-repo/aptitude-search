@@ -17,4 +17,4 @@ Tables required to build occupation profile text for `data/embed/build_occupatio
 
 Load only these files locally: `ONET_EMBED_ONLY=1 ./data/load-onet-postgres.sh` (see [../README.md](../README.md)).
 
-See [db_30_3_mysql-insert-counts.md](db_30_3_mysql-insert-counts.md) for full O*NET INSERT counts.
+See [db_30_3_mysql-insert-counts.md](db_30_3_mysql-insert-counts.md) for full O\*NET INSERT counts.

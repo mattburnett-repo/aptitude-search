@@ -1,17 +1,17 @@
-# Aptitude-to-jobtype matching edge: Stage 1 aptitude ↔ O*NET occupations
+# Aptitude-to-jobtype matching edge: Stage 1 aptitude ↔ O\*NET occupations
 
-Where the vector-matching boundary sits in a large O*NET schema, and which fields participate on each side. Complements [`onet-and-occupation-taxonomies.md`](./onet-and-occupation-taxonomies.md) and [`aptitude-embedding-summary.md`](./aptitude-embedding-summary.md).
+Where the vector-matching boundary sits in a large O\*NET schema, and which fields participate on each side. Complements [`onet-and-occupation-taxonomies.md`](./onet-and-occupation-taxonomies.md) and [`aptitude-embedding-summary.md`](./aptitude-embedding-summary.md).
 
 ---
 
 ## The edge (one sentence)
 
-**One Stage 1 aptitude document ↔ one O*NET occupation (`onetsoc_code`), compared by embedding similarity.**
+**One Stage 1 aptitude document ↔ one O\*NET occupation (`onetsoc_code`), compared by embedding similarity.**
 
-Not every table row. Not every rating. **~1,016 occupation nodes** on the O*NET side; **one composed profile** on the aptitude side per pipeline run.
+Not every table row. Not every rating. **~1,016 occupation nodes** on the O\*NET side; **one composed profile** on the aptitude side per pipeline run.
 
 ```
-Stage 1 AptitudeProfile          aptitude-to-jobtype          O*NET occupation
+Stage 1 AptitudeProfile          aptitude-to-jobtype          O\*NET occupation
                                  matching (vector)
 ────────────────────────         ────────────────          ──────────────────
 strengths                    ──►  embed as prose    ◄──►  description
@@ -42,7 +42,7 @@ From `schemas/aptitude-profile.schema.json` and career-changer fixtures, fields 
 | **`working_style_signals`** | **Yes — primary** | How they like to work; pairs with work activities / context |
 | **`aptitude_summary`** | **Yes — glue** | Short narrative tying signals together |
 | **`adjacent_roles`** | **Weak on embed side** | Market titles; better as validation or title crosswalk after SOC match |
-| **`domains`** | **Optional** | Industry context; O*NET has no clean industry node |
+| **`domains`** | **Optional** | Industry context; O\*NET has no clean industry node |
 | **`core_skills` / `secondary_skills`** | **No as primary** | “Python/Django” → keyword matching in vector form |
 | **`seniority_band`** | **Filter, not embed** | Maps to `job_zones`, not similarity |
 | **`rationale`** | **No** | Meta for humans/LLM |
@@ -59,7 +59,7 @@ Embed once per pipeline run.
 
 ---
 
-## O*NET: what goes on the other side of the edge
+## O\*NET: what goes on the other side of the edge
 
 The natural **retrieval unit** is `occupation_data` — one row per SOC code.
 
@@ -69,7 +69,7 @@ JOIN content_model_reference cmr ON cmr.element_id = wa.element_id
 WHERE wa.onetsoc_code = '...' AND wa.scale_id = 'IM'
 ```
 
-| O*NET source | On the embedding edge? | Role |
+| O\*NET source | On the embedding edge? | Role |
 |--------------|------------------------|------|
 | **`occupation_data.description`** | **Yes — primary** | What this kind of work is |
 | **`work_activities` (top IM)** + **`content_model_reference`** | **Yes — primary** | What you do — aligns with strengths |
@@ -79,7 +79,7 @@ WHERE wa.onetsoc_code = '...' AND wa.scale_id = 'IM'
 | **`work_styles`** | **Later** | Could augment explainability or second-pass filter |
 | **`tasks` / `work_context`** | **Later / optional** | Finer grain; heavy; not first edge |
 
-**O*NET-side text** (precomputed, one doc per `onetsoc_code`):
+**O\*NET-side text** (precomputed, one doc per `onetsoc_code`):
 
 ```text
 Title: Software Developers
@@ -110,7 +110,7 @@ The **edge is occupation-level**, built by **rolling up** joins into prose on ea
 
 Vector search returns **SOC codes + scores**. Relational data does the rest:
 
-| After match | O*NET table | Pipeline use |
+| After match | O\*NET table | Pipeline use |
 |-------------|-------------|--------------|
 | Search strings | `job_titles` | `search_terms` → Stage 3 |
 | Adjacent roles | `related_occupations` | Expand / diversify families |
@@ -122,9 +122,9 @@ Stage 2 LLM can **augment** this (curated role families, market titles) rather t
 
 Maps to existing Stage 2 plan fields ([`onet-and-occupation-taxonomies.md`](./onet-and-occupation-taxonomies.md)):
 
-| role_family plan | O*NET equivalent |
+| role_family plan | O\*NET equivalent |
 |------------------|------------------|
-| role_family | O*NET-SOC title + occupational family |
+| role_family | O\*NET-SOC title + occupational family |
 | work_modes | Work activities / generalized work activities |
 | search_terms | Alternate titles + related occupations |
 | avoid_terms | Low-scoring / crosswalked-out occupations |
@@ -160,7 +160,7 @@ OUTPUT:     List[(onetsoc_code, score)]
 - **`f(...)`** — built at runtime from Stage 1 JSON.
 - **`related_occupations` / full `job_titles`** — read from SQL after top-K, not embedded as separate nodes.
 
-O*NET alone won't cover market titles (“Platform Engineer”, “RevOps”) — curated `role_family` rows sit **alongside** occupation vectors in the same index ([`onet-and-occupation-taxonomies.md`](./onet-and-occupation-taxonomies.md)).
+O\*NET alone won't cover market titles (“Platform Engineer”, “RevOps”) — curated `role_family` rows sit **alongside** occupation vectors in the same index ([`onet-and-occupation-taxonomies.md`](./onet-and-occupation-taxonomies.md)).
 
 ---
 

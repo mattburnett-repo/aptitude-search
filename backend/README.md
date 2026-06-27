@@ -1,6 +1,6 @@
 # Aptitude Search API (Python / FastAPI)
 
-Orchestration for **Stage 1** (aptitude profile), **Stage 2** (O*NET vector match + role family plan), and **Stage 3** (plan-driven search → aptitude fit ranking → synthesis → `verified_matches` JSON, schema-validated).
+Orchestration for **Stage 1** (aptitude profile), **Stage 2** (O\*NET vector match + role family plan), and **Stage 3** (plan-driven search → aptitude fit ranking → synthesis → `verified_matches` JSON, schema-validated).
 
 **Hugging Face keys** in `config.toml`:
 
@@ -9,7 +9,7 @@ Orchestration for **Stage 1** (aptitude profile), **Stage 2** (O*NET vector matc
 - **Stage 3 discovery:** Python builds queries from the role family plan `search_terms` (fallback: profile `adjacent_roles` / `domains` / skills) and runs `search_job_postings` (`[job_discovery].discovery_query_max`). No LLM for discovery.
 - **Stage 3 fit:** Python ranks/filters scraped jobs by work-pattern fit (`aptitude_fit.py`; `[job_discovery].aptitude_fit_min_score`). No LLM.
 - **Stage 3 synthesis:** `[llm.job_discovery].model_key` + `[llm.job_discovery].model` + `[llm.job_discovery].temperature` — maps ranked `found_jobs` to verified matches JSON.
-- **O*NET matching (Stage 2):** `[onet_matching]` in `config.toml` (required) — embeds the Stage 1 profile (`[embedding]`), queries `occupation_embeddings` via `[onet]` + pgvector, and grounds the Stage 2 LLM. Requires offline load: [`data/README.md`](../data/README.md).
+- **O\*NET matching (Stage 2):** `[onet_matching]` in `config.toml` (required) — embeds the Stage 1 profile (`[embedding]`), queries `occupation_embeddings` via `[onet]` + pgvector, and grounds the Stage 2 LLM. Requires offline load: [`data/README.md`](../data/README.md).
 
 See **[PROMPT-CONTRACT](../docs/PROMPT-CONTRACT.md)** for the full pipeline.
 
@@ -57,13 +57,13 @@ pytest
 
 During tests, `conftest.py` then swaps in `config.test.toml` so runs stay mocked and offline (no network or live API keys). Also run `scripts/validate_fixtures.py` for golden fixture schema checks.
 
-**O*NET Postgres smoke** (optional integration; skipped unless enabled):
+**O\*NET Postgres smoke** (optional integration; skipped unless enabled):
 
 ```bash
 ONET_SMOKE_TEST=1 pytest tests/test_onet_smoke.py -v
 ```
 
-Requires `config.toml` with a loaded O*NET database (`[onet]`). See [`data/README.md`](../data/README.md). GitHub Actions: workflow **O*NET Postgres smoke test** (`workflow_dispatch`, `ONET_*` secrets).
+Requires `config.toml` with a loaded O\*NET database (`[onet]`). See [`data/README.md`](../data/README.md). GitHub Actions: workflow **O\*NET Postgres smoke test** (`workflow_dispatch`, `ONET_*` secrets).
 
 ## Endpoints
 

@@ -1,10 +1,10 @@
-# O*NET 30.3 SQL download
+# O\*NET 30.3 SQL download
 
 The MySQL-format SQL dumps are **not stored in git** (~300 MB, ~1.2M INSERTs). Download them locally before running `./data/load-onet-postgres.sh`.
 
 ## Download
 
-1. Go to the [O*NET 30.3 MySQL dictionary](https://www.onetcenter.org/dictionary/30.3/mysql/).
+1. Go to the [O\*NET 30.3 MySQL dictionary](https://www.onetcenter.org/dictionary/30.3/mysql/).
 2. Download the database release (zip).
 3. Extract so numbered SQL files land here:
 
@@ -20,4 +20,4 @@ data/download/db_30_3_mysql/
 
 ## License
 
-O*NET® content is © U.S. Department of Labor, Employment and Training Administration, licensed under [CC BY 4.0](https://www.onetcenter.org/license_db.html). See root [README.md](../../README.md#third-party-data).
+O\*NET® content is © U.S. Department of Labor, Employment and Training Administration, licensed under [CC BY 4.0](https://www.onetcenter.org/license_db.html). See root [README.md](../../README.md#third-party-data).

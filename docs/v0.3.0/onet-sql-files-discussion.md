@@ -1,29 +1,29 @@
-# O*NET design thread
+# O\*NET design thread
 
-Continuous notes from a June 2026 conversation on using O*NET in aptitude-search: project fit, what the dataset provides, proposed implementation steps, and the local MySQL dump layout.
+Continuous notes from a June 2026 conversation on using O\*NET in aptitude-search: project fit, what the dataset provides, proposed implementation steps, and the local MySQL dump layout.
 
 Related: `[onet-and-occupation-taxonomies.md](./onet-and-occupation-taxonomies.md)` (integration plan), `[aptitude-embedding-summary.md](./aptitude-embedding-summary.md)` (semantic matching direction), `[onet_NOTES.md](./onet_NOTES.md)` (links and intro).
 
 ---
 
-## 1. O*NET in this project today
+## 1. O\*NET in this project today
 
-**Implemented (offline data pipeline).** O*NET 30.3 loads into Postgres via `data/load-onet-postgres.sh`; occupation vectors are built by `data/embed/build_occupation_embeddings.py`. Entry point: [`data/README.md`](../../data/README.md). Integration plan: `onet-and-occupation-taxonomies.md`.
+**Implemented (offline data pipeline).** O\*NET 30.3 loads into Postgres via `data/load-onet-postgres.sh`; occupation vectors are built by `data/embed/build_occupation_embeddings.py`. Entry point: [`data/README.md`](../../data/README.md). Integration plan: `onet-and-occupation-taxonomies.md`.
 
 ### Intended role
 
-O*NET is meant for **aptitude-to-jobtype matching** — matching aptitudes derived from the resume to job types, not live job postings.
+O\*NET is meant for **aptitude-to-jobtype matching** — matching aptitudes derived from the resume to job types, not live job postings.
 
 - **Stage 1** produces an aptitude profile.
-- **Aptitude-to-jobtype matching** (planned): embed profile vs a stable occupation index (O*NET + curated `role_family` descriptions).
+- **Aptitude-to-jobtype matching** (planned): embed profile vs a stable occupation index (O\*NET + curated `role_family` descriptions).
 - **Stage 2** uses those matches to drive `search_terms` / `role_family_plan`.
 - **Stage 3** stays as-is: web search for live postings.
 
-O*NET answers “what kinds of work fit?” Job discovery answers “what’s open right now?”
+O\*NET answers “what kinds of work fit?” Job discovery answers “what’s open right now?”
 
 ### Why the docs favor it
 
-~1,000 normalized SOC occupations with summaries, work activities, alternate titles — good for explainable, career-adjacent matching. Weak on market titles (“Staff Platform Engineer”), so the plan is **O*NET bootstrap + curated role families on top**.
+~1,000 normalized SOC occupations with summaries, work activities, alternate titles — good for explainable, career-adjacent matching. Weak on market titles (“Staff Platform Engineer”), so the plan is **O\*NET bootstrap + curated role families on top**.
 
 ### Integration paths
 
@@ -33,30 +33,30 @@ O*NET answers “what kinds of work fit?” Job discovery answers “what’s op
 ### What exists in code today
 
 - **`role_family_plan`** is real: LLM-generated in Stage 2, used in discovery query planning and fit scoring (`aptitude_fit.py`, `discovery.py`).
-- **O*NET Postgres load + occupation embeddings:** `data/load-onet-postgres.sh`, `data/embed/build_occupation_embeddings.py`, `[onet]` and `[embedding]` in `backend/config.toml`.
+- **O\*NET Postgres load + occupation embeddings:** `data/load-onet-postgres.sh`, `data/embed/build_occupation_embeddings.py`, `[onet]` and `[embedding]` in `backend/config.toml`.
 - **Pipeline wiring** of embed search against `occupation_embeddings` may still be in progress; see `aptitude-to-jobtype-matching-edge.md`.
 
-Discovery does not search O*NET directly. It searches the **web** using short hiring-shaped strings built from `search_terms` on the role family plan (`backend/app/job_discovery/discovery.py`). O*NET embeddings sit **upstream**: aptitude profile → vector match → occupation titles / alternate titles → those become (or feed) `search_terms` → existing Stage 3 runs unchanged.
+Discovery does not search O\*NET directly. It searches the **web** using short hiring-shaped strings built from `search_terms` on the role family plan (`backend/app/job_discovery/discovery.py`). O\*NET embeddings sit **upstream**: aptitude profile → vector match → occupation titles / alternate titles → those become (or feed) `search_terms` → existing Stage 3 runs unchanged.
 
 ---
 
-## 2. What O*NET provides
+## 2. What O\*NET provides
 
-O*NET (Occupational Information Network) is a **US government occupational research database** — not a job board, not live hiring data. It describes ~1,000 standardized occupations and what work in each one typically involves.
+O\*NET (Occupational Information Network) is a **US government occupational research database** — not a job board, not live hiring data. It describes ~1,000 standardized occupations and what work in each one typically involves.
 
 
 |              |                                                                           |
 | ------------ | ------------------------------------------------------------------------- |
 | **Sponsor**  | US Dept. of Labor (ETA)                                                   |
 | **Purpose**  | Shared vocabulary for describing jobs, workers, and labor-market context  |
-| **Taxonomy** | **O*NET-SOC** — roughly **1,016 occupations** (current release: **30.3**) |
+| **Taxonomy** | **O\*NET-SOC** — roughly **1,016 occupations** (current release: **30.3**) |
 | **Updates**  | Quarterly data refreshes; major content-model changes periodically        |
 | **License**  | Bulk database is **CC BY 4.0** (free to use with attribution)             |
 
 
 Think of it as a **structured encyclopedia of occupations**, not a feed of open roles.
 
-Official overview: [O*NET Content Model](https://www.onetcenter.org/content.html) · Database: [O*NET 30.3 Database](https://www.onetcenter.org/database.html)
+Official overview: [O\*NET Content Model](https://www.onetcenter.org/content.html) · Database: [O\*NET 30.3 Database](https://www.onetcenter.org/database.html)
 
 ### Mental model: Worker → Job → Market
 
@@ -72,7 +72,7 @@ Everything hangs off the **Content Model** — a hierarchy of variables with def
 
 ### The occupation spine
 
-Every row is keyed by **O*NET-SOC code** (e.g. `15-1252.00` = Software Developers).
+Every row is keyed by **O\*NET-SOC code** (e.g. `15-1252.00` = Software Developers).
 
 Per occupation:
 
@@ -99,13 +99,13 @@ Per occupation:
 
 ### Linkages & crosswalks
 
-Relationship tables connect abilities, skills, and work styles to work activities and work context. **Crosswalks** map O*NET-SOC to SOC, DOT, military MOS, ESCO, education programs, Occupational Outlook Handbook, etc.
+Relationship tables connect abilities, skills, and work styles to work activities and work context. **Crosswalks** map O\*NET-SOC to SOC, DOT, military MOS, ESCO, education programs, Occupational Outlook Handbook, etc.
 
 ### Access paths
 
 1. **Bulk download** — tab-delimited, Excel, or SQL (MySQL/PostgreSQL/SQL Server)
 2. **Web Services API** — [services.onetcenter.org](https://services.onetcenter.org/), JSON REST, always current DB
-3. **Human-facing sites** — O*NET OnLine, My Next Move
+3. **Human-facing sites** — O\*NET OnLine, My Next Move
 4. **Machine-readable taxonomies** — JSON-LD competency frameworks (CTDL/ASN)
 
 ### Scale (release 30.3)
@@ -132,7 +132,7 @@ Large relationally, **small as a search index** (~1k embeddable documents).
 
 ```text
 Title: Software Developers
-Summary: [O*NET description]
+Summary: [O\*NET description]
 Work activities: [top N by importance, as prose]
 Alternate titles: [sample from Job Titles]
 ```
@@ -179,7 +179,7 @@ Project docs:
 > Don’t embed skill checklists alone — that recreates keyword search in vector form.  
 > Weight work activities + description higher than raw Skills tables.
 
-**Abilities** in O*NET are occupation *requirement ratings* (`Oral Comprehension`, `Deductive Reasoning`), not a narrative of what the work is like. They align poorly with Stage 1 output (`strengths`, `working_style_signals`, `adjacent_roles`).
+**Abilities** in O\*NET are occupation *requirement ratings* (`Oral Comprehension`, `Deductive Reasoning`), not a narrative of what the work is like. They align poorly with Stage 1 output (`strengths`, `working_style_signals`, `adjacent_roles`).
 
 Embed **aptitude profile side** similarly — strengths + working_style_signals + adjacent_roles as prose, not `core_skills`.
 
@@ -190,17 +190,17 @@ Abilities / work styles / RIASEC are useful **later** as structured filters or e
 ```
 Stage 1 aptitude profile
   → embed profile
-  → vector search O*NET corpus
+  → vector search O\*NET corpus
   → top-K occupations + alternate titles
-Stage 2 role family plan (augment LLM with O*NET matches, or replace search_terms source)
+Stage 2 role family plan (augment LLM with O\*NET matches, or replace search_terms source)
 Stage 3 discovery (unchanged)
 ```
 
 **Recommended placement:** aptitude-to-jobtype matching between Stage 1 and 2.
 
-**Option B:** Map top O*NET matches directly to `search_terms` via alternate titles; faster prototype; loses `work_modes` / `avoid_terms` unless added separately.
+**Option B:** Map top O\*NET matches directly to `search_terms` via alternate titles; faster prototype; loses `work_modes` / `avoid_terms` unless added separately.
 
-Stage 2 today also produces `work_modes`, `avoid_terms`, and `fit_reason` — used by `aptitude_fit.py`. Pragmatic path: **O*NET drives `search_terms`; keep Stage 2 (or lighter rules) for work_modes/avoid_terms** until embedding corpus is validated.
+Stage 2 today also produces `work_modes`, `avoid_terms`, and `fit_reason` — used by `aptitude_fit.py`. Pragmatic path: **O\*NET drives `search_terms`; keep Stage 2 (or lighter rules) for work_modes/avoid_terms** until embedding corpus is validated.
 
 ### Minimal files for first ETL subset
 
@@ -215,11 +215,11 @@ Stage 2 today also produces `work_modes`, `avoid_terms`, and `fit_reason` — us
 
 ---
 
-## 4. O*NET 30.3 MySQL dump (`data/download/db_30_3_mysql/`)
+## 4. O\*NET 30.3 MySQL dump (`data/download/db_30_3_mysql/`)
 
-Local path (not in git): `data/download/db_30_3_mysql/` — **45 MySQL-format SQL scripts**, ~284 MB uncompressed. Download: [data/download/README.md](../../data/download/README.md). Official docs: [O*NET 30.3 MySQL dictionary](https://www.onetcenter.org/dictionary/30.3/mysql/).
+Local path (not in git): `data/download/db_30_3_mysql/` — **45 MySQL-format SQL scripts**, ~284 MB uncompressed. Download: [data/download/README.md](../../data/download/README.md). Official docs: [O\*NET 30.3 MySQL dictionary](https://www.onetcenter.org/dictionary/30.3/mysql/).
 
-**Yes — each file creates one table and bulk-loads it with `INSERT` rows.** Together they are the full O*NET 30.3 relational database.
+**Yes — each file creates one table and bulk-loads it with `INSERT` rows.** Together they are the full O\*NET 30.3 relational database.
 
 ### File pattern
 
@@ -349,7 +349,7 @@ Small bridge tables (e.g. abilities ↔ work activities). Useful for explainabil
 
 Before touching the live pipeline:
 
-1. Register for O*NET Web Services (or use downloaded DB release in `data/download/`).
+1. Register for O\*NET Web Services (or use downloaded DB release in `data/download/`).
 2. Pull ~30 occupations relevant to career-changer fixtures (Software Developers, Computer Systems Analysts, Management Analysts, etc.) plus non-tech controls.
 3. Build embedding text from description + work activities (join `03` + `28` + `01`).
 4. Run offline: career-changer profile vs corpus → inspect top-10.

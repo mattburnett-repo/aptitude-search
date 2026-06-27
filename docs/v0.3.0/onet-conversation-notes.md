@@ -1,27 +1,27 @@
-# O*NET conversation notes
+# O\*NET conversation notes
 
-Notes from an initial design conversation (June 2026) on using O*NET in aptitude-search. Complements [`onet-and-occupation-taxonomies.md`](./onet-and-occupation-taxonomies.md) (integration plan) with project context and a fuller picture of what O*NET provides.
+Notes from an initial design conversation (June 2026) on using O\*NET in aptitude-search. Complements [`onet-and-occupation-taxonomies.md`](./onet-and-occupation-taxonomies.md) (integration plan) with project context and a fuller picture of what O\*NET provides.
 
 ---
 
-## O*NET in this project today
+## O\*NET in this project today
 
-**Implemented (offline data pipeline).** O*NET 30.3 loads into Postgres via `data/load-onet-postgres.sh`; occupation vectors are built by `data/embed/build_occupation_embeddings.py`. Entry point: [`data/README.md`](../../data/README.md). Integration plan: [`onet-and-occupation-taxonomies.md`](./onet-and-occupation-taxonomies.md).
+**Implemented (offline data pipeline).** O\*NET 30.3 loads into Postgres via `data/load-onet-postgres.sh`; occupation vectors are built by `data/embed/build_occupation_embeddings.py`. Entry point: [`data/README.md`](../../data/README.md). Integration plan: [`onet-and-occupation-taxonomies.md`](./onet-and-occupation-taxonomies.md).
 
 ### Intended role
 
-O*NET is meant for **aptitude-to-jobtype matching** — matching aptitudes derived from the resume to job types, not live job postings.
+O\*NET is meant for **aptitude-to-jobtype matching** — matching aptitudes derived from the resume to job types, not live job postings.
 
 - **Stage 1** produces an aptitude profile.
-- **Aptitude-to-jobtype matching** (planned): embed profile vs a stable occupation index (O*NET + curated `role_family` descriptions).
+- **Aptitude-to-jobtype matching** (planned): embed profile vs a stable occupation index (O\*NET + curated `role_family` descriptions).
 - **Stage 2** uses those matches to drive `search_terms` / `role_family_plan`.
 - **Stage 3** stays as-is: web search for live postings.
 
-O*NET answers “what kinds of work fit?” Job discovery answers “what’s open right now?”
+O\*NET answers “what kinds of work fit?” Job discovery answers “what’s open right now?”
 
 ### Why the docs favor it
 
-~1,000 normalized SOC occupations with summaries, work activities, alternate titles — good for explainable, career-adjacent matching. Weak on market titles (“Staff Platform Engineer”), so the plan is **O*NET bootstrap + curated role families on top**.
+~1,000 normalized SOC occupations with summaries, work activities, alternate titles — good for explainable, career-adjacent matching. Weak on market titles (“Staff Platform Engineer”), so the plan is **O\*NET bootstrap + curated role families on top**.
 
 ### Integration paths (per project docs)
 
@@ -31,23 +31,23 @@ O*NET answers “what kinds of work fit?” Job discovery answers “what’s op
 ### What exists in code today
 
 - **`role_family_plan`** is real: LLM-generated in Stage 2, used in discovery query planning and fit scoring (`aptitude_fit.py`, `discovery.py`).
-- No O*NET API key in config, no occupation data store, no embedding index.
+- No O\*NET API key in config, no occupation data store, no embedding index.
 
 ### Practical takeaway
 
-The project already has the *downstream* hook (`role_family_plan` → search). O*NET would be the *upstream* stable index to improve or augment how those families are chosen — still design-phase only.
+The project already has the *downstream* hook (`role_family_plan` → search). O\*NET would be the *upstream* stable index to improve or augment how those families are chosen — still design-phase only.
 
 ---
 
-## What O*NET is
+## What O\*NET is
 
-O*NET (Occupational Information Network) is a **US government occupational research database** — not a job board, not live hiring data. It describes ~1,000 standardized occupations and what work in each one typically involves.
+O\*NET (Occupational Information Network) is a **US government occupational research database** — not a job board, not live hiring data. It describes ~1,000 standardized occupations and what work in each one typically involves.
 
 | | |
 |---|---|
 | **Sponsor** | US Dept. of Labor (ETA) |
 | **Purpose** | Shared vocabulary for describing jobs, workers, and labor-market context |
-| **Taxonomy** | **O*NET-SOC** — roughly **1,016 occupations** (current release: **30.3**) |
+| **Taxonomy** | **O\*NET-SOC** — roughly **1,016 occupations** (current release: **30.3**) |
 | **Updates** | Quarterly data refreshes; major content-model changes periodically |
 | **License** | Bulk database is **CC BY 4.0** (free to use with attribution) |
 
@@ -67,13 +67,13 @@ Recent releases organize everything around **Worker → Job → Market**:
 
 Everything hangs off the **Content Model** — a hierarchy of variables with definitions, scales, and occupation-level ratings.
 
-Official overview: [O*NET Content Model](https://www.onetcenter.org/content.html)
+Official overview: [O\*NET Content Model](https://www.onetcenter.org/content.html)
 
 ---
 
 ## The occupation spine
 
-Every row is keyed by **O*NET-SOC code** (e.g. `15-1252.00` = Software Developers).
+Every row is keyed by **O\*NET-SOC code** (e.g. `15-1252.00` = Software Developers).
 
 Per occupation you get:
 
@@ -145,13 +145,13 @@ Proposed new/revised tasks not yet fully collected — a weak signal for “wher
 
 ## Linkages & crosswalks
 
-O*NET also ships **relationship tables** connecting domains:
+O\*NET also ships **relationship tables** connecting domains:
 
 - Abilities ↔ work activities / work context
 - Skills ↔ work activities / work context
 - Work styles ↔ work activities / work context
 
-**Crosswalks** map O*NET-SOC to other systems: SOC, DOT, military MOS, ESCO, education programs, Occupational Outlook Handbook, etc.
+**Crosswalks** map O\*NET-SOC to other systems: SOC, DOT, military MOS, ESCO, education programs, Occupational Outlook Handbook, etc.
 
 Useful when you scrape a posting title and need a stable occupation ID.
 
@@ -161,7 +161,7 @@ Useful when you scrape a posting title and need a stable occupation ID.
 
 ### 1. Bulk download (45 core files)
 
-Tab-delimited, Excel, or SQL dumps from [O*NET Database](https://www.onetcenter.org/database.html).
+Tab-delimited, Excel, or SQL dumps from [O\*NET Database](https://www.onetcenter.org/database.html).
 
 Best for: building a local corpus, precomputing embeddings, versioning in `data/`.
 
@@ -181,7 +181,7 @@ Best for: prototyping, title lookup, exploration — not high-volume pipeline ho
 
 ### 3. Human-facing sites
 
-O*NET OnLine, My Next Move, etc. — same underlying data, UI-oriented.
+O\*NET OnLine, My Next Move, etc. — same underlying data, UI-oriented.
 
 ### 4. Machine-readable taxonomies
 
@@ -228,7 +228,7 @@ Per occupation, build narrative text — not raw skill tables:
 
 ```text
 Title: Software Developers
-Summary: [O*NET description]
+Summary: [O\*NET description]
 Work activities: [top N activities as prose]
 Typical context: [technology design, systems analysis, ...]
 Alternate titles: [...]
@@ -246,7 +246,7 @@ Bulk download → ETL → `data/occupations/onet_corpus.jsonl` → precomputed e
 
 1. **Title gap** — “Solutions Engineer”, “RevOps”, “Developer Experience” may only appear as alternate titles or not at all → curated overlay required.
 2. **Generic clusters** — without curated families, embeddings may over-index on “Software Developer”.
-3. **Attribution** — O*NET requires credit/link in public apps ([services.onetcenter.org/about](https://services.onetcenter.org/about)).
+3. **Attribution** — O\*NET requires credit/link in public apps ([services.onetcenter.org/about](https://services.onetcenter.org/about)).
 4. **Not a ranking oracle** — similarity suggests families; `avoid_terms`, constraints, and posting fit ranking still do the filtering.
 
 ---
@@ -255,7 +255,7 @@ Bulk download → ETL → `data/occupations/onet_corpus.jsonl` → precomputed e
 
 Before touching the live pipeline:
 
-1. Register for O*NET Web Services (or download one DB release).
+1. Register for O\*NET Web Services (or download one DB release).
 2. Pull ~30 occupations relevant to career-changer fixtures (Software Developers, Computer Systems Analysts, Management Analysts, etc.) plus a few non-tech controls.
 3. Build embedding text from description + work activities.
 4. Run offline: career-changer profile vs corpus → inspect top-10.

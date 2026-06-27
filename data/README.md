@@ -1,6 +1,6 @@
-# O*NET data pipeline
+# O\*NET data pipeline
 
-Load O*NET 30.3 into Postgres, build occupation embeddings, and verify the result.
+Load O\*NET 30.3 into Postgres, build occupation embeddings, and verify the result.
 
 ## Prerequisites
 
@@ -10,7 +10,7 @@ Load O*NET 30.3 into Postgres, build occupation embeddings, and verify the resul
    - `[onet]` — Postgres host, database, user, password, `sslmode`
    - `[embedding]` — Hugging Face `model_key`, `model`, `dimensions`
 4. **Python venv** — `pip install -r backend/requirements.txt` (use `backend/.venv`)
-5. **O*NET SQL dumps** — not committed; see [download/README.md](download/README.md)
+5. **O\*NET SQL dumps** — not committed; see [download/README.md](download/README.md)
 
 `occupation_embeddings.embedding` uses `vector(N)` where `N` is `[embedding].dimensions`. If you change `dimensions` in config, drop the table before re-running embed (`DROP TABLE occupation_embeddings CASCADE;`).
 
@@ -33,10 +33,10 @@ python data/smoke_onet_postgres.py
 
 | Path | Purpose |
 |------|---------|
-| `download/` | O*NET 30.3 MySQL-format SQL (local only; gitignored) |
+| `download/` | O\*NET 30.3 MySQL-format SQL (local only; gitignored) |
 | `embed/` | `occupation_embeddings` table + profile SQL + HF embed build |
 | `docs/` | Runbooks and INSERT-count reference |
-| `load-onet-postgres.sh` | Load O*NET (full or embed-only), then embed |
+| `load-onet-postgres.sh` | Load O\*NET (full or embed-only), then embed |
 | `onet-conninfo.sh` | Print libpq conninfo from `[onet]` |
 | `smoke_onet_postgres.py` | Post-load verification (also via pytest; see below) |
 
@@ -44,7 +44,7 @@ python data/smoke_onet_postgres.py
 
 | Variable | Default | Effect |
 |----------|---------|--------|
-| `ONET_SKIP_EMBED` | unset | Set to `1` to load O*NET only (creates empty `occupation_embeddings`, skips HF) |
+| `ONET_SKIP_EMBED` | unset | Set to `1` to load O\*NET only (creates empty `occupation_embeddings`, skips HF) |
 | `ONET_EMBED_ONLY` | unset | Set to `1` to load only the 7 tables required for embed (~18% of INSERTs) |
 | `ONET_RESET_SCHEMA` | `1` | Set to `0` to append without `DROP SCHEMA public CASCADE` |
 | `ONET_VERBOSE` | unset | Set to `1` to show every INSERT line |
@@ -56,8 +56,8 @@ Pipeline runtime (`backend/config.toml`):
 
 | Setting | Section | Effect |
 |---------|---------|--------|
-| `enabled` | `[onet_matching]` | required in `config.toml`; set `false` to skip O*NET vector search in Stage 2 |
-| `top_k` | `[onet_matching]` | Max O*NET occupations passed to Stage 2 LLM |
+| `enabled` | `[onet_matching]` | required in `config.toml`; set `false` to skip O\*NET vector search in Stage 2 |
+| `top_k` | `[onet_matching]` | Max O\*NET occupations passed to Stage 2 LLM |
 | `min_similarity` | `[onet_matching]` | Drop matches below this cosine similarity (0–1) |
 
 Examples:
@@ -85,4 +85,4 @@ cd backend && ONET_SMOKE_TEST=1 pytest tests/test_onet_smoke.py -v
 
 ## License
 
-O*NET database files are [CC BY 4.0](https://www.onetcenter.org/license_db.html). See root [README.md](../README.md#third-party-data).
+O\*NET database files are [CC BY 4.0](https://www.onetcenter.org/license_db.html). See root [README.md](../README.md#third-party-data).

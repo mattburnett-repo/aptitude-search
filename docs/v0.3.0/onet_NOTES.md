@@ -1,4 +1,4 @@
-## Intro to O*NET
+## Intro to O\*NET
 https://www.youtube.com/watch?v=5bmzgwyniGw
 
 Job analysis, job descriptions, job specifications
@@ -23,11 +23,11 @@ CONTENT MODEL
 
 ---
 
-## O*NET 30.3 Database
+## O\*NET 30.3 Database
 https://www.onetcenter.org/database.html
 
-- "The O*NET Data Collection Program currently makes updates to the O*NET Database on a quarterly basis, with a primary update occurring in the 3rd quarter of each year"
-- "The O*NET 30.3 Database is available under a Creative Commons license. See the Database license page for more information."
+- "The O\*NET Data Collection Program currently makes updates to the O\*NET Database on a quarterly basis, with a primary update occurring in the 3rd quarter of each year"
+- "The O\*NET 30.3 Database is available under a Creative Commons license. See the Database license page for more information."
 - NOTE: SQL files are provided in a zip file named "..._mysql", but files are generic enough to work with Postgres.
 
 - Usage/Download options
@@ -45,7 +45,7 @@ https://www.onetcenter.org/database.html
 
 ---
 
-## O*NET Resource Center
+## O\*NET Resource Center
 
 - https://www.onetcenter.org/
 

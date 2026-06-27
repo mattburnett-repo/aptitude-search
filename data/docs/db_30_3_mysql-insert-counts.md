@@ -1,4 +1,4 @@
-# O*NET `db_30_3_mysql` SQL files — INSERT counts
+# O\*NET `db_30_3_mysql` SQL files — INSERT counts
 
 Source: `data/download/db_30_3_mysql/*.sql`  
 Count: lines matching `INSERT INTO` (case-insensitive).

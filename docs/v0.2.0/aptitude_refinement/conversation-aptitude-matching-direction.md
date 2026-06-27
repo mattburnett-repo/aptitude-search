@@ -294,7 +294,7 @@ If both sides aren't describing **the same kind of thing** (work mode, role sema
 | Raw job postings | Full scraped JD text | Direct: compare person → opening | Huge, noisy, stale index; inflated reqs; same title ≠ same work; you don't own a job corpus |
 | Extracted role profiles | LLM-parsed responsibilities, work modes, seniority from each posting | Closer to "what work is this?" | Still per-posting; best as **re-rank** after discovery, not primary index |
 | Role-family archetypes | Curated descriptions: "Solutions Engineer (integration-heavy SaaS)" with work modes | Small stable index; interpretable; drives non-obvious discovery | Needs ontology curation; abstraction can miss edge cases |
-| O*NET / ESCO occupations | Official occupation summaries + work activities | Normalized, broad (not just tech), finite | Generic; lags market titles; "Staff Platform Engineer" won't map cleanly |
+| O\*NET / ESCO occupations | Official occupation summaries + work activities | Normalized, broad (not just tech), finite | Generic; lags market titles; "Staff Platform Engineer" won't map cleanly |
 | Per-candidate role hypotheses | Dynamic docs generated from aptitude profile: "person suited for X because Y" | Personalized retrieval targets; no global index | Not a fixed corpus — more like **query expansion** than search |
 | Company/team context | Product domain + team charter + title | Disambiguates "Engineer" at a logistics co vs fintech | Hard to get at scale; secondary signal |
 
@@ -306,7 +306,7 @@ Don't pick one target. Use **three stages**, each with a different corpus:
 
     Aptitude-to-jobtype matching — "What kinds of work fit this person?"
       Embed: aptitude profile (summary + strengths + work modes + domains)
-      Search against: role-family archetypes + O*NET occupations (small, stable index)
+      Search against: role-family archetypes + O\*NET occupations (small, stable index)
       Output: top-K role families / occupations + explainable scores
 
     Job discovery — "Find live openings in those families"
@@ -350,7 +350,7 @@ For a **stable index** (aptitude-to-jobtype matching), each item should look lik
 
 Embed the narrative + work_modes + typical responsibilities — **not** a skill checklist.
 
-O*NET gives you ~1,000 occupations for free as a bootstrap corpus. Your curated role families sit on top for market-relevant granularity (Platform Engineer, RevOps, etc.).
+O\*NET gives you ~1,000 occupations for free as a bootstrap corpus. Your curated role families sit on top for market-relevant granularity (Platform Engineer, RevOps, etc.).
 
 For **per-posting** compare (posting fit ranking), embed extracted:
 
@@ -378,7 +378,7 @@ From your doc — still the right test:
 
 You can test aptitude-to-jobtype matching **without** a vector DB:
 
-1. Take 20–50 hand-curated role-family descriptions (+ O*NET samples)
+1. Take 20–50 hand-curated role-family descriptions (+ O\*NET samples)
 2. Embed aptitude profiles from your fixtures
 3. See if top matches align with human judgment on `adjacent_roles` / `strengths`
 

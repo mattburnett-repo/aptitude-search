@@ -53,7 +53,7 @@ Useful sources for role semantics include:
    Schema.org `JobPosting` fields, ATS fields, department labels, requisition categories, location, employment type, compensation, and level can all provide useful context.
 
 3. **Occupation taxonomies**  
-   O*NET, ESCO, and SOC/BLS categories can help normalize role types, skills, work activities, and occupational families beyond the wording of a single company.
+   O\*NET, ESCO, and SOC/BLS categories can help normalize role types, skills, work activities, and occupational families beyond the wording of a single company.
 
 4. **Company and product context**  
    The same title can mean different things depending on whether the company is SaaS, healthcare, fintech, logistics, AI tooling, ecommerce, devtools, a marketplace, an agency, or another kind of organization.
