@@ -63,7 +63,7 @@ During tests, `conftest.py` then swaps in `config.test.toml` so runs stay mocked
 ONET_SMOKE_TEST=1 pytest tests/test_onet_smoke.py -v
 ```
 
-Requires `config.toml` with a loaded O\*NET database (`[onet]`). See [`data/README.md`](../data/README.md). GitHub Actions: workflow **O\*NET Postgres smoke test** (`workflow_dispatch`, `ONET_*` secrets).
+Requires `config.toml` with a loaded O\*NET database (`[onet]`). See [`data/README.md`](../data/README.md).
 
 ## Endpoints
 
