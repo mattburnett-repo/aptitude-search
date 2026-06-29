@@ -1,5 +1,19 @@
--- Build occupation_profile text from O*NET (title, description, abilities, skills, job titles).
--- Used by data/embed/build_occupation_embeddings.py
+-- =============================================================================
+-- O*NET OCCUPATION MASHUP (this file IS the mashup — not a separate script)
+-- =============================================================================
+--
+-- Rolls up O*NET tables into one occupation_profile text blob per onetsoc_code.
+-- That prose is what gets embedded offline and stored in occupation_embeddings.
+--
+-- Runtime flow:
+--   build_occupation_embeddings.py  →  runs THIS SQL  →  embed  →  Postgres
+--   match.py (Stage 2)              →  compares aptitude vector to those rows
+--
+-- Current fields: title, description, abilities, skills, job titles.
+-- See docs/v0.3.1/embedding-matchability-gaps.md for planned additions
+-- (e.g. work_activities). After editing here, re-run build_occupation_embeddings.py.
+--
+-- =============================================================================
 
 SELECT
   od.onetsoc_code,
@@ -12,7 +26,7 @@ SELECT
     'Titles: ' || COALESCE(jt.names, '')
   ) AS occupation_profile
 FROM occupation_data od
-LEFT JOIN LATERAL (
+LEFT JOIN   (
   SELECT string_agg(element_name, ', ' ORDER BY data_value DESC) AS names
   FROM (
     SELECT cmr.element_name, a.data_value

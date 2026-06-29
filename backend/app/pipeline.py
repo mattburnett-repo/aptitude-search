@@ -1,4 +1,5 @@
 import logging
+from typing import TypedDict
 
 from langsmith import traceable  # pyright: ignore[reportUnknownVariableType]
 
@@ -28,6 +29,13 @@ from app.role_family_plan import run_stage2
 logger = logging.getLogger(__name__)
 
 DEFAULT_CONSTRAINTS = Constraints()
+
+
+class PipelineResult(TypedDict):
+    aptitude_profile: JsonObject
+    role_family_plan: JsonObject
+    occupation_matches: list[JsonObject]
+    verified_matches: JsonObject
 
 
 @traceable(run_type="chain", name="stage1")
@@ -127,7 +135,7 @@ def run_pipeline(
     constraints: Constraints | None = None,
     *,
     on_progress: ProgressCallback | None = None,
-) -> dict[str, JsonObject]:
+) -> PipelineResult:
     emit_progress("Starting pipeline…", on_progress=on_progress)
     aptitude_profile = run_stage1(resume, on_progress=on_progress)
     stage2 = run_stage2(aptitude_profile, on_progress=on_progress)
