@@ -4,16 +4,10 @@ export type Theme = "light" | "dark";
 
 const STORAGE_KEY = "theme";
 
-function getSystemTheme(): Theme {
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
-}
-
 export function readStoredTheme(): Theme {
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored === "light" || stored === "dark") return stored;
-  return getSystemTheme();
+  return "dark";
 }
 
 export function applyTheme(theme: Theme) {

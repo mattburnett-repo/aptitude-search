@@ -52,7 +52,14 @@ function JobCard({ job }: { job: JobPosting }) {
   ].filter(Boolean);
 
   return (
-    <article className="job-card">
+    <article
+      className={[
+        "job-card",
+        job.confidence === "high" ? "job-card-high-confidence" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
       <header className="job-card-header">
         <div>
           <h4 className="job-card-role">{job.role}</h4>

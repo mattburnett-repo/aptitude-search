@@ -27,6 +27,120 @@ type AppView =
   | "stage4"
   | "stage5";
 
+const RESULT_STEPS = [
+  { id: "stage1" as const, label: "Profile" },
+  { id: "stage2" as const, label: "Confidence" },
+  { id: "stage3" as const, label: "Matches" },
+  { id: "stage4" as const, label: "Roles" },
+  { id: "stage5" as const, label: "Jobs" },
+];
+
+const PIPELINE_STAGE_COUNT = 3;
+
+function parsePipelineStage(message: string): number | null {
+  const match = /Stage\s+(\d+)/i.exec(message);
+  return match ? Number(match[1]) : null;
+}
+
+function formatRunningLabel(messages: string[]): string {
+  if (messages.length === 0) {
+    return "Starting pipeline…";
+  }
+
+  const latest = messages[messages.length - 1]!;
+  if (latest.toLowerCase().includes("pipeline complete")) {
+    return "Pipeline complete";
+  }
+
+  const stageFromLatest = parsePipelineStage(latest);
+  const stage =
+    stageFromLatest ??
+    [...messages].reverse().map(parsePipelineStage).find((value) => value != null) ??
+    1;
+
+  const detail = latest
+    .replace(/^Stage\s+\d+:?\s*/i, "")
+    .replace(/\.$/, "")
+    .trim();
+
+  if (detail && !/^Stage\s+\d+/i.test(latest)) {
+    return `Stage ${stage} of ${PIPELINE_STAGE_COUNT} — ${detail}`;
+  }
+
+  if (detail) {
+    return `Stage ${stage} of ${PIPELINE_STAGE_COUNT} — ${detail}`;
+  }
+
+  return `Stage ${stage} of ${PIPELINE_STAGE_COUNT}`;
+}
+
+function progressItemClassName(
+  index: number,
+  messages: string[],
+  loading: boolean,
+): string | undefined {
+  const isLast = index === messages.length - 1;
+  if (isLast && loading) return "progress-log-item-active";
+  if (!isLast || !loading) return "progress-log-item-complete";
+  return undefined;
+}
+
+function StepIndicator({
+  view,
+  hasResult,
+  navDisabled,
+  onStepSelect,
+}: {
+  view: AppView;
+  hasResult: boolean;
+  navDisabled: boolean;
+  onStepSelect: (step: AppView) => void;
+}) {
+  if (view === "input") return null;
+
+  const canNavigate = hasResult && !navDisabled;
+
+  return (
+    <nav className="step-indicator" aria-label="Pipeline steps">
+      <ol className="step-indicator-list">
+        {RESULT_STEPS.map((step, index) => {
+          const isActive = view === step.id;
+          const isRunning =
+            view === "running" && index === 0 && !hasResult;
+          const stepIndex = view.startsWith("stage")
+            ? Number(view.replace("stage", "")) - 1
+            : -1;
+          const isComplete = hasResult && stepIndex > index;
+
+          return (
+            <li key={step.id}>
+              <button
+                type="button"
+                className={[
+                  "step-indicator-item",
+                  isActive ? "step-indicator-item-active" : "",
+                  isRunning ? "step-indicator-item-running" : "",
+                  isComplete ? "step-indicator-item-complete" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                disabled={!canNavigate}
+                aria-current={isActive ? "step" : undefined}
+                onClick={() => onStepSelect(step.id)}
+              >
+                <span className="step-indicator-number">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <span className="step-indicator-label">{step.label}</span>
+              </button>
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+  );
+}
+
 function StageBottomNav({ stageNav }: { stageNav: StageNavProps }) {
   const disabled = stageNav.disabled ?? false;
   return (
@@ -51,8 +165,13 @@ function StageBottomNav({ stageNav }: { stageNav: StageNavProps }) {
             Start over
           </button>
         ) : (
-          <button type="button" disabled={disabled} onClick={stageNav.onNext}>
-            Next
+          <button
+            type="button"
+            className="primary-cta"
+            disabled={disabled}
+            onClick={stageNav.onNext}
+          >
+            Next →
           </button>
         )}
     </div>
@@ -75,7 +194,12 @@ function ProgressLog({
         aria-busy={loading}
       >
         {messages.map((message, index) => (
-          <li key={`${index}-${message}`}>{message}</li>
+          <li
+            key={`${index}-${message}`}
+            className={progressItemClassName(index, messages, loading)}
+          >
+            {message}
+          </li>
         ))}
       </ol>
     </details>
@@ -222,8 +346,13 @@ export default function App() {
 
   return (
     <>
-      <div className="page-header">
-        <h1>Aptitude Search</h1>
+      <header className="page-header">
+        <div className="page-header-text">
+          <h1>Aptitude Search</h1>
+          <p className="app-tagline">
+            Discover roles that fit your real strengths.
+          </p>
+        </div>
         <button
           type="button"
           className="theme-toggle"
@@ -232,54 +361,80 @@ export default function App() {
         >
           <ThemeToggleIcon theme={theme} />
         </button>
-      </div>
+      </header>
+
+      <StepIndicator
+        view={view}
+        hasResult={Boolean(result)}
+        navDisabled={stepNavDisabled}
+        onStepSelect={setView}
+      />
 
       <div className="step-panel" hidden={view !== "input"}>
-        <ul className="subtitle">
-          <li>Upload resume file, or copy/paste.</li>
-          <li>Click &apos;Go&apos;.</li>
+        <ol className="input-steps" aria-label="How it works">
           <li>
-            LLMs assess aptitudes from your resume; O*NET matching and a role
-            family plan guide job search.
+            <span className="input-step-number">01</span>
+            <span className="input-step-text">
+              Upload a resume file or paste your text.
+            </span>
           </li>
-        </ul>
+          <li>
+            <span className="input-step-number">02</span>
+            <span className="input-step-text">
+              Run the pipeline to assess aptitudes and match roles.
+            </span>
+          </li>
+          <li>
+            <span className="input-step-number">03</span>
+            <span className="input-step-text">
+              Review your profile, matches, and verified job postings.
+            </span>
+          </li>
+        </ol>
 
-        <ResumeInput
-          value={resumeInput}
-          onChange={setResumeInput}
-          onError={setError}
-        />
+        <div className="input-panel">
+          <ResumeInput
+            value={resumeInput}
+            onChange={setResumeInput}
+            onError={setError}
+          />
 
-        {/*
-        <OptionalConstraints
-          constraints={constraints}
-          onChange={setConstraints}
-        />
-        */}
+          {/*
+          <OptionalConstraints
+            constraints={constraints}
+            onChange={setConstraints}
+          />
+          */}
 
-        <PipelineActions
-          loading={loading}
-          canRun={hasResumeInput(resumeInput)}
-          onRun={() => void runPipeline(resumeInput, defaultConstraints)}
-        />
+          <PipelineActions
+            loading={loading}
+            canRun={hasResumeInput(resumeInput)}
+            onRun={() => void runPipeline(resumeInput, defaultConstraints)}
+          />
 
-        {error && <p className="error">{error}</p>}
+          {error && <p className="error">{error}</p>}
+        </div>
       </div>
 
       <div className="step-panel" hidden={view !== "running"}>
-        <p className="step-label">Running pipeline</p>
-        {progressMessages.length > 0 ? (
+        <p className="running-stage-label" aria-live="polite">
+          {loading && (
+            <span className="running-spinner" aria-hidden="true" />
+          )}
+          {formatRunningLabel(progressMessages)}
+        </p>
+        {progressMessages.length > 0 && (
           <ProgressLog messages={progressMessages} loading={loading} />
-        ) : (
-          <p className="running-status" aria-live="polite">
-            Starting pipeline…
-          </p>
         )}
         {error && <p className="error">{error}</p>}
         {result && !loading && (
           <div className="actions step-nav step-nav-end">
-            <button type="button" onClick={() => setView("stage1")}>
-              Next
+            <button
+              type="button"
+              className="primary-cta"
+              onClick={() => setView("stage1")}
+            >
+              Next →
             </button>
           </div>
         )}

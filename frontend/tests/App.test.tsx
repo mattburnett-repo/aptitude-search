@@ -10,7 +10,7 @@ describe('App', () => {
 		expect(
 			screen.getByRole('heading', { name: 'Aptitude Search' }),
 		).toBeInTheDocument()
-		expect(screen.getByRole('button', { name: 'Go' })).toBeDisabled()
+		expect(screen.getByRole('button', { name: 'Go →' })).toBeDisabled()
 	})
 
 	it('enables Go button after pasting resume text', async () => {
@@ -25,7 +25,7 @@ describe('App', () => {
 		)
 
 		await waitFor(() => {
-			expect(screen.getByRole('button', { name: 'Go' })).toBeEnabled()
+			expect(screen.getByRole('button', { name: 'Go →' })).toBeEnabled()
 		})
 	})
 
@@ -47,7 +47,7 @@ describe('App', () => {
 					/PDF resume attached\. Text will be extracted on the server/,
 				),
 			).toBeInTheDocument()
-			expect(screen.getByRole('button', { name: 'Go' })).toBeEnabled()
+			expect(screen.getByRole('button', { name: 'Go →' })).toBeEnabled()
 		})
 	})
 })

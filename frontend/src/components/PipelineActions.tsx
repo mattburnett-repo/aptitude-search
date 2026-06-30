@@ -10,9 +10,14 @@ export function PipelineActions({
   onRun,
 }: PipelineActionsProps) {
   return (
-    <div className="actions">
-      <button type="button" disabled={loading || !canRun} onClick={onRun}>
-        {loading ? "Running…" : "Go"}
+    <div className="actions actions-primary">
+      <button
+        type="button"
+        className="primary-cta"
+        disabled={loading || !canRun}
+        onClick={onRun}
+      >
+        {loading ? "Running…" : "Go →"}
       </button>
     </div>
   );

@@ -8,7 +8,7 @@ describe("PipelineActions", () => {
       <PipelineActions loading={false} canRun={false} onRun={() => {}} />
     );
 
-    expect(screen.getByRole("button", { name: "Go" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Go →" })).toBeDisabled();
 
     rerender(<PipelineActions loading={true} canRun={true} onRun={() => {}} />);
 
@@ -18,6 +18,6 @@ describe("PipelineActions", () => {
   it("enables Go when input is present and not loading", () => {
     render(<PipelineActions loading={false} canRun={true} onRun={() => {}} />);
 
-    expect(screen.getByRole("button", { name: "Go" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Go →" })).toBeEnabled();
   });
 });
