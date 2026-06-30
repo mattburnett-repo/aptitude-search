@@ -36,7 +36,7 @@ App settings live in `config.toml` (see `config.example.toml`). Loaded once via 
 .venv/bin/python -m uvicorn app.main:app --reload --port 3001
 ```
 
-**Try it:** Open [http://localhost:3001/docs](http://localhost:3001/docs) (Swagger UI) → `POST /v1/pipeline` → use the pre-filled **example** request body (from [`fixtures/pipeline-request-example.json`](../fixtures/pipeline-request-example.json)).
+**Try it:** Open [http://localhost:3001/docs](http://localhost:3001/docs) (Swagger UI) → `POST /v1/pipeline` → use the pre-filled **example** request body (from [`fixtures/pipeline-request-example.json`](../fixtures/pipeline-request-example.json)). Other sample resumes and request bodies: [`fixtures/sample-resumes/README.md`](../fixtures/sample-resumes/README.md).
 
 ## Validate fixtures
 
@@ -44,7 +44,7 @@ App settings live in `config.toml` (see `config.example.toml`). Loaded once via 
 .venv/bin/python scripts/validate_fixtures.py
 ```
 
-Validates stage-1 golden output only (`career-changer-mixed-stack-stage1.json`).
+Validates golden Stage 1 and Stage 2 outputs (`career-changer-mixed-stack-stage1.json`, `career-changer-role-family-plan.json`) against their schemas.
 
 ## Tests
 
@@ -91,12 +91,20 @@ curl -s -X POST http://localhost:3001/v1/pipeline \
   -d @../fixtures/pipeline-request-example.json
 ```
 
-Resume only:
+Resume only (career-changer):
 
 ```bash
 curl -s -X POST http://localhost:3001/v1/pipeline \
   -H "Content-Type: application/json" \
   -d "$(jq -n --rawfile r ../fixtures/sample-resumes/career-changer-mixed-stack.txt '{resume: $r}')"
+```
+
+Entry-level profile with Kirksville constraints:
+
+```bash
+curl -s -X POST http://localhost:3001/v1/pipeline \
+  -H "Content-Type: application/json" \
+  -d @../fixtures/pipeline-request-pre-college.json
 ```
 
 `verified_matches` and `aptitude_profile` are parsed JSON validated against their schemas.

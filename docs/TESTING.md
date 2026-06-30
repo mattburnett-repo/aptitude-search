@@ -7,7 +7,12 @@ Run the stack and call the pipeline — Stages 1, 2, and 3 run automatically wit
 - **UI:** [frontend/README.md](../frontend/README.md) — `npm run dev` on port 5173
 - **API:** [backend/README.md](../backend/README.md) — Swagger at `http://localhost:3001/docs` → `POST /v1/pipeline`
 
-Example body: [`fixtures/pipeline-request-example.json`](../fixtures/pipeline-request-example.json).
+Example bodies:
+
+- [`fixtures/pipeline-request-example.json`](../fixtures/pipeline-request-example.json) — mid-career software engineer, Toronto remote
+- [`fixtures/pipeline-request-pre-college.json`](../fixtures/pipeline-request-pre-college.json) — entry-level retail/service, Kirksville MO
+
+Sample resume text files: [`fixtures/sample-resumes/README.md`](../fixtures/sample-resumes/README.md).
 
 Requires `[llm.aptitude].model_key` in `backend/config.toml`. See [PROMPT-CONTRACT.md](PROMPT-CONTRACT.md).
 
@@ -37,13 +42,13 @@ cd frontend && npm run build
 
 GitHub Actions: **Backend tests** (`backend-tests.yml`) and **Frontend tests** (`frontend-tests.yml`) on path-filtered push/PR.
 
-**Stage 1 golden fixture:**
+**Golden fixtures** (Stage 1 + Stage 2; registered in `backend/config.toml`):
 
 ```bash
 cd backend && .venv/bin/python scripts/validate_fixtures.py
 ```
 
-Validates `fixtures/example-outputs/career-changer-mixed-stack-stage1.json` against `aptitude-profile.schema.json` only. There is no committed golden Stage 3 output — Stage 3 quality is judged when running the live pipeline (above).
+Validates `fixtures/example-outputs/career-changer-mixed-stack-stage1.json` against `aptitude-profile.schema.json` and `career-changer-role-family-plan.json` against `role-family-plan.schema.json`. There is no committed golden Stage 3 output — Stage 3 quality is judged when running the live pipeline (above).
 
 **Stage 3 discovery smoke** (live web search; optional):
 
@@ -95,10 +100,26 @@ curl -s -X POST http://localhost:3001/v1/stages/1 \
   -d "$(jq -n --rawfile r ../fixtures/sample-resumes/career-changer-mixed-stack.txt '{resume: $r}')"
 ```
 
-Full pipeline:
+Full pipeline (mid-career example):
 
 ```bash
 curl -s -X POST http://localhost:3001/v1/pipeline \
   -H "Content-Type: application/json" \
   -d @fixtures/pipeline-request-example.json
+```
+
+Full pipeline (entry-level, Kirksville constraints):
+
+```bash
+curl -s -X POST http://localhost:3001/v1/pipeline \
+  -H "Content-Type: application/json" \
+  -d @fixtures/pipeline-request-pre-college.json
+```
+
+Resume file only (no constraints):
+
+```bash
+curl -s -X POST http://localhost:3001/v1/pipeline \
+  -H "Content-Type: application/json" \
+  -d "$(jq -n --rawfile r fixtures/sample-resumes/pre-college-retail-service.txt '{resume: $r}')"
 ```
