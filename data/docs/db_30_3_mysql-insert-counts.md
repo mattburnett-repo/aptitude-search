@@ -105,6 +105,6 @@ Count: lines matching `INSERT INTO` (case-insensitive).
 | `10_task_categories.sql`                                  |            7 |
 | `02_job_zone_reference.sql`                               |            4 |
 
-See [onet-embedding-required-tables.md](onet-embedding-required-tables.md) for mashup / embed load subset (7 files, ~217k INSERTs).
+See [onet-embedding-required-tables.md](onet-embedding-required-tables.md) for mashup / embed load subset (8 files, ~290k INSERTs).
 
 See [onet-faster-reload.md](onet-faster-reload.md) for local build → `pg_dump` → `pg_restore` to Render.

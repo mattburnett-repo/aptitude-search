@@ -76,6 +76,7 @@ frontend/         # MVP UI (Vite + React)
 
 ## Changelog
 
+- **[docs/changelog/0.3.1.md](docs/changelog/0.3.1.md)** — embedding matchability (`work_activities`, `adjacent_roles`)
 - **[docs/changelog/0.3.0.md](docs/changelog/0.3.0.md)** — O\*NET integration (vector matching, Stage 2 UI, CI)
 - **[docs/changelog/0.2.0.md](docs/changelog/0.2.0.md)** — aptitude refinement (role families, work-pattern fit)
 - **[docs/changelog/0.1.0.md](docs/changelog/0.1.0.md)** — initial release

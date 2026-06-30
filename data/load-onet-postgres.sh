@@ -8,7 +8,7 @@
 # Usage:
 #   ./data/load-onet-postgres.sh
 #   ONET_SKIP_EMBED=1 ./data/load-onet-postgres.sh   # load O*NET only, skip Hugging Face embed
-#   ONET_EMBED_ONLY=1 ./data/load-onet-postgres.sh   # load embed-required tables only (~18% of INSERTs)
+#   ONET_EMBED_ONLY=1 ./data/load-onet-postgres.sh   # load embed-required tables only (~24% of INSERTs)
 #   ONET_RESET_SCHEMA=0 ./data/load-onet-postgres.sh   # append without wipe
 #   ONET_VERBOSE=1 ./data/load-onet-postgres.sh        # show every INSERT line
 #   ONET_LOG_FILE=data/onet-load.log ./data/load-onet-postgres.sh
@@ -44,6 +44,7 @@ EMBED_ONLY_SQL_FILES=(
   12_abilities.sql
   24_essential_skills.sql
   25_transferable_skills.sql
+  28_work_activities.sql
   36_job_titles.sql
 )
 

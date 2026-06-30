@@ -11,9 +11,10 @@ Tables required to build occupation profile text for `data/embed/build_occupatio
 | `abilities`               | `12_abilities.sql`               |       92,976 |
 | `essential_skills`        | `24_essential_skills.sql`        |       17,880 |
 | `transferable_skills`     | `25_transferable_skills.sql`     |       44,700 |
+| `work_activities`         | `28_work_activities.sql`         |       73,308 |
 | `job_titles`              | `36_job_titles.sql`              |       57,543 |
 
-**Total: 217,153 INSERT statements across 7 files** (~18% of all INSERTs).
+**Total: 290,461 INSERT statements across 8 files** (~24% of all INSERTs).
 
 Load only these files locally: `ONET_EMBED_ONLY=1 ./data/load-onet-postgres.sh` (see [../README.md](../README.md)).
 

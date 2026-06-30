@@ -26,7 +26,7 @@ EXPECTED_DATABASE = config.onet.database
 
 EXPECTED_OCCUPATION_COUNT = 1016
 FULL_ONET_TABLE_COUNT = 45
-EMBED_ONLY_ONET_TABLE_COUNT = 7
+EMBED_ONLY_ONET_TABLE_COUNT = 8
 OCCUPATION_EMBEDDINGS_TABLE = "occupation_embeddings"
 
 EMBED_ONLY_TABLES = frozenset(
@@ -37,6 +37,7 @@ EMBED_ONLY_TABLES = frozenset(
         "abilities",
         "essential_skills",
         "transferable_skills",
+        "work_activities",
         "job_titles",
     }
 )

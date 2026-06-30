@@ -47,11 +47,15 @@ def test_aptitude_text_for_embedding_uses_work_pattern_fields() -> None:
         "aptitude_summary": "Builder who modernizes legacy systems.",
         "strengths": [{"name": "End-to-end ownership", "confidence": "high"}],
         "working_style_signals": [{"name": "High ambiguity tolerance", "confidence": "high"}],
+        "adjacent_roles": [
+            {"label": "Platform Engineer (internal tools)", "confidence": "medium"},
+        ],
     }
     text = aptitude_text_for_embedding(profile)
     assert "Summary: Builder who modernizes legacy systems." in text
     assert "Strengths: End-to-end ownership" in text
     assert "Work style: High ambiguity tolerance" in text
+    assert "Adjacent roles: Platform Engineer (internal tools)" in text
     assert "Python" not in text
 
 

@@ -1,4 +1,0 @@
--- occupation_embeddings DDL is applied by create-occupation-embeddings-table.sh
--- using [embedding].dimensions from backend/config.toml (not a fixed vector size).
---
--- See that shell script for the live CREATE TABLE / INDEX / TRUNCATE statements.

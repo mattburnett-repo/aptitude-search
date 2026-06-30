@@ -9,9 +9,8 @@
 --   build_occupation_embeddings.py  →  runs THIS SQL  →  embed  →  Postgres
 --   match.py (Stage 2)              →  compares aptitude vector to those rows
 --
--- Current fields: title, description, abilities, skills, job titles.
--- See docs/v0.3.1/embedding-matchability-gaps.md for planned additions
--- (e.g. work_activities). After editing here, re-run build_occupation_embeddings.py.
+-- Current fields: title, description, work activities (top 10 IM), abilities,
+-- skills, job titles. After editing here, re-run build_occupation_embeddings.py.
 --
 -- =============================================================================
 
@@ -21,12 +20,25 @@ SELECT
     E'\n',
     'Title: ' || od.title,
     'Description: ' || od.description,
+    'Work activities: ' || COALESCE(act.names, ''),
     'Abilities: ' || COALESCE(ab.names, ''),
     'Skills: ' || COALESCE(sk.names, ''),
     'Titles: ' || COALESCE(jt.names, '')
   ) AS occupation_profile
 FROM occupation_data od
-LEFT JOIN   (
+LEFT JOIN LATERAL (
+  SELECT string_agg(element_name, ', ' ORDER BY data_value DESC) AS names
+  FROM (
+    SELECT cmr.element_name, wa.data_value
+    FROM work_activities wa
+    JOIN content_model_reference cmr ON cmr.element_id = wa.element_id
+    WHERE wa.onetsoc_code = od.onetsoc_code
+      AND wa.scale_id = 'IM'
+    ORDER BY wa.data_value DESC
+    LIMIT 10
+  ) activity_rows
+) act ON true
+LEFT JOIN LATERAL (
   SELECT string_agg(element_name, ', ' ORDER BY data_value DESC) AS names
   FROM (
     SELECT cmr.element_name, a.data_value

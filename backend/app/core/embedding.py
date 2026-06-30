@@ -184,7 +184,7 @@ BGE_QUERY_INSTRUCTION = "Represent this sentence for searching relevant passages
 
 
 def aptitude_text_for_embedding(profile: JsonObject) -> str:
-    """Build aptitude embedding payload from Stage 1 output (work-pattern fields only)."""
+    """Build aptitude embedding payload from Stage 1 output (work-pattern + adjacent roles)."""
     summary_raw = profile.get("aptitude_summary")
     summary = summary_raw.strip() if isinstance(summary_raw, str) else ""
 
@@ -199,6 +199,10 @@ def aptitude_text_for_embedding(profile: JsonObject) -> str:
     work_style = labeled_names(profile.get("working_style_signals"), limit=6)
     if work_style:
         parts.append(f"Work style: {work_style}")
+
+    adjacent_roles = labeled_names(profile.get("adjacent_roles"), limit=6)
+    if adjacent_roles:
+        parts.append(f"Adjacent roles: {adjacent_roles}")
 
     if not parts:
         raise ValueError("aptitude profile has no embeddable text")

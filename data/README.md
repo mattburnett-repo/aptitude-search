@@ -45,7 +45,7 @@ python data/smoke_onet_postgres.py
 | Variable | Default | Effect |
 |----------|---------|--------|
 | `ONET_SKIP_EMBED` | unset | Set to `1` to load O\*NET only (creates empty `occupation_embeddings`, skips HF) |
-| `ONET_EMBED_ONLY` | unset | Set to `1` to load only the 7 tables required for embed (~18% of INSERTs) |
+| `ONET_EMBED_ONLY` | unset | Set to `1` to load only the 8 tables required for embed (~24% of INSERTs) |
 | `ONET_RESET_SCHEMA` | `1` | Set to `0` to append without `DROP SCHEMA public CASCADE` |
 | `ONET_VERBOSE` | unset | Set to `1` to show every INSERT line |
 | `ONET_LOG_FILE` | unset | e.g. `data/onet-load.log` — append psql output to file |
