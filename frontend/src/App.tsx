@@ -14,6 +14,13 @@ import {
   ResumeInput,
 } from "./components/ResumeInput";
 import { VerifiedMatchesDisplay } from "./components/VerifiedMatchesDisplay";
+import {
+  InputHero,
+  InputTrustNotes,
+  SiteFooter,
+  SiteHeader,
+  SiteShell,
+} from "./components/SiteChrome";
 import type { StageNavProps } from "./components/SaveAsPdfToolbar";
 import { usePipeline } from "./hooks/usePipeline";
 import { useTheme } from "./hooks/useTheme";
@@ -85,6 +92,47 @@ function progressItemClassName(
   return undefined;
 }
 
+const STAGE_HERO: Partial<
+  Record<AppView, { title: string; lead: string }>
+> = {
+  running: {
+    title: "Running your analysis",
+    lead: "Assessing aptitudes, matching careers, and searching open roles.",
+  },
+  stage1: {
+    title: "Your aptitude profile",
+    lead: "Skills, strengths, and working-style signals from your resume.",
+  },
+  stage2: {
+    title: "How sure we are",
+    lead: "Confidence levels for each inference in your profile.",
+  },
+  stage3: {
+    title: "Matching careers",
+    lead: "Careers ranked by fit to your aptitude profile.",
+  },
+  stage4: {
+    title: "Recommended roles",
+    lead: "Target roles and search terms to guide your job hunt.",
+  },
+  stage5: {
+    title: "Job search results",
+    lead: "Verified postings discovered from your profile and recommended roles.",
+  },
+};
+
+function StepSectionHero({ view }: { view: AppView }) {
+  const hero = STAGE_HERO[view];
+  if (!hero) return null;
+
+  return (
+    <header className="step-section-hero">
+      <h2 className="step-section-hero-title">{hero.title}</h2>
+      <p className="step-section-hero-lead">{hero.lead}</p>
+    </header>
+  );
+}
+
 function StepIndicator({
   view,
   hasResult,
@@ -102,7 +150,8 @@ function StepIndicator({
 
   return (
     <nav className="step-indicator" aria-label="Pipeline steps">
-      <ol className="step-indicator-list">
+      <div className="step-indicator-inner">
+        <ol className="step-indicator-list">
         {RESULT_STEPS.map((step, index) => {
           const isActive = view === step.id;
           const isRunning =
@@ -136,7 +185,8 @@ function StepIndicator({
             </li>
           );
         })}
-      </ol>
+        </ol>
+      </div>
     </nav>
   );
 }
@@ -203,41 +253,6 @@ function ProgressLog({
         ))}
       </ol>
     </details>
-  );
-}
-
-function ThemeToggleIcon({ theme }: { theme: "light" | "dark" }) {
-  if (theme === "light") {
-    return (
-      <svg
-        aria-hidden="true"
-        className="theme-toggle-icon"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-      </svg>
-    );
-  }
-
-  return (
-    <svg
-      aria-hidden="true"
-      className="theme-toggle-icon"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="12" cy="12" r="4" />
-      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
-    </svg>
   );
 }
 
@@ -344,34 +359,27 @@ export default function App() {
     isLastStage: true,
   };
 
+  const siteMode =
+    view === "input" || view === "running" ? "marketing" : "tool";
+
   return (
-    <>
-      <header className="page-header">
-        <div className="page-header-text">
-          <h1>Aptitude Search</h1>
-          <p className="app-tagline">
-            Discover roles that fit your real strengths.
-          </p>
-        </div>
-        <button
-          type="button"
-          className="theme-toggle"
-          onClick={toggleTheme}
-          aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-        >
-          <ThemeToggleIcon theme={theme} />
-        </button>
-      </header>
+    <SiteShell mode={siteMode}>
+      <div className="site-top-chrome">
+        <SiteHeader theme={theme} onToggleTheme={toggleTheme} />
+        <StepIndicator
+          view={view}
+          hasResult={Boolean(result)}
+          navDisabled={stepNavDisabled}
+          onStepSelect={setView}
+        />
+      </div>
 
-      <StepIndicator
-        view={view}
-        hasResult={Boolean(result)}
-        navDisabled={stepNavDisabled}
-        onStepSelect={setView}
-      />
+      <main className="site-main">
+        <div className="site-content">
+          <div className="step-panel" hidden={view !== "input"}>
+            <InputHero />
 
-      <div className="step-panel" hidden={view !== "input"}>
-        <ol className="input-steps" aria-label="How it works">
+            <ol className="input-steps" aria-label="How it works">
           <li>
             <span className="input-step-number">01</span>
             <span className="input-step-text">
@@ -414,9 +422,12 @@ export default function App() {
 
           {error && <p className="error">{error}</p>}
         </div>
-      </div>
 
-      <div className="step-panel" hidden={view !== "running"}>
+        <InputTrustNotes />
+          </div>
+
+          <div className="step-panel" hidden={view !== "running"}>
+            <StepSectionHero view="running" />
         <p className="running-stage-label" aria-live="polite">
           {loading && (
             <span className="running-spinner" aria-hidden="true" />
@@ -438,56 +449,65 @@ export default function App() {
             </button>
           </div>
         )}
-      </div>
+          </div>
 
-      {result && (
-        <>
-          <div className="step-panel" hidden={view !== "stage1"}>
+          {result && (
+            <>
+              <div className="step-panel" hidden={view !== "stage1"}>
+                <StepSectionHero view="stage1" />
             <AptitudeProfileDisplay
               profile={result.aptitude_profile}
               stageNav={withStepNavDisabled(stage1Nav)}
               onPdfBusyChange={setStepNavDisabled}
             />
             <StageBottomNav stageNav={withStepNavDisabled(stage1Nav)} />
-          </div>
+              </div>
 
-          <div className="step-panel" hidden={view !== "stage2"}>
+              <div className="step-panel" hidden={view !== "stage2"}>
+                <StepSectionHero view="stage2" />
             <InferenceConfidenceDisplay
               profile={result.aptitude_profile}
               stageNav={withStepNavDisabled(stage2Nav)}
               onPdfBusyChange={setStepNavDisabled}
             />
             <StageBottomNav stageNav={withStepNavDisabled(stage2Nav)} />
-          </div>
+              </div>
 
-          <div className="step-panel" hidden={view !== "stage3"}>
+              <div className="step-panel" hidden={view !== "stage3"}>
+                <StepSectionHero view="stage3" />
             <OccupationMatchesDisplay
               matches={result.occupation_matches}
               stageNav={withStepNavDisabled(stage3Nav)}
               onPdfBusyChange={setStepNavDisabled}
             />
             <StageBottomNav stageNav={withStepNavDisabled(stage3Nav)} />
-          </div>
+              </div>
 
-          <div className="step-panel" hidden={view !== "stage4"}>
+              <div className="step-panel" hidden={view !== "stage4"}>
+                <StepSectionHero view="stage4" />
             <RoleFamilyPlanDisplay
               plan={result.role_family_plan}
               stageNav={withStepNavDisabled(stage4Nav)}
               onPdfBusyChange={setStepNavDisabled}
             />
             <StageBottomNav stageNav={withStepNavDisabled(stage4Nav)} />
-          </div>
+              </div>
 
-          <div className="step-panel" hidden={view !== "stage5"}>
+              <div className="step-panel" hidden={view !== "stage5"}>
+                <StepSectionHero view="stage5" />
             <VerifiedMatchesDisplay
               matches={result.verified_matches}
               stageNav={withStepNavDisabled(stage5Nav)}
               onPdfBusyChange={setStepNavDisabled}
             />
             <StageBottomNav stageNav={withStepNavDisabled(stage5Nav)} />
-          </div>
-        </>
-      )}
-    </>
+              </div>
+            </>
+          )}
+        </div>
+      </main>
+
+      <SiteFooter />
+    </SiteShell>
   );
 }

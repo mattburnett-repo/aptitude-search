@@ -96,7 +96,6 @@ export function ResumeInput({ value, onChange, onError }: ResumeInputProps) {
 
   return (
     <section>
-      <label htmlFor="resume">Resume</label>
       <div className="resume-toolbar">
         <input
           ref={fileInputRef}
@@ -105,13 +104,14 @@ export function ResumeInput({ value, onChange, onError }: ResumeInputProps) {
           accept=".txt,.md,.text,.pdf,text/plain,application/pdf"
           className="resume-file-input"
           onChange={handleFileChange}
+          aria-label="Resume file"
         />
         <button
           type="button"
           className="secondary resume-file-button"
           onClick={() => fileInputRef.current?.click()}
         >
-          Choose file
+          Choose resume file
         </button>
         {value.fileName && (
           <span className="resume-file-name">{value.fileName}</span>
@@ -157,6 +157,7 @@ export function ResumeInput({ value, onChange, onError }: ResumeInputProps) {
           value={value.resume}
           onChange={handleTextChange}
           placeholder="Paste resume text..."
+          aria-label="Resume text"
         />
       )}
     </section>
