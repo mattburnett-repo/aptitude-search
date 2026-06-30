@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { SaveAsPdfToolbar } from "./SaveAsPdfToolbar";
+import { SaveAsPdfToolbar, type StageNavProps } from "./SaveAsPdfToolbar";
 
 type Confidence = "high" | "medium" | "low";
 
@@ -91,16 +91,24 @@ function JobCard({ job }: { job: JobPosting }) {
 
 type VerifiedMatchesDisplayProps = {
   matches: unknown;
+  stageNav?: StageNavProps;
+  onPdfBusyChange?: (busy: boolean) => void;
 };
 
 function VerifiedSaveAsPdfToolbar({
   matchesRef,
+  stageNav,
+  onPdfBusyChange,
 }: {
   matchesRef: React.RefObject<HTMLDivElement | null>;
+  stageNav?: StageNavProps;
+  onPdfBusyChange?: (busy: boolean) => void;
 }) {
   return (
     <SaveAsPdfToolbar
       contentRef={matchesRef}
+      stageNav={stageNav}
+      onPdfBusyChange={onPdfBusyChange}
       loadExporter={async () => {
         const { openVerifiedMatchesPdf } = await import(
           "../lib/exportVerifiedMatchesPdf"
@@ -111,7 +119,11 @@ function VerifiedSaveAsPdfToolbar({
   );
 }
 
-export function VerifiedMatchesDisplay({ matches }: VerifiedMatchesDisplayProps) {
+export function VerifiedMatchesDisplay({
+  matches,
+  stageNav,
+  onPdfBusyChange,
+}: VerifiedMatchesDisplayProps) {
   const matchesRef = useRef<HTMLDivElement>(null);
 
   if (!matches) return null;
@@ -119,8 +131,12 @@ export function VerifiedMatchesDisplay({ matches }: VerifiedMatchesDisplayProps)
   if (!isVerifiedMatches(matches)) {
     return (
       <details className="collapsible-section" open>
-        <summary>Stage 3 — Verified matches</summary>
-        <VerifiedSaveAsPdfToolbar matchesRef={matchesRef} />
+        <summary>Step 5 — Job search results</summary>
+        <VerifiedSaveAsPdfToolbar
+          matchesRef={matchesRef}
+          stageNav={stageNav}
+          onPdfBusyChange={onPdfBusyChange}
+        />
         <div ref={matchesRef} className="collapsible-section-body verified-matches">
           <pre className="aptitude-raw-pre">{JSON.stringify(matches, null, 2)}</pre>
         </div>
@@ -130,13 +146,17 @@ export function VerifiedMatchesDisplay({ matches }: VerifiedMatchesDisplayProps)
 
   return (
     <details className="collapsible-section" open>
-      <summary>Stage 3 — Verified matches</summary>
-      <VerifiedSaveAsPdfToolbar matchesRef={matchesRef} />
+      <summary>Step 5 — Job search results</summary>
+      <VerifiedSaveAsPdfToolbar
+        matchesRef={matchesRef}
+        stageNav={stageNav}
+        onPdfBusyChange={onPdfBusyChange}
+      />
       <div className="collapsible-section-body">
         <div ref={matchesRef} className="verified-matches">
           {matches.search_plan.length > 0 && (
             <section className="verified-section">
-              <h3 className="verified-section-title">Search plan</h3>
+              <h3 className="verified-section-title">What we looked for</h3>
               <ol className="verified-search-plan">
                 {matches.search_plan.map((item) => (
                   <li key={item}>{item}</li>
@@ -175,12 +195,14 @@ export function VerifiedMatchesDisplay({ matches }: VerifiedMatchesDisplayProps)
           )}
         </div>
 
+        {/*
         <details className="collapsible-section verified-raw-json">
           <summary>Raw JSON</summary>
           <pre className="aptitude-raw-pre">
             {JSON.stringify(matches, null, 2)}
           </pre>
         </details>
+        */}
       </div>
     </details>
   );

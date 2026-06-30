@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { SaveAsPdfToolbar } from "./SaveAsPdfToolbar";
+import { SaveAsPdfToolbar, type StageNavProps } from "./SaveAsPdfToolbar";
 
 export type OccupationMatch = {
   onetsoc_code: string;
@@ -30,12 +30,18 @@ function formatScore(score: number): string {
 
 function OccupationSaveAsPdfToolbar({
   matchesRef,
+  stageNav,
+  onPdfBusyChange,
 }: {
   matchesRef: React.RefObject<HTMLDivElement | null>;
+  stageNav?: StageNavProps;
+  onPdfBusyChange?: (busy: boolean) => void;
 }) {
   return (
     <SaveAsPdfToolbar
       contentRef={matchesRef}
+      stageNav={stageNav}
+      onPdfBusyChange={onPdfBusyChange}
       loadExporter={async () => {
         const { openOccupationMatchesPdf } = await import(
           "../lib/exportOccupationMatchesPdf"
@@ -48,9 +54,15 @@ function OccupationSaveAsPdfToolbar({
 
 type OccupationMatchesDisplayProps = {
   matches: unknown;
+  stageNav?: StageNavProps;
+  onPdfBusyChange?: (busy: boolean) => void;
 };
 
-export function OccupationMatchesDisplay({ matches }: OccupationMatchesDisplayProps) {
+export function OccupationMatchesDisplay({
+  matches,
+  stageNav,
+  onPdfBusyChange,
+}: OccupationMatchesDisplayProps) {
   const matchesRef = useRef<HTMLDivElement>(null);
 
   if (matches == null) return null;
@@ -58,8 +70,15 @@ export function OccupationMatchesDisplay({ matches }: OccupationMatchesDisplayPr
   if (!isOccupationMatches(matches)) {
     return (
       <details className="collapsible-section" open>
-        <summary>Stage 2 — O*NET occupation matches</summary>
-        <div className="collapsible-section-body">
+        <summary>Step 3 — Matching careers</summary>
+        {stageNav && (
+          <OccupationSaveAsPdfToolbar
+            matchesRef={matchesRef}
+            stageNav={stageNav}
+            onPdfBusyChange={onPdfBusyChange}
+          />
+        )}
+        <div ref={matchesRef} className="collapsible-section-body">
           <pre className="aptitude-raw-pre">{JSON.stringify(matches, null, 2)}</pre>
         </div>
       </details>
@@ -68,18 +87,26 @@ export function OccupationMatchesDisplay({ matches }: OccupationMatchesDisplayPr
 
   return (
     <details className="collapsible-section" open>
-      <summary>Stage 2 — O*NET occupation matches</summary>
-      {matches.length > 0 && <OccupationSaveAsPdfToolbar matchesRef={matchesRef} />}
+      <summary>Step 3 — Matching careers</summary>
+      {(matches.length > 0 || stageNav) && (
+        <OccupationSaveAsPdfToolbar
+          matchesRef={matchesRef}
+          stageNav={stageNav}
+          onPdfBusyChange={onPdfBusyChange}
+        />
+      )}
       <div className="collapsible-section-body">
         {matches.length === 0 ? (
-          <p className="stage2-empty">
-            No O*NET occupation matches (matching disabled or unavailable).
-          </p>
+          <div ref={matchesRef}>
+            <p className="stage2-empty">
+              No matching careers (matching disabled or unavailable).
+            </p>
+          </div>
         ) : (
           <div ref={matchesRef} className="occupation-matches">
             <section className="aptitude-section">
               <p className="stage2-lead">
-                Top occupations by embedding similarity to your aptitude profile.
+                Careers ranked by how well they match your resume.
               </p>
               <ol className="occupation-match-list">
                 {matches.map((match) => (
@@ -98,10 +125,12 @@ export function OccupationMatchesDisplay({ matches }: OccupationMatchesDisplayPr
           </div>
         )}
 
+        {/*
         <details className="collapsible-section aptitude-raw-json">
           <summary>Raw JSON</summary>
           <pre className="aptitude-raw-pre">{JSON.stringify(matches, null, 2)}</pre>
         </details>
+        */}
       </div>
     </details>
   );

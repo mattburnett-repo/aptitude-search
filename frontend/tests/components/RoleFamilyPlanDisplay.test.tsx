@@ -15,7 +15,7 @@ describe("RoleFamilyPlanDisplay", () => {
     render(<RoleFamilyPlanDisplay plan={roleFamilyPlan} />);
 
     expect(
-      screen.getByRole("heading", { name: "Solutions / Integration Engineering" })
+      screen.getByRole("heading", { name: "Role: Solutions / Integration Engineering" })
     ).toBeInTheDocument();
     expect(document.querySelector(".role-family-fit-reason")).toHaveTextContent(
       /Repeated API integrations/

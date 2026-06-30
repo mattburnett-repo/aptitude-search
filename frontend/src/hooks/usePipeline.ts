@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   buildConstraintsBody,
   type Constraints,
@@ -8,6 +8,7 @@ import { runPipelineStream, type PipelineResult } from "../api/pipeline";
 import { readFileAsBase64 } from "../lib/readFileAsBase64";
 
 export function usePipeline() {
+  const runIdRef = useRef(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [progressMessages, setProgressMessages] = useState<string[]>([]);
@@ -17,6 +18,7 @@ export function usePipeline() {
     resumeInput: ResumeInputValue,
     constraints: Constraints
   ) {
+    const runId = ++runIdRef.current;
     setError(null);
     setResult(null);
     setProgressMessages([]);
@@ -33,14 +35,26 @@ export function usePipeline() {
             constraints: buildConstraintsBody(constraints),
           };
       const data = await runPipelineStream(body, (message) => {
+        if (runId !== runIdRef.current) return;
         setProgressMessages((prev) => [...prev, message]);
       });
+      if (runId !== runIdRef.current) return;
       setResult(data);
     } catch (e) {
+      if (runId !== runIdRef.current) return;
       setError(e instanceof Error ? e.message : "Request failed");
     } finally {
+      if (runId !== runIdRef.current) return;
       setLoading(false);
     }
+  }
+
+  function resetPipeline() {
+    runIdRef.current += 1;
+    setLoading(false);
+    setError(null);
+    setResult(null);
+    setProgressMessages([]);
   }
 
   return {
@@ -50,5 +64,6 @@ export function usePipeline() {
     progressMessages,
     result,
     runPipeline,
+    resetPipeline,
   };
 }

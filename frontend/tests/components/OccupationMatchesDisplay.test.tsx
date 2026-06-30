@@ -23,7 +23,7 @@ describe("OccupationMatchesDisplay", () => {
   it("shows empty state for an empty array", () => {
     render(<OccupationMatchesDisplay matches={[]} />);
 
-    expect(screen.getByText(/No O\*NET occupation matches/)).toBeInTheDocument();
+    expect(screen.getByText(/No matching careers/)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Save as PDF" })).not.toBeInTheDocument();
   });
 

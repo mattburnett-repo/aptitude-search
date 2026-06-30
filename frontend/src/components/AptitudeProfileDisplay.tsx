@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { SaveAsPdfToolbar } from "./SaveAsPdfToolbar";
+import { SaveAsPdfToolbar, type StageNavProps } from "./SaveAsPdfToolbar";
 
 type Confidence = "high" | "medium" | "low";
 
@@ -100,16 +100,20 @@ function LabeledList({ title, items }: { title: string; items: LabeledItem[] }) 
   );
 }
 
-type SaveAsPdfToolbarProps = {
-  profileRef: React.RefObject<HTMLDivElement | null>;
-};
-
 function AptitudeSaveAsPdfToolbar({
   profileRef,
-}: SaveAsPdfToolbarProps) {
+  stageNav,
+  onPdfBusyChange,
+}: {
+  profileRef: React.RefObject<HTMLDivElement | null>;
+  stageNav?: StageNavProps;
+  onPdfBusyChange?: (busy: boolean) => void;
+}) {
   return (
     <SaveAsPdfToolbar
       contentRef={profileRef}
+      stageNav={stageNav}
+      onPdfBusyChange={onPdfBusyChange}
       loadExporter={async () => {
         const { openAptitudeProfilePdf } = await import(
           "../lib/exportAptitudeProfilePdf"
@@ -122,9 +126,15 @@ function AptitudeSaveAsPdfToolbar({
 
 type AptitudeProfileDisplayProps = {
   profile: unknown;
+  stageNav?: StageNavProps;
+  onPdfBusyChange?: (busy: boolean) => void;
 };
 
-export function AptitudeProfileDisplay({ profile }: AptitudeProfileDisplayProps) {
+export function AptitudeProfileDisplay({
+  profile,
+  stageNav,
+  onPdfBusyChange,
+}: AptitudeProfileDisplayProps) {
   const profileRef = useRef<HTMLDivElement>(null);
 
   if (!profile) return null;
@@ -132,8 +142,12 @@ export function AptitudeProfileDisplay({ profile }: AptitudeProfileDisplayProps)
   if (!isAptitudeProfile(profile)) {
     return (
       <details className="collapsible-section" open>
-        <summary>Stage 1 — Aptitude profile</summary>
-        <AptitudeSaveAsPdfToolbar profileRef={profileRef} />
+        <summary>Step 1 — From your resume</summary>
+        <AptitudeSaveAsPdfToolbar
+          profileRef={profileRef}
+          stageNav={stageNav}
+          onPdfBusyChange={onPdfBusyChange}
+        />
         <div ref={profileRef} className="collapsible-section-body aptitude-profile">
           <pre className="aptitude-raw-pre">{JSON.stringify(profile, null, 2)}</pre>
         </div>
@@ -141,17 +155,14 @@ export function AptitudeProfileDisplay({ profile }: AptitudeProfileDisplayProps)
     );
   }
 
-  const confidenceEntries = Object.entries(profile.confidence_map ?? {}).filter(
-    ([, entry]) =>
-      isRecord(entry) &&
-      isConfidence(entry.confidence) &&
-      typeof entry.reason === "string"
-  ) as [string, ConfidenceMapEntry][];
-
   return (
     <details className="collapsible-section" open>
-      <summary>Stage 1 — Aptitude profile</summary>
-      <AptitudeSaveAsPdfToolbar profileRef={profileRef} />
+      <summary>Step 1 — From your resume</summary>
+      <AptitudeSaveAsPdfToolbar
+        profileRef={profileRef}
+        stageNav={stageNav}
+        onPdfBusyChange={onPdfBusyChange}
+      />
       <div className="collapsible-section-body">
         <div ref={profileRef} className="aptitude-profile">
           <div className="aptitude-pdf-page" data-pdf-page>
@@ -196,34 +207,16 @@ export function AptitudeProfileDisplay({ profile }: AptitudeProfileDisplayProps)
             )}
           </div>
 
-          {confidenceEntries.length > 0 && (
-            <div className="aptitude-pdf-page" data-pdf-page>
-              <details className="collapsible-section aptitude-meta">
-                <summary>Inference confidence</summary>
-                <div className="collapsible-section-body">
-                  <ul className="aptitude-confidence-map">
-                    {confidenceEntries.map(([key, entry]) => (
-                      <li key={key}>
-                        <span className="aptitude-confidence-key">
-                          {key.replace(/_/g, " ")}
-                        </span>
-                        <ConfidenceBadge level={entry.confidence} />
-                        <p className="aptitude-evidence">{entry.reason}</p>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </details>
-            </div>
-          )}
         </div>
 
+        {/*
         <details className="collapsible-section aptitude-raw-json">
           <summary>Raw JSON</summary>
           <pre className="aptitude-raw-pre">
             {JSON.stringify(profile, null, 2)}
           </pre>
         </details>
+        */}
       </div>
     </details>
   );

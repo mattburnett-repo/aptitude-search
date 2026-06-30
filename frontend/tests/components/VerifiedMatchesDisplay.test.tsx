@@ -14,7 +14,7 @@ describe("VerifiedMatchesDisplay", () => {
   it("renders search plan, results, and notes", () => {
     render(<VerifiedMatchesDisplay matches={verifiedMatches} />);
 
-    expect(screen.getByText("Search plan")).toBeInTheDocument();
+    expect(screen.getByText("What we looked for")).toBeInTheDocument();
     expect(screen.getByText("Django modernization roles")).toBeInTheDocument();
     expect(screen.getByText("Senior Software Engineer")).toBeInTheDocument();
     expect(screen.getByText("Riverbend Logistics")).toBeInTheDocument();

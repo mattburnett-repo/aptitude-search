@@ -107,4 +107,36 @@ describe("usePipeline", () => {
     await waitFor(() => expect(result.current.error).toBe("Invalid resume"));
     expect(result.current.result).toBeNull();
   });
+
+  it("ignores stale pipeline results after reset", async () => {
+    const pipelineResult = {
+      aptitude_profile: stage1Profile,
+      role_family_plan: roleFamilyPlan,
+      occupation_matches: occupationMatches,
+      verified_matches: verifiedMatches,
+    };
+    let resolvePipeline: (value: typeof pipelineResult) => void = () => {};
+    vi.mocked(runPipelineStream).mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolvePipeline = resolve;
+        })
+    );
+
+    const { result } = renderHook(() => usePipeline());
+
+    const runPromise = result.current.runPipeline(
+      { ...defaultResumeInput, resume: "Alex Morgan" },
+      defaultConstraints
+    );
+
+    result.current.resetPipeline();
+
+    resolvePipeline(pipelineResult);
+    await runPromise;
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.result).toBeNull();
+    expect(result.current.progressMessages).toEqual([]);
+  });
 });

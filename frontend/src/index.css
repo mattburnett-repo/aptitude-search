@@ -349,6 +349,22 @@ button.secondary.success:hover {
   border-color: #0f5c29;
 }
 
+button.back {
+  background: #c48832;
+  border: 1px solid #c48832;
+  color: #fff;
+}
+
+button.back:hover {
+  background: #b07a2c;
+  border-color: #b07a2c;
+}
+
+button.back:active {
+  background: #9d6d27;
+  border-color: #9d6d27;
+}
+
 [data-theme="dark"] button.secondary.success {
   background: #2e7d4a;
   border-color: #2e7d4a;
@@ -357,6 +373,22 @@ button.secondary.success:hover {
 [data-theme="dark"] button.secondary.success:hover {
   background: #3d9960;
   border-color: #3d9960;
+}
+
+[data-theme="dark"] button.back {
+  background: #b89248;
+  border-color: #b89248;
+  color: #fff;
+}
+
+[data-theme="dark"] button.back:hover {
+  background: #c49e52;
+  border-color: #c49e52;
+}
+
+[data-theme="dark"] button.back:active {
+  background: #a68340;
+  border-color: #a68340;
 }
 
 button.theme-toggle {
@@ -389,6 +421,34 @@ button.theme-toggle:hover {
   margin: 1rem 0;
 }
 
+.result-steps {
+  margin-top: 1rem;
+}
+
+.step-panel[hidden] {
+  display: none;
+}
+
+.step-label {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  color: var(--color-muted);
+}
+
+.running-status {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--color-muted);
+}
+
+.step-nav {
+  margin-top: 1.5rem;
+}
+
+.step-nav-end {
+  justify-content: flex-end;
+}
+
 .error {
   color: #f28b82;
   font-size: 0.9rem;
@@ -404,8 +464,6 @@ button.theme-toggle:hover {
   padding: 0.75rem 1rem 0.75rem 2rem;
   font-size: 0.85rem;
   color: var(--color-muted);
-  max-height: 200px;
-  overflow-y: auto;
   border-top: 1px solid var(--color-field-border);
 }
 
@@ -451,7 +509,15 @@ button.theme-toggle:hover {
   border-bottom: 1px solid var(--color-field-border);
 }
 
+.stage-nav-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
 .pdf-export-error {
+  flex-basis: 100%;
   margin: 0;
   font-size: 0.85rem;
 }
@@ -518,6 +584,12 @@ button.theme-toggle:hover {
   margin: 0 0 0.75rem;
   font-size: 0.9rem;
   color: var(--color-muted);
+}
+
+.role-family-lead {
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-field-border);
 }
 
 .stage2-empty {

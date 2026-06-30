@@ -103,7 +103,7 @@ def run_stage3(
         found_jobs = ranked
     if found_jobs:
         emit_progress(
-            f"Found {len(found_jobs)} job posting(s). Synthesizing verified matches…",
+            f"Found {len(found_jobs)} job posting(s). Preparing verified job listings…",
             on_progress=on_progress,
         )
         result = synthesize_job_discovery_results(

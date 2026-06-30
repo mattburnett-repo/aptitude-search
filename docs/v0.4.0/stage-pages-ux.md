@@ -1,5 +1,7 @@
 # Stage pages UX — one screen at a time
 
+> **Status (v0.4.0):** Done. Shipped as the **presentation-only wizard** (option A below): one `POST /v1/pipeline`, five result steps after Running, Back/Next/Start over, panels stay mounted when navigating. Inference confidence is its own step (Step 2); occupation matches and role family plan are separate steps (3 and 4). Optional constraints UI remains commented out; pipeline still sends defaults. This file is kept mostly for archival reasons — the pre-ship planning notes below are no longer authoritative.
+
 ## What you have now
 
 One long page: input → Go → progress log → **all four result panels stacked** when done (`App.tsx` lines 144–150).

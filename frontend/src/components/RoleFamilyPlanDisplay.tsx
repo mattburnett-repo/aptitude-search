@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { SaveAsPdfToolbar } from "./SaveAsPdfToolbar";
+import { SaveAsPdfToolbar, type StageNavProps } from "./SaveAsPdfToolbar";
 
 type RoleFamily = {
   role_family: string;
@@ -60,12 +60,18 @@ function TagList({ label, items }: { label: string; items: string[] }) {
 
 function RoleFamilySaveAsPdfToolbar({
   planRef,
+  stageNav,
+  onPdfBusyChange,
 }: {
   planRef: React.RefObject<HTMLDivElement | null>;
+  stageNav?: StageNavProps;
+  onPdfBusyChange?: (busy: boolean) => void;
 }) {
   return (
     <SaveAsPdfToolbar
       contentRef={planRef}
+      stageNav={stageNav}
+      onPdfBusyChange={onPdfBusyChange}
       loadExporter={async () => {
         const { openRoleFamilyPlanPdf } = await import("../lib/exportRoleFamilyPlanPdf");
         return openRoleFamilyPlanPdf;
@@ -76,9 +82,15 @@ function RoleFamilySaveAsPdfToolbar({
 
 type RoleFamilyPlanDisplayProps = {
   plan: unknown;
+  stageNav?: StageNavProps;
+  onPdfBusyChange?: (busy: boolean) => void;
 };
 
-export function RoleFamilyPlanDisplay({ plan }: RoleFamilyPlanDisplayProps) {
+export function RoleFamilyPlanDisplay({
+  plan,
+  stageNav,
+  onPdfBusyChange,
+}: RoleFamilyPlanDisplayProps) {
   const planRef = useRef<HTMLDivElement>(null);
 
   if (!plan) return null;
@@ -86,7 +98,7 @@ export function RoleFamilyPlanDisplay({ plan }: RoleFamilyPlanDisplayProps) {
   if (!isRoleFamilyPlan(plan)) {
     return (
       <details className="collapsible-section" open>
-        <summary>Stage 2 — Role family plan</summary>
+        <summary>Step 4 — Recommended roles</summary>
         <div className="collapsible-section-body">
           <pre className="aptitude-raw-pre">{JSON.stringify(plan, null, 2)}</pre>
         </div>
@@ -96,24 +108,34 @@ export function RoleFamilyPlanDisplay({ plan }: RoleFamilyPlanDisplayProps) {
 
   return (
     <details className="collapsible-section" open>
-      <summary>Stage 2 — Role family plan</summary>
-      <RoleFamilySaveAsPdfToolbar planRef={planRef} />
+      <summary>Step 4 — Recommended roles</summary>
+      <RoleFamilySaveAsPdfToolbar
+        planRef={planRef}
+        stageNav={stageNav}
+        onPdfBusyChange={onPdfBusyChange}
+      />
       <div className="collapsible-section-body">
         <div ref={planRef} className="role-family-plan">
+          <p className="stage2-lead role-family-lead">
+            Each role shows why we recommend it, keywords to use when searching,
+            preferred work setup, details from your resume that support the fit,
+            and keywords to skip.
+          </p>
           {plan.recommended_role_families.map((family) => (
             <section key={family.role_family} className="aptitude-section role-family-card">
-              <h3 className="aptitude-section-title">{family.role_family}</h3>
+              <h3 className="aptitude-section-title">Role: {family.role_family}</h3>
+              <p className="role-family-tags-label">Why it fits</p>
               <p className="role-family-fit-reason">{family.fit_reason}</p>
-              <TagList label="Search terms" items={family.search_terms} />
-              <TagList label="Work modes" items={family.work_modes} />
-              <TagList label="Supporting signals" items={family.supporting_signals} />
-              <TagList label="Avoid terms" items={family.avoid_terms} />
+              <TagList label="Job search keywords" items={family.search_terms} />
+              <TagList label="Work setup" items={family.work_modes} />
+              <TagList label="From your resume" items={family.supporting_signals} />
+              <TagList label="Skip these keywords" items={family.avoid_terms} />
             </section>
           ))}
 
           {plan.rationale.length > 0 && (
             <section className="aptitude-section aptitude-rationale-section">
-              <h3 className="aptitude-section-title">Rationale</h3>
+              <h3 className="aptitude-section-title">Why these roles</h3>
               <ul className="aptitude-rationale">
                 {plan.rationale.map((item) => (
                   <li key={item}>{item}</li>
@@ -123,10 +145,12 @@ export function RoleFamilyPlanDisplay({ plan }: RoleFamilyPlanDisplayProps) {
           )}
         </div>
 
+        {/*
         <details className="collapsible-section aptitude-raw-json">
           <summary>Raw JSON</summary>
           <pre className="aptitude-raw-pre">{JSON.stringify(plan, null, 2)}</pre>
         </details>
+        */}
       </div>
     </details>
   );

@@ -44,7 +44,7 @@ describe("AptitudeProfileDisplay", () => {
     render(<AptitudeProfileDisplay profile={stage1Profile} />);
 
     const pages = document.querySelectorAll(".aptitude-profile [data-pdf-page]");
-    expect(pages).toHaveLength(4);
+    expect(pages).toHaveLength(3);
     expect(pages[0]).toHaveTextContent(/Adaptable full-stack engineer/);
     expect(pages[0]).toHaveTextContent("Core skills");
     expect(pages[0]).not.toHaveTextContent("Domains");
@@ -52,6 +52,6 @@ describe("AptitudeProfileDisplay", () => {
     expect(pages[1]).toHaveTextContent("Strengths");
     expect(pages[2]).toHaveTextContent("Adjacent roles");
     expect(pages[2]).toHaveTextContent("Working style signals");
-    expect(pages[3]).toHaveTextContent("Inference confidence");
+    expect(pages[2]).not.toHaveTextContent("Inference confidence");
   });
 });
