@@ -128,9 +128,17 @@ def _strip_contact_header_lines(text: str) -> str:
 @lru_cache(maxsize=1)
 def _presidio_engines() -> tuple[AnalyzerEngine, AnonymizerEngine]:
     from presidio_analyzer import AnalyzerEngine
+    from presidio_analyzer.nlp_engine import NlpEngineProvider
     from presidio_anonymizer import AnonymizerEngine
 
-    return AnalyzerEngine(), AnonymizerEngine()
+    # Use en_core_web_sm from requirements.txt — not Presidio's default en_core_web_lg.
+    nlp_engine = NlpEngineProvider(
+        nlp_configuration={
+            "nlp_engine_name": "spacy",
+            "models": [{"lang_code": "en", "model_name": "en_core_web_sm"}],
+        }
+    ).create_engine()
+    return AnalyzerEngine(nlp_engine=nlp_engine), AnonymizerEngine()
 
 
 def _delete_pii(text: str) -> str:

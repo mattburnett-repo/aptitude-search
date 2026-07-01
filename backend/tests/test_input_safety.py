@@ -10,6 +10,7 @@ from app.core.input_safety import (
     _check_injection,
     _collapse_whitespace,
     _delete_pii,
+    _presidio_engines,
     _strip_contact_header_lines,
     prepare_resume,
 )
@@ -87,3 +88,22 @@ def test_prepare_resume_runs_injection_then_pii(
     result = prepare_resume("Software engineer resume body.")
     assert result == "scrubbed resume"
     mock_delete.assert_called_once()
+
+
+@patch("presidio_anonymizer.AnonymizerEngine")
+@patch("presidio_analyzer.AnalyzerEngine")
+@patch("presidio_analyzer.nlp_engine.NlpEngineProvider")
+def test_presidio_engines_use_bundled_sm_model(
+    mock_provider_cls: MagicMock,
+    _mock_analyzer: MagicMock,
+    _mock_anonymizer: MagicMock,
+) -> None:
+    mock_provider_cls.return_value.create_engine.return_value = MagicMock()
+    _presidio_engines.cache_clear()
+    _presidio_engines()
+    mock_provider_cls.assert_called_once_with(
+        nlp_configuration={
+            "nlp_engine_name": "spacy",
+            "models": [{"lang_code": "en", "model_name": "en_core_web_sm"}],
+        }
+    )
