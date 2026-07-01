@@ -189,7 +189,10 @@ export function AptitudeProfileDisplay({
             </div>
           </div>
 
-          <div className="aptitude-pdf-page" data-pdf-page>
+          <div
+            className="aptitude-pdf-page aptitude-profile-section-divider"
+            data-pdf-page
+          >
             <div className="aptitude-grid">
               <LabeledList title="Adjacent roles" items={profile.adjacent_roles} />
               <LabeledList

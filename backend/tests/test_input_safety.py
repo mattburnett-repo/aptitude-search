@@ -92,10 +92,18 @@ def test_prepare_resume_runs_injection_then_pii(
 
 @patch("presidio_anonymizer.AnonymizerEngine")
 @patch("presidio_analyzer.AnalyzerEngine")
+@patch("presidio_analyzer.predefined_recognizers.UsSsnRecognizer")
+@patch("presidio_analyzer.predefined_recognizers.PhoneRecognizer")
+@patch("presidio_analyzer.predefined_recognizers.EmailRecognizer")
+@patch("presidio_analyzer.RecognizerRegistry")
 @patch("presidio_analyzer.nlp_engine.NlpEngineProvider")
 def test_presidio_engines_use_bundled_sm_model(
     mock_provider_cls: MagicMock,
-    _mock_analyzer: MagicMock,
+    mock_registry_cls: MagicMock,
+    mock_email_cls: MagicMock,
+    mock_phone_cls: MagicMock,
+    mock_ssn_cls: MagicMock,
+    mock_analyzer_cls: MagicMock,
     _mock_anonymizer: MagicMock,
 ) -> None:
     mock_provider_cls.return_value.create_engine.return_value = MagicMock()
@@ -105,5 +113,31 @@ def test_presidio_engines_use_bundled_sm_model(
         nlp_configuration={
             "nlp_engine_name": "spacy",
             "models": [{"lang_code": "en", "model_name": "en_core_web_sm"}],
+            "ner_model_configuration": {
+                "labels_to_ignore": [
+                    "CARDINAL",
+                    "PERCENT",
+                    "ORDINAL",
+                    "QUANTITY",
+                    "MONEY",
+                    "EVENT",
+                    "LANGUAGE",
+                    "LAW",
+                    "PRODUCT",
+                    "WORK_OF_ART",
+                ],
+            },
         }
     )
+    mock_registry_cls.assert_called_once_with(supported_languages=["en"])
+    mock_registry_cls.return_value.add_recognizer.assert_any_call(
+        mock_email_cls.return_value
+    )
+    mock_registry_cls.return_value.add_recognizer.assert_any_call(
+        mock_phone_cls.return_value
+    )
+    mock_registry_cls.return_value.add_recognizer.assert_any_call(
+        mock_ssn_cls.return_value
+    )
+    mock_analyzer_cls.assert_called_once()
+    assert mock_analyzer_cls.call_args.kwargs["supported_languages"] == ["en"]

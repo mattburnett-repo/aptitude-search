@@ -61,6 +61,21 @@ _CONTACT_HEADER_MARKERS = (
     "mailto:",
 )
 
+_PRESIDIO_LANGUAGE = "en"
+_SPACY_MODEL = "en_core_web_sm"
+_SPACY_LABELS_TO_IGNORE = (
+    "CARDINAL",
+    "PERCENT",
+    "ORDINAL",
+    "QUANTITY",
+    "MONEY",
+    "EVENT",
+    "LANGUAGE",
+    "LAW",
+    "PRODUCT",
+    "WORK_OF_ART",
+)
+
 
 def prepare_resume(
     text: str,
@@ -127,18 +142,37 @@ def _strip_contact_header_lines(text: str) -> str:
 
 @lru_cache(maxsize=1)
 def _presidio_engines() -> tuple[AnalyzerEngine, AnonymizerEngine]:
-    from presidio_analyzer import AnalyzerEngine
+    from presidio_analyzer import AnalyzerEngine, RecognizerRegistry
     from presidio_analyzer.nlp_engine import NlpEngineProvider
+    from presidio_analyzer.predefined_recognizers import (
+        EmailRecognizer,
+        PhoneRecognizer,
+        UsSsnRecognizer,
+    )
     from presidio_anonymizer import AnonymizerEngine
 
-    # Use en_core_web_sm from requirements.txt — not Presidio's default en_core_web_lg.
+    logging.getLogger("presidio-analyzer").setLevel(logging.WARNING)
+
     nlp_engine = NlpEngineProvider(
         nlp_configuration={
             "nlp_engine_name": "spacy",
-            "models": [{"lang_code": "en", "model_name": "en_core_web_sm"}],
+            "models": [{"lang_code": _PRESIDIO_LANGUAGE, "model_name": _SPACY_MODEL}],
+            "ner_model_configuration": {
+                "labels_to_ignore": list(_SPACY_LABELS_TO_IGNORE),
+            },
         }
     ).create_engine()
-    return AnalyzerEngine(nlp_engine=nlp_engine), AnonymizerEngine()
+
+    registry = RecognizerRegistry(supported_languages=[_PRESIDIO_LANGUAGE])
+    for recognizer_cls in (EmailRecognizer, PhoneRecognizer, UsSsnRecognizer):
+        registry.add_recognizer(recognizer_cls())
+
+    analyzer = AnalyzerEngine(
+        nlp_engine=nlp_engine,
+        registry=registry,
+        supported_languages=[_PRESIDIO_LANGUAGE],
+    )
+    return analyzer, AnonymizerEngine()
 
 
 def _delete_pii(text: str) -> str:
