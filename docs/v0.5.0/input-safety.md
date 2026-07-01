@@ -1,6 +1,6 @@
 # Input safety — PII deletion and prompt-injection gate
 
-> **Status (v0.5.0):** Planned. Resume text (paste or PDF extract) currently passes straight into Stage 1 with no ingress checks. This doc defines the v0.5.0 input-safety layer before aptitude profiling.
+> **Status (v0.5.0):** Implemented. Resume ingress runs injection screening (regex → blocklist → Prompt Guard 2 22M) then Presidio PII deletion before Stage 1.
 
 ## Problem
 
@@ -94,6 +94,7 @@ The user sees the generic message plus `(ref: …)` when the backend sends a `re
 - Mocked API test: malicious resume → **400**, `detail` equals the shared constant (not attack-specific text).
 - Stream test: same `detail` on `{ "type": "error" }` event.
 
+## Config
 
 New section, separate from aptitude and job discovery:
 

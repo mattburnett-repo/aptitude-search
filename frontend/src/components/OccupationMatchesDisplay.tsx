@@ -7,6 +7,20 @@ export type OccupationMatch = {
   score: number;
 };
 
+type Confidence = "high" | "medium" | "low";
+
+function scoreToConfidence(score: number): Confidence {
+  if (score >= 0.7) return "high";
+  if (score >= 0.65) return "medium";
+  return "low";
+}
+
+function ConfidenceBadge({ level }: { level: Confidence }) {
+  return (
+    <span className={`confidence-badge confidence-${level}`}>{level}</span>
+  );
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -22,10 +36,6 @@ function isOccupationMatch(value: unknown): value is OccupationMatch {
 
 function isOccupationMatches(value: unknown): value is OccupationMatch[] {
   return Array.isArray(value) && value.every(isOccupationMatch);
-}
-
-function formatScore(score: number): string {
-  return score.toFixed(4);
 }
 
 function OccupationSaveAsPdfToolbar({
@@ -113,11 +123,8 @@ export function OccupationMatchesDisplay({
                   <li key={match.onetsoc_code} className="occupation-match-item">
                     <div className="occupation-match-header">
                       <span className="occupation-match-title">{match.title}</span>
-                      <span className="occupation-match-score">
-                        {formatScore(match.score)}
-                      </span>
+                      <ConfidenceBadge level={scoreToConfidence(match.score)} />
                     </div>
-                    <span className="occupation-match-code">{match.onetsoc_code}</span>
                   </li>
                 ))}
               </ol>

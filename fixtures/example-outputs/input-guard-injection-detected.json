@@ -1,0 +1,5 @@
+{
+  "injection_detected": true,
+  "severity": "high",
+  "rationale": "Resume contains explicit instruction-override language."
+}

@@ -24,6 +24,7 @@ from app.job_discovery.tool_observed_urls import (
 )
 from app.job_discovery.url_utils import filter_found_jobs
 from app.core.progress import ProgressCallback, emit_progress
+from app.core.input_safety import prepare_resume
 from app.role_family_plan import run_stage2
 
 logger = logging.getLogger(__name__)
@@ -137,6 +138,7 @@ def run_pipeline(
     on_progress: ProgressCallback | None = None,
 ) -> PipelineResult:
     emit_progress("Starting pipeline…", on_progress=on_progress)
+    resume = prepare_resume(resume, on_progress=on_progress)
     aptitude_profile = run_stage1(resume, on_progress=on_progress)
     stage2 = run_stage2(aptitude_profile, on_progress=on_progress)
     verified_matches = run_stage3(

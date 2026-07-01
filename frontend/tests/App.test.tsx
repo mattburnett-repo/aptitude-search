@@ -29,6 +29,24 @@ describe('App', () => {
 		})
 	})
 
+	it('advances to optional criteria after Go with resume input', async () => {
+		const user = userEvent.setup()
+
+		render(<App />)
+
+		await user.click(screen.getByRole('button', { name: 'Paste resume' }))
+		await user.type(
+			screen.getByPlaceholderText('Paste resume text...'),
+			'Alex Morgan — software engineer',
+		)
+		await user.click(screen.getByRole('button', { name: 'Go →' }))
+
+		expect(
+			screen.getByRole('heading', { name: 'Optional search criteria' }),
+		).toBeInTheDocument()
+		expect(screen.getByLabelText('Location')).toBeInTheDocument()
+	})
+
 	it('enables Go button after uploading a PDF resume', async () => {
 		render(<App />)
 

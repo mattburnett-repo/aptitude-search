@@ -15,8 +15,9 @@ describe("OccupationMatchesDisplay", () => {
     render(<OccupationMatchesDisplay matches={occupationMatches} />);
 
     expect(screen.getByText("Web Developers")).toBeInTheDocument();
-    expect(screen.getByText("0.6803")).toBeInTheDocument();
-    expect(screen.getByText("15-1254.00")).toBeInTheDocument();
+    expect(screen.getAllByText("medium")).toHaveLength(2);
+    expect(screen.queryByText("0.6803")).not.toBeInTheDocument();
+    expect(screen.queryByText("15-1254.00")).not.toBeInTheDocument();
     expect(screen.getByText("Software Developers")).toBeInTheDocument();
   });
 

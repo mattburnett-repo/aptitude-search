@@ -26,11 +26,13 @@ def _build_validators() -> dict[str, Draft202012Validator]:
     aptitude = _load_schema(config.schemas.aptitude_profile)
     role_family_plan = _load_schema(config.schemas.role_family_plan)
     job_discovery = _load_schema(config.schemas.job_discovery_results)
+    input_guard = _load_schema(config.schemas.input_guard)
     store: dict[str, JsonObject] = {
         str(constraints["$id"]): constraints,
         str(aptitude["$id"]): aptitude,
         str(role_family_plan["$id"]): role_family_plan,
         str(job_discovery["$id"]): job_discovery,
+        str(input_guard["$id"]): input_guard,
     }
     return {
         "aptitudeProfile": Draft202012Validator(
@@ -55,6 +57,12 @@ def _build_validators() -> dict[str, Draft202012Validator]:
             job_discovery,
             resolver=RefResolver.from_schema(  # pyright: ignore[reportDeprecated, reportUnknownMemberType]
                 job_discovery, store=store
+            ),
+        ),
+        "inputGuard": Draft202012Validator(
+            input_guard,
+            resolver=RefResolver.from_schema(  # pyright: ignore[reportDeprecated, reportUnknownMemberType]
+                input_guard, store=store
             ),
         ),
     }

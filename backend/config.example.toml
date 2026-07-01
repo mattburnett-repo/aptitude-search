@@ -15,6 +15,16 @@ model = ""  # Stage 1: resume → aptitude profile
 temperature = 0.3  # modest variation in profile interpretation
 max_tokens = 8192  # Stage 1 JSON output cap; raise if responses truncate
 
+[llm.input_guard]
+model_key = ""  # required: Hugging Face key for injection classifier
+model = "meta-llama/Llama-Prompt-Guard-2-22M"
+chunk_max_chars = 1800
+malicious_score_threshold = 0.5
+
+[input_safety]
+max_resume_chars = 100000
+pii_entities = ["EMAIL_ADDRESS", "PHONE_NUMBER", "PERSON", "LOCATION", "US_SSN"]
+
 [llm.job_discovery]
 model_key = ""  # required: Hugging Face key for Stage 3 synthesis
 model = ""  # Stage 3: found_jobs → verified_matches JSON
@@ -65,6 +75,7 @@ constraints = "constraints.schema.json"
 aptitude_profile = "aptitude-profile.schema.json"
 role_family_plan = "role-family-plan.schema.json"
 job_discovery_results = "job-discovery-results.schema.json"
+input_guard = "input-guard.schema.json"
 
 [paths]
 prompts_dir = "prompts"
@@ -78,3 +89,11 @@ stage = "aptitudeProfile"
 [[fixtures.files]]
 name = "career-changer-role-family-plan.json"
 stage = "roleFamilyPlan"
+
+[[fixtures.files]]
+name = "input-guard-clean-pass.json"
+stage = "inputGuard"
+
+[[fixtures.files]]
+name = "input-guard-injection-detected.json"
+stage = "inputGuard"

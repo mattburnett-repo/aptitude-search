@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aptitude-search.local/schemas/input-guard.schema.json",
+  "title": "InputGuardVerdict",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["injection_detected", "severity"],
+  "properties": {
+    "injection_detected": { "type": "boolean" },
+    "severity": {
+      "type": "string",
+      "enum": ["none", "low", "medium", "high"]
+    },
+    "rationale": { "type": "string" }
+  }
+}

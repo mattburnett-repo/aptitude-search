@@ -26,6 +26,11 @@ function isAptitudeProfile(value: unknown): value is AptitudeProfile {
   );
 }
 
+function confidenceFieldLabel(key: string): string {
+  if (key === "domains") return "Industry experience";
+  return key.replace(/_/g, " ");
+}
+
 function ConfidenceBadge({ level }: { level: Confidence }) {
   return (
     <span className={`confidence-badge confidence-${level}`}>{level}</span>
@@ -119,7 +124,7 @@ export function InferenceConfidenceDisplay({
                   {confidenceEntries.map(([key, entry]) => (
                     <li key={key}>
                       <span className="aptitude-confidence-key">
-                        {key.replace(/_/g, " ")}
+                        {confidenceFieldLabel(key)}
                       </span>
                       <ConfidenceBadge level={entry.confidence} />
                       <p className="aptitude-evidence">{entry.reason}</p>

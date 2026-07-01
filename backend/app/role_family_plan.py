@@ -32,11 +32,11 @@ def run_stage2(
     *,
     on_progress: ProgressCallback | None = None,
 ) -> Stage2Result:
-    emit_progress("Stage 2: Matching aptitude to O*NET occupations…", on_progress=on_progress)
+    emit_progress("Stage 2: Accessing career metadata database…", on_progress=on_progress)
     occupation_matches = tuple(match_aptitude_to_occupations(aptitude_profile))
     if occupation_matches:
         emit_progress(
-            f"Stage 2: Top O*NET match — {occupation_matches[0].title}.",
+            f"Stage 2: Top career match — {occupation_matches[0].title}.",
             on_progress=on_progress,
         )
 

@@ -179,9 +179,12 @@ export function AptitudeProfileDisplay({
             </div>
           </div>
 
-          <div className="aptitude-pdf-page" data-pdf-page>
+          <div
+            className="aptitude-pdf-page aptitude-profile-section-divider"
+            data-pdf-page
+          >
             <div className="aptitude-grid">
-              <LabeledList title="Domains" items={profile.domains} />
+              <LabeledList title="Industry experience" items={profile.domains} />
               <LabeledList title="Strengths" items={profile.strengths} />
             </div>
           </div>

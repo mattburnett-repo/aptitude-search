@@ -9,5 +9,9 @@ Plain-text resumes for manual testing and demos. Upload in the UI or pass to `PO
 | [`marketing-operations-lead.txt`](marketing-operations-lead.txt) | Marketing ops director, CRM/analytics | Non-engineering leadership and ops roles |
 | [`pre-college-retail-service.txt`](pre-college-retail-service.txt) | Recent high-school grad, retail/food service | Entry-level, small-town, thin resume |
 | [`long-unemployment-gap-admin-coordinator.txt`](long-unemployment-gap-admin-coordinator.txt) | Admin coordinator, 6+ month unemployment gap | Long job search, layoff + temp-agency work, mid-career office/support roles |
+| [`prompt-injection-ignore-instructions.txt`](prompt-injection-ignore-instructions.txt) | Malicious override text embedded in resume | Input-safety rejection test (expect **400**) |
 
-Pre-built request body with constraints for the entry-level profile: [`fixtures/pipeline-request-pre-college.json`](../pipeline-request-pre-college.json).
+Pre-built request bodies:
+
+- Entry-level profile with constraints: [`fixtures/pipeline-request-pre-college.json`](../pipeline-request-pre-college.json)
+- Injection blocklist smoke test: [`fixtures/pipeline-request-injection-test.json`](../pipeline-request-injection-test.json)

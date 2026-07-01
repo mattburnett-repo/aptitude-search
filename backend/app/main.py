@@ -21,6 +21,7 @@ from app.core.request_context import (
     RequestIdFilter,
 )
 from app.core.resume_io import parse_pipeline_body
+from app.core.input_safety import prepare_resume
 from app.core.stream_pipeline import stream_pipeline_response
 from app.onet.match import matches_to_json
 from app.pipeline import run_pipeline, run_stage1, run_stage3
@@ -126,7 +127,7 @@ async def pipeline(body: PipelineRequest, stream: bool = False):
 def stage1(body: Stage1Request):
     if not body.resume.strip():
         raise HTTPException(status_code=400, detail="resume is required")
-    return {"aptitude_profile": run_stage1(body.resume)}
+    return {"aptitude_profile": run_stage1(prepare_resume(body.resume))}
 
 
 @app.post("/v1/stages/2", tags=["Pipeline Stages"])

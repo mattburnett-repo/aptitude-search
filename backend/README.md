@@ -5,6 +5,7 @@ Orchestration for **Stage 1** (aptitude profile), **Stage 2** (O\*NET vector mat
 **Hugging Face keys** in `config.toml`:
 
 - **Stage 1:** `[llm.aptitude].model_key` + `[llm.aptitude].model` — resume → aptitude profile (chat JSON).
+- **Ingress safety:** `[llm.input_guard]` — Prompt Guard 2 22M text-classification before Stage 1; Presidio PII deletion (`[input_safety]`). See [`docs/v0.5.0/input-safety.md`](../docs/v0.5.0/input-safety.md).
 - **Stage 2:** same model/key — aptitude profile → role family plan (chat JSON).
 - **Stage 3 discovery:** Python builds queries from the role family plan `search_terms` (fallback: profile `adjacent_roles` / `domains` / skills) and runs `search_job_postings` (`[job_discovery].discovery_query_max`). No LLM for discovery.
 - **Stage 3 fit:** Python ranks/filters scraped jobs by work-pattern fit (`aptitude_fit.py`; `[job_discovery].aptitude_fit_min_score`). No LLM.
@@ -44,7 +45,7 @@ App settings live in `config.toml` (see `config.example.toml`). Loaded once via 
 .venv/bin/python scripts/validate_fixtures.py
 ```
 
-Validates golden Stage 1 and Stage 2 outputs (`career-changer-mixed-stack-stage1.json`, `career-changer-role-family-plan.json`) against their schemas.
+Validates golden Stage 1, Stage 2, and input-guard fixtures under `fixtures/example-outputs/`.
 
 ## Tests
 

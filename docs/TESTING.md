@@ -11,6 +11,7 @@ Example bodies:
 
 - [`fixtures/pipeline-request-example.json`](../fixtures/pipeline-request-example.json) — mid-career software engineer, Toronto remote
 - [`fixtures/pipeline-request-pre-college.json`](../fixtures/pipeline-request-pre-college.json) — entry-level retail/service, Kirksville MO
+- [`fixtures/pipeline-request-injection-test.json`](../fixtures/pipeline-request-injection-test.json) — should return **400** (input safety)
 
 Sample resume text files: [`fixtures/sample-resumes/README.md`](../fixtures/sample-resumes/README.md).
 

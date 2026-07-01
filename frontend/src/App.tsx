@@ -5,7 +5,7 @@ import { OccupationMatchesDisplay } from "./components/OccupationMatchesDisplay"
 import { RoleFamilyPlanDisplay } from "./components/RoleFamilyPlanDisplay";
 import {
   defaultConstraints,
-  // OptionalConstraints,
+  OptionalConstraints,
 } from "./components/OptionalConstraints";
 import { PipelineActions } from "./components/PipelineActions";
 import {
@@ -27,6 +27,7 @@ import { useTheme } from "./hooks/useTheme";
 
 type AppView =
   | "input"
+  | "constraints"
   | "running"
   | "stage1"
   | "stage2"
@@ -35,6 +36,7 @@ type AppView =
   | "stage5";
 
 const RESULT_STEPS = [
+  { id: "constraints" as const, label: "Criteria" },
   { id: "stage1" as const, label: "Profile" },
   { id: "stage2" as const, label: "Confidence" },
   { id: "stage3" as const, label: "Matches" },
@@ -95,6 +97,10 @@ function progressItemClassName(
 const STAGE_HERO: Partial<
   Record<AppView, { title: string; lead: string }>
 > = {
+  constraints: {
+    title: "Optional search criteria",
+    lead: "Narrow job discovery by location, remote preference, salary, or industries. All fields are optional.",
+  },
   running: {
     title: "Running your analysis",
     lead: "Assessing aptitudes, matching careers, and searching open roles.",
@@ -133,6 +139,12 @@ function StepSectionHero({ view }: { view: AppView }) {
   );
 }
 
+function resultStepIndex(view: AppView): number {
+  if (view === "constraints") return 0;
+  if (view.startsWith("stage")) return Number(view.replace("stage", ""));
+  return -1;
+}
+
 function StepIndicator({
   view,
   hasResult,
@@ -155,10 +167,8 @@ function StepIndicator({
         {RESULT_STEPS.map((step, index) => {
           const isActive = view === step.id;
           const isRunning =
-            view === "running" && index === 0 && !hasResult;
-          const stepIndex = view.startsWith("stage")
-            ? Number(view.replace("stage", "")) - 1
-            : -1;
+            view === "running" && index === 1 && !hasResult;
+          const stepIndex = resultStepIndex(view);
           const isComplete = hasResult && stepIndex > index;
 
           return (
@@ -259,7 +269,7 @@ function ProgressLog({
 export default function App() {
   const { theme, toggleTheme } = useTheme();
   const [resumeInput, setResumeInput] = useState(defaultResumeInput);
-  // const [constraints, setConstraints] = useState(defaultConstraints);
+  const [constraints, setConstraints] = useState(defaultConstraints);
   const [view, setView] = useState<AppView>("input");
   const [stepNavDisabled, setStepNavDisabled] = useState(false);
   const {
@@ -286,7 +296,7 @@ export default function App() {
 
   useEffect(() => {
     if (!loading && error && !result) {
-      setView("input");
+      setView("constraints");
     }
   }, [loading, error, result]);
 
@@ -296,6 +306,7 @@ export default function App() {
 
   function handleStartOver() {
     resetPipeline();
+    setConstraints(defaultConstraints);
     setView("input");
   }
 
@@ -360,7 +371,9 @@ export default function App() {
   };
 
   const siteMode =
-    view === "input" || view === "running" ? "marketing" : "tool";
+    view === "input" || view === "constraints" || view === "running"
+      ? "marketing"
+      : "tool";
 
   return (
     <SiteShell mode={siteMode}>
@@ -389,11 +402,17 @@ export default function App() {
           <li>
             <span className="input-step-number">02</span>
             <span className="input-step-text">
-              Run the pipeline to assess aptitudes and match roles.
+              Add optional search criteria such as location or remote preference.
             </span>
           </li>
           <li>
             <span className="input-step-number">03</span>
+            <span className="input-step-text">
+              Run the pipeline to assess aptitudes and match roles.
+            </span>
+          </li>
+          <li>
+            <span className="input-step-number">04</span>
             <span className="input-step-text">
               Review your profile, matches, and verified job postings.
             </span>
@@ -407,23 +426,48 @@ export default function App() {
             onError={setError}
           />
 
-          {/*
-          <OptionalConstraints
-            constraints={constraints}
-            onChange={setConstraints}
-          />
-          */}
-
           <PipelineActions
             loading={loading}
             canRun={hasResumeInput(resumeInput)}
-            onRun={() => void runPipeline(resumeInput, defaultConstraints)}
+            onRun={() => {
+              setError(null);
+              setView("constraints");
+            }}
           />
 
           {error && <p className="error">{error}</p>}
         </div>
 
         <InputTrustNotes />
+          </div>
+
+          <div className="step-panel" hidden={view !== "constraints"}>
+            <StepSectionHero view="constraints" />
+
+            <OptionalConstraints
+              constraints={constraints}
+              onChange={setConstraints}
+              layout="panel"
+            />
+
+            <div className="actions step-nav step-nav-end">
+              <button
+                type="button"
+                className="back"
+                disabled={loading}
+                onClick={() => setView("input")}
+              >
+                Back
+              </button>
+              <PipelineActions
+                loading={loading}
+                canRun={hasResumeInput(resumeInput)}
+                inline
+                onRun={() => void runPipeline(resumeInput, constraints)}
+              />
+            </div>
+
+            {error && <p className="error">{error}</p>}
           </div>
 
           <div className="step-panel" hidden={view !== "running"}>

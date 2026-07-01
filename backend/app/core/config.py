@@ -87,6 +87,61 @@ class JobDiscoveryConfig(BaseModel):
         return value
 
 
+class InputGuardLlmConfig(BaseModel):
+    model_key: str
+    model: str
+    chunk_max_chars: int = 1800
+    malicious_score_threshold: float = 0.5
+
+    @field_validator("model_key", "model")
+    @classmethod
+    def string_must_be_set(cls, value: str, info: ValidationInfo) -> str:
+        stripped = value.strip()
+        if not stripped:
+            field = info.field_name or "field"
+            raise ValueError(f"llm.input_guard.{field} must be set in config.toml")
+        return stripped
+
+    @field_validator("chunk_max_chars")
+    @classmethod
+    def chunk_max_chars_positive(cls, value: int, info: ValidationInfo) -> int:
+        if value < 256:
+            field = info.field_name or "field"
+            raise ValueError(f"llm.input_guard.{field} must be at least 256")
+        return value
+
+    @field_validator("malicious_score_threshold")
+    @classmethod
+    def malicious_score_threshold_in_range(
+        cls, value: float, info: ValidationInfo
+    ) -> float:
+        if value < 0.0 or value > 1.0:
+            field = info.field_name or "field"
+            raise ValueError(f"llm.input_guard.{field} must be between 0 and 1")
+        return value
+
+
+class InputSafetyConfig(BaseModel):
+    max_resume_chars: int = 100_000
+    pii_entities: list[str] = Field(
+        default_factory=lambda: [
+            "EMAIL_ADDRESS",
+            "PHONE_NUMBER",
+            "PERSON",
+            "LOCATION",
+            "US_SSN",
+        ]
+    )
+
+    @field_validator("max_resume_chars")
+    @classmethod
+    def max_resume_chars_positive(cls, value: int, info: ValidationInfo) -> int:
+        if value < 1:
+            field = info.field_name or "field"
+            raise ValueError(f"input_safety.{field} must be at least 1")
+        return value
+
+
 class JobDiscoveryLlmConfig(BaseModel):
     model_key: str
     model: str
@@ -224,6 +279,7 @@ class OnetConfig(BaseModel):
 class LlmConfig(BaseModel):
     aptitude: AptitudeLlmConfig
     job_discovery: JobDiscoveryLlmConfig
+    input_guard: InputGuardLlmConfig
 
 
 class PromptsConfig(BaseModel):
@@ -240,6 +296,7 @@ class SchemasConfig(BaseModel):
     aptitude_profile: str
     role_family_plan: str = "role-family-plan.schema.json"
     job_discovery_results: str
+    input_guard: str = "input-guard.schema.json"
 
 
 class PathsConfig(BaseModel):
@@ -261,6 +318,7 @@ class Config(BaseModel):
     app: AppConfig
     cors: CorsConfig
     llm: LlmConfig
+    input_safety: InputSafetyConfig = Field(default_factory=InputSafetyConfig)
     embedding: EmbeddingConfig
     onet: OnetConfig
     onet_matching: OnetMatchingConfig

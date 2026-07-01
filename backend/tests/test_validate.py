@@ -70,6 +70,13 @@ def test_normalize_job_discovery_results_builds_match_description():
     assert "extra_field" not in row
 
 
+def test_validate_stage_accepts_golden_input_guard_fixtures() -> None:
+    for name in ("input-guard-clean-pass.json", "input-guard-injection-detected.json"):
+        path = FIXTURES_DIR / name
+        data = cast(JsonObject, json.loads(path.read_text(encoding="utf-8")))
+        validate_stage("inputGuard", data)
+
+
 def test_validate_stage_accepts_golden_aptitude_fixture():
     path = FIXTURES_DIR / "career-changer-mixed-stack-stage1.json"
     data = cast(JsonObject, json.loads(path.read_text(encoding="utf-8")))

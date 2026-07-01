@@ -36,16 +36,15 @@ export function buildConstraintsBody(constraints: Constraints) {
 type OptionalConstraintsProps = {
   constraints: Constraints;
   onChange: (constraints: Constraints) => void;
+  layout?: "collapsible" | "panel";
 };
 
-export function OptionalConstraints({
+function ConstraintsFields({
   constraints,
   onChange,
 }: OptionalConstraintsProps) {
   return (
-    <details className="collapsible-section">
-      <summary>Optional constraints</summary>
-      <div className="collapsible-section-body">
+    <>
         <div className="grid grid-3">
           <div>
             <label htmlFor="location">Location</label>
@@ -110,6 +109,28 @@ export function OptionalConstraints({
             />
           </div>
         </div>
+    </>
+  );
+}
+
+export function OptionalConstraints({
+  constraints,
+  onChange,
+  layout = "collapsible",
+}: OptionalConstraintsProps) {
+  if (layout === "panel") {
+    return (
+      <section className="constraints-form">
+        <ConstraintsFields constraints={constraints} onChange={onChange} />
+      </section>
+    );
+  }
+
+  return (
+    <details className="collapsible-section">
+      <summary>Optional constraints</summary>
+      <div className="collapsible-section-body">
+        <ConstraintsFields constraints={constraints} onChange={onChange} />
       </div>
     </details>
   );

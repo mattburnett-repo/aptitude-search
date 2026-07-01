@@ -47,8 +47,8 @@ describe("AptitudeProfileDisplay", () => {
     expect(pages).toHaveLength(3);
     expect(pages[0]).toHaveTextContent(/Adaptable full-stack engineer/);
     expect(pages[0]).toHaveTextContent("Core skills");
-    expect(pages[0]).not.toHaveTextContent("Domains");
-    expect(pages[1]).toHaveTextContent("Domains");
+    expect(pages[0]).not.toHaveTextContent("Industry experience");
+    expect(pages[1]).toHaveTextContent("Industry experience");
     expect(pages[1]).toHaveTextContent("Strengths");
     expect(pages[2]).toHaveTextContent("Adjacent roles");
     expect(pages[2]).toHaveTextContent("Working style signals");

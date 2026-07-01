@@ -1,0 +1,5 @@
+{
+  "injection_detected": false,
+  "severity": "none",
+  "rationale": "No instruction-override patterns detected."
+}

@@ -29,6 +29,7 @@
   --color-accent-muted: rgba(21, 128, 61, 0.1);
   --color-shadow: 0 1px 3px rgba(9, 9, 11, 0.06), 0 4px 14px rgba(9, 9, 11, 0.04);
   --site-glass-bg: rgba(255, 255, 255, 0.78);
+  --input-panel-glass-bg: rgba(255, 255, 255, 0.28);
   --site-glow-primary: rgba(21, 128, 61, 0.22);
   --site-glow-secondary: rgba(161, 161, 170, 0.28);
   --site-glow-center: rgba(21, 128, 61, 0.12);
@@ -61,6 +62,7 @@
   --color-accent: #4ade80;
   --color-accent-muted: rgba(74, 222, 128, 0.12);
   --site-glass-bg: rgba(9, 9, 11, 0.72);
+  --input-panel-glass-bg: rgba(9, 9, 11, 0.22);
   --site-glow-primary: rgba(74, 222, 128, 0.26);
   --site-glow-secondary: rgba(63, 63, 70, 0.55);
   --site-glow-center: rgba(74, 222, 128, 0.14);
@@ -462,7 +464,9 @@ h1 {
   padding: 1.25rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  background: var(--color-surface);
+  background: var(--input-panel-glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   text-align: center;
 }
 
@@ -1257,6 +1261,11 @@ button.theme-toggle:hover {
   margin-top: 1.25rem;
 }
 
+.aptitude-profile-section-divider {
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--color-field-border);
+}
+
 @media (min-width: 640px) {
   .aptitude-grid {
     grid-template-columns: 1fr 1fr;
@@ -1331,17 +1340,6 @@ button.theme-toggle:hover {
 
 .occupation-match-title {
   font-weight: 600;
-}
-
-.occupation-match-score {
-  font-size: 0.85rem;
-  font-variant-numeric: tabular-nums;
-  color: var(--color-muted);
-}
-
-.occupation-match-code {
-  font-size: 0.8rem;
-  color: var(--color-muted);
 }
 
 .role-family-plan {
@@ -1810,11 +1808,6 @@ button.theme-toggle:hover {
 
 .occupation-matches.occupation-matches--pdf-export .occupation-match-title {
   color: #202124;
-}
-
-.occupation-matches.occupation-matches--pdf-export .occupation-match-score,
-.occupation-matches.occupation-matches--pdf-export .occupation-match-code {
-  color: #3c4043;
 }
 
 .occupation-matches.occupation-matches--pdf-export .occupation-match-item {
