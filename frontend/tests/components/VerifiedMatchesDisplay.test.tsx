@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { VerifiedMatchesDisplay } from "../../src/components/VerifiedMatchesDisplay";
 import verifiedMatches from "../fixtures/sample-verified-matches.json";
 
@@ -11,6 +11,11 @@ vi.mock("../../src/lib/exportVerifiedMatchesPdf", () => ({
 import { openVerifiedMatchesPdf } from "../../src/lib/exportVerifiedMatchesPdf";
 
 describe("VerifiedMatchesDisplay", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.resetModules();
+  });
+
   it("renders search plan, results, and notes", () => {
     render(<VerifiedMatchesDisplay matches={verifiedMatches} />);
 
@@ -43,5 +48,43 @@ describe("VerifiedMatchesDisplay", () => {
     expect(openVerifiedMatchesPdf).toHaveBeenCalledWith(
       document.querySelector(".verified-matches")
     );
+  });
+
+  it("shows a support footnote when results exist and support URL is set", async () => {
+    vi.stubEnv("VITE_SUPPORT_URL", "https://buymeacoffee.com/aptitude.search");
+    const { VerifiedMatchesDisplay: Display } = await import(
+      "../../src/components/VerifiedMatchesDisplay"
+    );
+
+    render(<Display matches={verifiedMatches} />);
+
+    const donations = screen.getByRole("link", { name: "Donations" });
+    expect(donations).toHaveAttribute(
+      "href",
+      "https://buymeacoffee.com/aptitude.search",
+    );
+    expect(document.querySelector(".verified-results-support")).toHaveTextContent(
+      "Helpful? Donations are always appreciated.",
+    );
+  });
+
+  it("hides the support footnote when there are zero results", async () => {
+    vi.stubEnv("VITE_SUPPORT_URL", "https://buymeacoffee.com/aptitude.search");
+    const { VerifiedMatchesDisplay: Display } = await import(
+      "../../src/components/VerifiedMatchesDisplay"
+    );
+
+    render(
+      <Display
+        matches={{
+          search_plan: ["Example query"],
+          results: [],
+          notes: ["No matches in this test run."],
+        }}
+      />,
+    );
+
+    expect(screen.queryByText(/Helpful\?/)).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Donations" })).not.toBeInTheDocument();
   });
 });

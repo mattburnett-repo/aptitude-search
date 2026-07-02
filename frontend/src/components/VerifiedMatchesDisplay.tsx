@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { SupportLink } from "./SupportLink";
 import { SaveAsPdfToolbar, type StageNavProps } from "./SaveAsPdfToolbar";
 
 type Confidence = "high" | "medium" | "low";
@@ -201,6 +202,12 @@ export function VerifiedMatchesDisplay({
             </section>
           )}
         </div>
+
+        {matches.results.length > 0 && (
+          <p className="verified-results-support">
+            Helpful? <SupportLink>Donations</SupportLink> are always appreciated.
+          </p>
+        )}
 
         {/*
         <details className="collapsible-section verified-raw-json">

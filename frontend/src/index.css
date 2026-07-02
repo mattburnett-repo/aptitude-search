@@ -331,6 +331,45 @@ body {
   text-align: center;
 }
 
+.site-footer-support {
+  margin: 0.5rem 0 0;
+  display: flex;
+  justify-content: center;
+}
+
+.site-footer-bmc {
+  display: flex;
+  justify-content: center;
+}
+
+.site-footer-bmc .bmc-btn {
+  min-width: 158px !important;
+  height: 44px !important;
+  padding: 0 16px !important;
+  border-radius: 9px !important;
+  font-size: 20px !important;
+  line-height: 1 !important;
+}
+
+.site-footer-bmc .bmc-btn svg {
+  height: 24px !important;
+  transform: none !important;
+}
+
+.site-footer-bmc .bmc-btn-text {
+  margin-left: 6px !important;
+}
+
+.support-link {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.support-link:hover {
+  opacity: 0.85;
+}
+
 .site-hero {
   margin-bottom: 2rem;
   padding: 1.5rem 0 0.5rem;
@@ -1616,6 +1655,16 @@ button.theme-toggle:hover {
   margin: 0;
   font-size: 0.9rem;
   color: var(--color-muted);
+}
+
+.verified-results-support {
+  margin: 1.25rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  line-height: 1.5;
+  text-align: center;
 }
 
 .job-card-list {
