@@ -342,22 +342,45 @@ body {
   justify-content: center;
 }
 
-.site-footer-bmc .bmc-btn {
-  min-width: 158px !important;
-  height: 44px !important;
-  padding: 0 16px !important;
-  border-radius: 9px !important;
-  font-size: 20px !important;
-  line-height: 1 !important;
+.site-footer-bmc .bmc-btn-container {
+  display: flex;
+  justify-content: center;
 }
 
-.site-footer-bmc .bmc-btn svg {
-  height: 24px !important;
-  transform: none !important;
+.site-footer-bmc .bmc-btn {
+  display: inline-flex;
+  align-items: center;
+  min-width: 158px;
+  height: 44px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 9px;
+  background-color: #40dca5;
+  color: #ffffff;
+  font-family: "Cookie", cursive;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  box-sizing: border-box;
+  transition: opacity 0.15s ease;
+}
+
+.site-footer-bmc .bmc-btn:hover,
+.site-footer-bmc .bmc-btn:focus {
+  opacity: 0.92;
+  text-decoration: none;
+}
+
+.site-footer-bmc .bmc-btn-icon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
 }
 
 .site-footer-bmc .bmc-btn-text {
-  margin-left: 6px !important;
+  margin-left: 6px;
+  white-space: nowrap;
 }
 
 .support-link {

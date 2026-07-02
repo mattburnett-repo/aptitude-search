@@ -1,44 +1,8 @@
-import { useEffect, useRef, type ReactNode } from 'react'
-import { hasSupportLink, supportSlug } from '../config/support'
-import { renderBuyMeACoffeeButton } from '../lib/buyMeACoffee'
+import type { ReactNode } from 'react'
+import { hasSupportLink } from '../config/support'
+import { BuyMeACoffeeButton } from './BuyMeACoffeeButton'
 import { SupportLink } from './SupportLink'
 import type { Theme } from '../hooks/useTheme'
-
-function BuyMeACoffeeButton() {
-	const containerRef = useRef<HTMLDivElement>(null)
-
-	useEffect(() => {
-		const container = containerRef.current
-		if (!container || !hasSupportLink || !supportSlug) {
-			return
-		}
-
-		let cancelled = false
-
-		void renderBuyMeACoffeeButton(container, supportSlug).catch(() => {
-			if (!cancelled) {
-				container.replaceChildren()
-			}
-		})
-
-		return () => {
-			cancelled = true
-			container.replaceChildren()
-		}
-	}, [])
-
-	if (!hasSupportLink || !supportSlug) {
-		return null
-	}
-
-	return (
-		<div
-			ref={containerRef}
-			className="site-footer-bmc"
-			aria-label="Support Aptitude Search"
-		/>
-	)
-}
 
 function ThemeToggleIcon({ theme }: { theme: Theme }) {
 	if (theme === 'light') {

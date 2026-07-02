@@ -8,16 +8,3 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
-
-interface Window {
-  bmcBtnWidget?: (
-    text: string,
-    slug: string,
-    color: string,
-    emoji: string,
-    font: string,
-    fontColor?: string,
-    outlineColor?: string,
-    coffeeColor?: string,
-  ) => string;
-}
