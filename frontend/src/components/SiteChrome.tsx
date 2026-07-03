@@ -121,7 +121,7 @@ export function SiteFooter() {
 		<footer className="site-footer">
 			<div className="site-footer-inner">
 				<p className="site-footer-copy">
-					Aptitude Search — resume-driven career matching and job discovery.
+					Aptitude Search — beyond the obvious job search.
 				</p>
 				{hasSupportLink && (
 					<div className="site-footer-support">
@@ -166,13 +166,13 @@ export function InputTrustNotes() {
 export function InputHero() {
 	return (
 		<section className="site-hero" aria-labelledby="site-hero-title">
-			<p className="site-hero-eyebrow">Career intelligence</p>
+			<p className="site-hero-eyebrow">Beyond the obvious job searches</p>
 			<h2 id="site-hero-title" className="site-hero-title">
 				Find work that fits your real strengths
 			</h2>
 			<p className="site-hero-lead">
-				Upload your resume. We infer aptitudes, match careers, recommend roles
-				to target, and search for verified job postings — in one pipeline.
+				Discover non-obvious job search paths from your resume: aptitudes,
+				career matches, target roles, and verified postings — all in one go.
 			</p>
 		</section>
 	)
