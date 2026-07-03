@@ -27,3 +27,4 @@ data/download/*
 data/onet-load.log
 data/**/*.dump
 db/*
+docs/lighthouse-reports/

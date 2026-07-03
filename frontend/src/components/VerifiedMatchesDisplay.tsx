@@ -209,14 +209,6 @@ export function VerifiedMatchesDisplay({
           </p>
         )}
 
-        {/*
-        <details className="collapsible-section verified-raw-json">
-          <summary>Raw JSON</summary>
-          <pre className="aptitude-raw-pre">
-            {JSON.stringify(matches, null, 2)}
-          </pre>
-        </details>
-        */}
       </div>
     </details>
   );

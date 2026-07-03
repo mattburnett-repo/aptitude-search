@@ -49,4 +49,20 @@ npm ci && npm test
 
 GitHub Actions runs `npm test` and `npm run build` on push/PR when `frontend/**` or shared fixtures change (`.github/workflows/frontend-tests.yml`).
 
-Deploy `dist/` to Vercel/Netlify. Point the browser at your API (today: dev proxy only; add `VITE_API_URL` or reverse-proxy `/api` in production if you deploy API separately).
+## Production (Vercel)
+
+Live site: **https://aptitude-search.vercel.app/**
+
+```bash
+npm run build
+```
+
+Deploy the `dist/` output on Vercel (project root: `frontend/`). Security headers (CSP, COOP, XFO, etc.) are defined in `vercel.json` and apply on Vercel only.
+
+### Environment variables
+
+| Variable | Purpose |
+|----------|---------|
+| `VITE_SUPPORT_URL` | Buy Me a Coffee page URL for donations links and footer button. Defaults in `.env.development` / `.env.production`. When unset, support UI renders as plain text with no links. |
+
+The production deploy is **frontend-only**. The browser calls `/api/v1/pipeline`; Vercel does not host the FastAPI backend. For a full pipeline in production, point `VITE_API_URL` at a running API or reverse-proxy `/api` to your backend. Local dev uses the Vite proxy (`vite.config.ts` → `http://localhost:3001`).

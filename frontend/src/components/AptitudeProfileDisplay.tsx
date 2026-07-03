@@ -214,15 +214,6 @@ export function AptitudeProfileDisplay({
           </div>
 
         </div>
-
-        {/*
-        <details className="collapsible-section aptitude-raw-json">
-          <summary>Raw JSON</summary>
-          <pre className="aptitude-raw-pre">
-            {JSON.stringify(profile, null, 2)}
-          </pre>
-        </details>
-        */}
       </div>
     </details>
   );

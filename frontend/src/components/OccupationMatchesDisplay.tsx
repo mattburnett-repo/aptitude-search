@@ -1,11 +1,7 @@
 import { useRef } from "react";
 import { SaveAsPdfToolbar, type StageNavProps } from "./SaveAsPdfToolbar";
 
-export type OccupationMatch = {
-  onetsoc_code: string;
-  title: string;
-  score: number;
-};
+import type { OccupationMatch } from "../api/pipeline";
 
 type Confidence = "high" | "medium" | "low";
 
@@ -132,12 +128,6 @@ export function OccupationMatchesDisplay({
           </div>
         )}
 
-        {/*
-        <details className="collapsible-section aptitude-raw-json">
-          <summary>Raw JSON</summary>
-          <pre className="aptitude-raw-pre">{JSON.stringify(matches, null, 2)}</pre>
-        </details>
-        */}
       </div>
     </details>
   );

@@ -145,12 +145,6 @@ export function RoleFamilyPlanDisplay({
           )}
         </div>
 
-        {/*
-        <details className="collapsible-section aptitude-raw-json">
-          <summary>Raw JSON</summary>
-          <pre className="aptitude-raw-pre">{JSON.stringify(plan, null, 2)}</pre>
-        </details>
-        */}
       </div>
     </details>
   );

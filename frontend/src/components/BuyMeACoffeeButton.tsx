@@ -36,6 +36,10 @@ export function BuyMeACoffeeButton() {
           href={supportUrl}
           target="_blank"
           rel="noopener noreferrer"
+          style={{
+            backgroundColor: bmcButtonConfig.color,
+            color: bmcButtonConfig.fontColor,
+          }}
         >
           <BuyMeCoffeeIcon />
           <span className="bmc-btn-text">{bmcButtonConfig.text}</span>

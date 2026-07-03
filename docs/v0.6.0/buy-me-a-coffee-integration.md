@@ -1,5 +1,7 @@
 # Buy Me a Coffee integration (v0.6.0)
 
+> **Superseded in v0.6.1.** The footer button is now a static styled link (`BuyMeACoffeeButton.tsx`); the BMC script embed described below was removed. See **[docs/v0.6.1/lighthouse-and-security-polish.md](../v0.6.1/lighthouse-and-security-polish.md)** for the current implementation.
+
 Design and implementation notes for optional support links on the Aptitude Search frontend. No pipeline or API changes.
 
 ## Goals
@@ -42,7 +44,7 @@ Button styling (slug, colors, Cookie font, “Buy me a coffee” label) matches 
 
 ## Shared components
 
-- `frontend/src/config/support.ts` — reads `VITE_SUPPORT_URL`, derives BMC slug from URL path.
+- `frontend/src/config/support.ts` — reads `VITE_SUPPORT_URL`.
 - `frontend/src/components/SupportLink.tsx` — muted accent link used in trust notes and Jobs footnote.
 - `frontend/src/lib/buyMeACoffee.ts` — script loader + `bmcBtnWidget` renderer for the footer.
 

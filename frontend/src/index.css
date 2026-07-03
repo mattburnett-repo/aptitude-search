@@ -355,8 +355,6 @@ body {
   padding: 0 16px;
   border: none;
   border-radius: 9px;
-  background-color: #40dca5;
-  color: #ffffff;
   font-family: "Cookie", cursive;
   font-size: 20px;
   font-weight: 700;
@@ -367,8 +365,8 @@ body {
 }
 
 .site-footer-bmc .bmc-btn:hover,
-.site-footer-bmc .bmc-btn:focus {
-  opacity: 0.92;
+.site-footer-bmc .bmc-btn:focus-visible {
+  filter: brightness(0.94);
   text-decoration: none;
 }
 
@@ -467,27 +465,6 @@ h1 {
   letter-spacing: -0.02em;
   margin: 0;
   line-height: 1.2;
-}
-
-.page-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1.25rem;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.page-header-text {
-  min-width: 0;
-}
-
-.app-tagline {
-  margin: 0.35rem 0 0;
-  font-size: 0.95rem;
-  color: var(--color-muted);
-  line-height: 1.45;
 }
 
 .input-steps {
@@ -668,17 +645,6 @@ h1 {
   .step-indicator-item-running {
     animation: none;
   }
-}
-
-.subtitle {
-  color: var(--color-muted);
-  margin: 0 0 1.5rem;
-  padding-left: 1.25rem;
-  font-size: 0.95rem;
-}
-
-.subtitle li + li {
-  margin-top: 0.35rem;
 }
 
 label {
@@ -1236,35 +1202,6 @@ button.theme-toggle:hover {
   color: #f87171;
 }
 
-.stage {
-  border: 1px solid #3c4043;
-  border-radius: 8px;
-  margin-bottom: 0.75rem;
-  overflow: hidden;
-}
-
-.stage summary {
-  padding: 0.75rem 1rem;
-  cursor: pointer;
-  background: #1a1d24;
-  font-weight: 600;
-}
-
-.stage pre {
-  margin: 0;
-  padding: 1rem;
-  font-size: 0.75rem;
-  overflow: auto;
-  max-height: 320px;
-  background: #0a0c10;
-}
-
-.refine {
-  border-top: 1px solid #3c4043;
-  padding-top: 1.25rem;
-  margin-top: 1.5rem;
-}
-
 .pdf-export-actions {
   display: flex;
   flex-wrap: wrap;
@@ -1537,7 +1474,6 @@ button.theme-toggle:hover {
   color: var(--color-muted);
 }
 
-.aptitude-meta,
 .aptitude-raw-json {
   margin-top: 1rem;
   margin-bottom: 0;
@@ -1780,11 +1716,6 @@ button.theme-toggle:hover {
 
 .job-card-link:hover {
   text-decoration: underline;
-}
-
-.verified-raw-json {
-  margin-top: 1rem;
-  margin-bottom: 0;
 }
 
 /* PDF export: verified matches — light, high-contrast rendering */
