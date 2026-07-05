@@ -27,6 +27,9 @@
   --color-primary-hover: #27272a;
   --color-accent: #15803d;
   --color-accent-muted: rgba(21, 128, 61, 0.1);
+  --color-cta-bg: #15803d;
+  --color-cta-text: #fafafa;
+  --color-cta-hover: #166534;
   --color-shadow: 0 1px 3px rgba(9, 9, 11, 0.06), 0 4px 14px rgba(9, 9, 11, 0.04);
   --site-glass-bg: rgba(255, 255, 255, 0.78);
   --input-panel-glass-bg: rgba(255, 255, 255, 0.28);
@@ -61,6 +64,9 @@
   --color-primary-hover: #e4e4e7;
   --color-accent: #4ade80;
   --color-accent-muted: rgba(74, 222, 128, 0.12);
+  --color-cta-bg: #4ade80;
+  --color-cta-text: #09090b;
+  --color-cta-hover: #86efac;
   --site-glass-bg: rgba(9, 9, 11, 0.72);
   --input-panel-glass-bg: rgba(9, 9, 11, 0.22);
   --site-glow-primary: rgba(74, 222, 128, 0.26);
@@ -706,6 +712,17 @@ textarea {
 button.resume-file-button {
   padding: 0.45rem 0.75rem;
   font-size: 0.85rem;
+  border-color: color-mix(in srgb, var(--color-accent) 38%, var(--color-secondary-btn-border));
+}
+
+button.secondary.resume-file-button:hover {
+  background: var(--color-accent-muted);
+  border-color: var(--color-accent);
+}
+
+button.secondary.resume-file-button:active {
+  background: var(--color-accent-muted);
+  border-color: var(--color-cta-hover);
 }
 
 .resume-file-name {
@@ -889,7 +906,7 @@ button {
     opacity 0.15s ease;
 }
 
-button:hover:not(:disabled):not(.secondary):not(.back):not(.theme-toggle):not(.field-clear):not(.success):not(.step-indicator-item) {
+button:hover:not(:disabled):not(.secondary):not(.back):not(.theme-toggle):not(.field-clear):not(.success):not(.step-indicator-item):not(.primary-cta) {
   background: var(--color-primary-hover);
 }
 
@@ -953,6 +970,20 @@ button.step-indicator-item.step-indicator-item-complete .step-indicator-number {
 
 button.primary-cta {
   min-width: 7rem;
+}
+
+button.primary-cta:not(:disabled) {
+  background: var(--color-cta-bg);
+  color: var(--color-cta-text);
+}
+
+button.primary-cta:not(:disabled):hover {
+  background: var(--color-cta-hover);
+}
+
+button.primary-cta:disabled {
+  background: var(--color-primary);
+  color: var(--color-primary-text);
 }
 
 .actions-primary {
