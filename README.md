@@ -76,6 +76,7 @@ frontend/         # MVP UI (Vite + React)
 
 ## Changelog
 
+- **[docs/changelog/0.7.0.md](docs/changelog/0.7.0.md)** — optional Sentry backend error monitoring
 - **[docs/changelog/0.6.2.md](docs/changelog/0.6.2.md)** — marketing copy refresh (hero, footer, meta description)
 - **[docs/changelog/0.6.1.md](docs/changelog/0.6.1.md)** — Lighthouse/security polish (static BMC button, CSP headers)
 - **[docs/changelog/0.6.0.md](docs/changelog/0.6.0.md)** — optional Buy Me a Coffee support UI

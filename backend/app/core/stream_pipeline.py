@@ -7,14 +7,14 @@ import json
 import logging
 from typing import Literal, TypedDict
 
+import sentry_sdk
 from fastapi import HTTPException
 from fastapi.responses import StreamingResponse
 
-from app.core.json_types import JsonObject
 from app.core.models import PipelineRequest
 from app.core.request_context import get_request_id
 from app.core.resume_io import parse_pipeline_body
-from app.pipeline import run_pipeline
+from app.pipeline import PipelineResult, run_pipeline
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +26,7 @@ class ProgressEvent(TypedDict):
 
 class ResultEvent(TypedDict):
     type: Literal["result"]
-    data: dict[str, JsonObject]
+    data: PipelineResult
 
 
 class ErrorEvent(TypedDict):
@@ -73,6 +73,7 @@ async def stream_pipeline_response(body: PipelineRequest) -> StreamingResponse:
             )
         except Exception as exc:
             logger.exception("Stream pipeline failed")
+            _ = sentry_sdk.capture_exception(exc)
             _ = loop.call_soon_threadsafe(
                 put_event,
                 ErrorEvent(

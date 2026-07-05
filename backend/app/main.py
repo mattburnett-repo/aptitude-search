@@ -1,7 +1,9 @@
 import logging
+import os
 import sys
 from typing import cast
 
+import sentry_sdk
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -37,6 +39,15 @@ for _handler in logging.root.handlers:
     _handler.addFilter(_request_id_filter)
 logging.root.addFilter(_request_id_filter)
 logger = logging.getLogger(__name__)
+
+_sentry_dsn = os.environ.get("SENTRY_DSN", "").strip()
+if _sentry_dsn:
+    _ = sentry_sdk.init(
+        dsn=_sentry_dsn,
+        environment=os.environ.get("SENTRY_ENVIRONMENT", "development"),
+        traces_sample_rate=0.0,
+        send_default_pii=False,
+    )
 
 provider = TracerProvider()
 provider.add_span_processor(BatchSpanProcessor(OTLPSpanExporter()))
@@ -93,6 +104,7 @@ async def unhandled_exception_handler(
     request: Request, exc: Exception
 ) -> JSONResponse:
     logger.exception("Request failed: %s", exc)
+    _ = sentry_sdk.capture_exception(exc)
     return JSONResponse(
         status_code=500,
         content={"detail": str(exc), "request_id": _request_id(request)},
