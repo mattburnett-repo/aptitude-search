@@ -76,18 +76,7 @@ frontend/         # MVP UI (Vite + React)
 
 ## Changelog
 
-- **[docs/changelog/0.7.0.md](docs/changelog/0.7.0.md)** — optional Sentry backend error monitoring
-- **[docs/changelog/0.6.2.md](docs/changelog/0.6.2.md)** — marketing copy refresh (hero, footer, meta description)
-- **[docs/changelog/0.6.1.md](docs/changelog/0.6.1.md)** — Lighthouse/security polish (static BMC button, CSP headers)
-- **[docs/changelog/0.6.0.md](docs/changelog/0.6.0.md)** — optional Buy Me a Coffee support UI
-- **[docs/changelog/0.5.0.md](docs/changelog/0.5.0.md)** — resume input safety (guard + PII deletion), optional criteria step
-- **[docs/changelog/0.4.2.md](docs/changelog/0.4.2.md)** — site shell, animated backdrop, trust notes
-- **[docs/changelog/0.4.1.md](docs/changelog/0.4.1.md)** — WorqAI-inspired styling, step nav pills
-- **[docs/changelog/0.4.0.md](docs/changelog/0.4.0.md)** — stage-pages wizard UX
-- **[docs/changelog/0.3.1.md](docs/changelog/0.3.1.md)** — embedding matchability (`work_activities`, `adjacent_roles`)
-- **[docs/changelog/0.3.0.md](docs/changelog/0.3.0.md)** — O\*NET integration (vector matching, Stage 2 UI, CI)
-- **[docs/changelog/0.2.0.md](docs/changelog/0.2.0.md)** — aptitude refinement (role families, work-pattern fit)
-- **[docs/changelog/0.1.0.md](docs/changelog/0.1.0.md)** — initial release
+**[docs/changelog/README.md](docs/changelog/README.md)** — release index (newest first)
 
 ## License
 
