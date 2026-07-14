@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Aptitude Search — Applied AI Workflow Engineering</title>
+  <style>
+    @page {
+      size: letter;
+      margin: 0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --navy: #0b1f33;
+      --navy-mid: #12324d;
+      --teal: #1a7a8c;
+      --teal-bright: #2a9fb0;
+      --green: #1a8f5c;
+      --ink: #122033;
+      --muted: #4a5d70;
+      --line: #d5dde5;
+      --paper: #f7f9fb;
+      --white: #ffffff;
+    }
+
+    html, body {
+      width: 8.5in;
+      height: 11in;
+      font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      color: var(--ink);
+      background: var(--white);
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .sheet {
+      width: 8.5in;
+      height: 11in;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    header {
+      flex-shrink: 0;
+      background: linear-gradient(115deg, #071526 0%, #0e2a44 48%, #0f4a58 100%);
+      color: var(--white);
+      padding: 0.28in 0.55in 0.24in;
+      position: relative;
+    }
+
+    header::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #3b9fd4, #2a9fb0, #1a8f5c);
+    }
+
+    .eyebrow {
+      font-size: 7.5pt;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #7ec8d6;
+      margin-bottom: 0.06in;
+    }
+
+    .brand {
+      font-size: 24pt;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+
+    .tagline {
+      margin-top: 0.06in;
+      font-size: 10.5pt;
+      font-weight: 600;
+      color: #ffffff;
+      max-width: 7.2in;
+      line-height: 1.3;
+    }
+
+    .tagline-sub {
+      margin-top: 0.05in;
+      font-size: 8.5pt;
+      font-weight: 400;
+      color: #a8c5d4;
+      max-width: 7.2in;
+      line-height: 1.3;
+    }
+
+    main {
+      flex: 1 1 auto;
+      min-height: 0;
+      padding: 0.18in 0.55in 0.12in;
+      display: flex;
+      flex-direction: column;
+      gap: 0.13in;
+    }
+
+    section h3 {
+      font-size: 8pt;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--navy);
+      margin-bottom: 0.08in;
+    }
+
+    /* —— Architecture —— */
+    .arch {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr auto 1fr;
+      align-items: stretch;
+      gap: 0.05in;
+    }
+
+    .arch-step {
+      text-align: center;
+      padding: 0.08in 0.04in;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      background: var(--white);
+    }
+
+    .arch-step .num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      font-size: 8pt;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 0.04in;
+    }
+
+    .arch-step:nth-child(1) .num { background: #3b9fd4; }
+    .arch-step:nth-child(3) .num { background: #3b9fd4; }
+    .arch-step:nth-child(5) .num { background: #2a9fb0; }
+    .arch-step:nth-child(7) .num { background: #2a9fb0; }
+    .arch-step:nth-child(9) .num { background: #1a8f5c; }
+
+    .arch-step strong {
+      display: block;
+      font-size: 7.5pt;
+      font-weight: 700;
+      margin-bottom: 0.03in;
+      color: var(--navy);
+      line-height: 1.2;
+    }
+
+    .arch-step span {
+      font-size: 6.5pt;
+      color: var(--muted);
+      line-height: 1.2;
+    }
+
+    .arrow {
+      display: flex;
+      align-items: center;
+      color: var(--teal-bright);
+      font-size: 12pt;
+      font-weight: 300;
+    }
+
+    .thesis {
+      padding: 0.11in 0.16in;
+      background: linear-gradient(90deg, rgba(26, 122, 140, 0.08), rgba(26, 143, 92, 0.08));
+      border-radius: 6px;
+      border: 1px solid rgba(26, 122, 140, 0.2);
+    }
+
+    .thesis h3 {
+      margin-bottom: 0.05in;
+      color: var(--teal);
+    }
+
+    .thesis p {
+      font-size: 9.5pt;
+      font-weight: 500;
+      line-height: 1.4;
+      color: var(--navy);
+    }
+
+    /* —— Signals + Domain —— */
+    .mid {
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 0.14in;
+    }
+
+    ul.signals {
+      list-style: none;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.06in 0.12in;
+    }
+
+    ul.signals li {
+      font-size: 8pt;
+      line-height: 1.3;
+      padding-left: 0.14in;
+      position: relative;
+      color: var(--ink);
+    }
+
+    ul.signals li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.28em;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .signals-note {
+      margin-top: 0.08in;
+      font-size: 7.5pt;
+      line-height: 1.3;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .domain {
+      background: var(--navy);
+      color: var(--white);
+      border-radius: 6px;
+      padding: 0.11in 0.14in;
+    }
+
+    .domain h3 {
+      color: #7ec8d6;
+      margin-bottom: 0.06in;
+    }
+
+    .domain p {
+      font-size: 8pt;
+      line-height: 1.35;
+      color: #d7e6ee;
+    }
+
+    .domain .label {
+      display: block;
+      margin-top: 0.08in;
+      font-size: 7pt;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #7ec8d6;
+    }
+
+    .domain .example {
+      margin-top: 0.03in;
+      font-size: 8pt;
+      font-weight: 600;
+      color: #ffffff;
+      line-height: 1.3;
+    }
+
+    /* —— Engineering detail —— */
+    .detail {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0.12in;
+    }
+
+    .detail-card {
+      padding: 0.09in 0.11in;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      background: var(--paper);
+    }
+
+    .detail-card h4 {
+      font-size: 7.5pt;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 0.05in;
+    }
+
+    .detail-card p {
+      font-size: 8pt;
+      line-height: 1.3;
+      color: var(--ink);
+    }
+
+    footer {
+      flex-shrink: 0;
+      margin-top: auto;
+      background: var(--navy);
+      color: var(--white);
+      padding: 0.16in 0.55in 0.18in;
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 0.16in;
+      align-items: center;
+    }
+
+    .cta-copy {
+      font-size: 9pt;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    .cta-copy span {
+      display: block;
+      margin-top: 0.05in;
+      font-size: 7.5pt;
+      font-weight: 400;
+      color: #a8c5d4;
+      line-height: 1.3;
+    }
+
+    .cta-box {
+      text-align: right;
+    }
+
+    .cta-box .label {
+      font-size: 7pt;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #7ec8d6;
+      margin-bottom: 0.03in;
+    }
+
+    .cta-box .pitch {
+      font-size: 9.5pt;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.25;
+    }
+  </style>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <div class="eyebrow">Applied AI System Design</div>
+      <div class="brand">Aptitude Search</div>
+      <p class="tagline">
+        Applied AI Workflow Engineering for Capability Discovery
+      </p>
+      <p class="tagline-sub">
+        A multi-stage LLM + embedding pipeline that turns messy human text into schema-validated,
+        explainable recommendations — with career search as the working domain.
+      </p>
+    </header>
+
+    <main>
+      <section>
+        <h3>Architecture</h3>
+        <div class="arch">
+          <div class="arch-step">
+            <div class="num">1</div>
+            <strong>Resume / Career Data</strong>
+            <span>Unstructured input</span>
+          </div>
+          <div class="arrow">→</div>
+          <div class="arch-step">
+            <div class="num">2</div>
+            <strong>LLM Extraction Pipeline</strong>
+            <span>Schema-constrained stages</span>
+          </div>
+          <div class="arrow">→</div>
+          <div class="arch-step">
+            <div class="num">3</div>
+            <strong>Structured Aptitude Profile</strong>
+            <span>Validated JSON outputs</span>
+          </div>
+          <div class="arrow">→</div>
+          <div class="arch-step">
+            <div class="num">4</div>
+            <strong>Semantic Matching + Reasoning</strong>
+            <span>Embeddings + fit ranking</span>
+          </div>
+          <div class="arrow">→</div>
+          <div class="arch-step">
+            <div class="num">5</div>
+            <strong>Recommendations</strong>
+            <span>Verified, constrained results</span>
+          </div>
+        </div>
+      </section>
+
+      <div class="thesis">
+        <h3>Why This Matters</h3>
+        <p>
+          The project explores how AI systems can transform ambiguous human information into
+          structured, explainable recommendations through controlled workflows rather than
+          unconstrained generation.
+        </p>
+      </div>
+
+      <div class="mid">
+        <section>
+          <h3>Engineering Signals</h3>
+          <ul class="signals">
+            <li>Multi-stage AI workflow architecture</li>
+            <li>Schema-constrained LLM extraction + validation</li>
+            <li>Embedding-based semantic matching (pgvector)</li>
+            <li>Occupation retrieval over vector store</li>
+            <li>Orchestrated LLM + tool-calling stages</li>
+            <li>Reliability: schema checks, URL grounding</li>
+          </ul>
+          <p class="signals-note">
+            Multi-stage, schema-validated pipeline — natural fit for graph orchestration
+            (e.g.&nbsp;LangGraph): staged nodes, structured state, tool-backed discovery.
+          </p>
+        </section>
+        <aside class="domain">
+          <h3>Domain = Example</h3>
+          <p>
+            Career opportunity discovery is the application surface.
+            The engineering problem is capability extraction, semantic grounding, and controlled synthesis.
+          </p>
+          <span class="label">Product flow</span>
+          <p class="example">Resume → profile → role plan → verified openings</p>
+        </aside>
+      </div>
+
+      <section>
+        <h3>Implementation Detail</h3>
+        <div class="detail">
+          <div class="detail-card">
+            <h4>LLMs</h4>
+            <p>Staged chat completions for profile extraction, role-family planning, and result synthesis — each bound to a JSON schema.</p>
+          </div>
+          <div class="detail-card">
+            <h4>Embeddings / Vectors</h4>
+            <p>Aptitude profiles embedded and matched against O*NET occupation vectors in Postgres (pgvector) for semantic role grounding.</p>
+          </div>
+          <div class="detail-card">
+            <h4>Orchestration</h4>
+            <p>Python orchestrates stage order, web discovery tools, aptitude-fit ranking, and post-synthesis URL filtering to observed sources.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="cta-copy">
+        Controlled AI workflows over unconstrained generation.
+        <span>
+          Built as a working FastAPI + React system: multi-stage LLM pipeline, embedding retrieval,
+          schema validation, and tool-assisted discovery — demonstrating applied AI engineering in practice.
+        </span>
+      </div>
+      <div class="cta-box">
+        <div class="label">Relevance</div>
+        <div class="pitch">Applied AI systems<br />for capability discovery</div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
