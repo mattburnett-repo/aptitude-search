@@ -46,6 +46,7 @@ class AptitudeLlmConfig(BaseModel):
 class JobDiscoveryConfig(BaseModel):
     url_filters_file: str
     discovery_query_max: int
+    search_backends: list[str]
     aptitude_fit_min_score: int = 1
     aptitude_fit_min_results: int = 2
 
@@ -69,6 +70,15 @@ class JobDiscoveryConfig(BaseModel):
             field = info.field_name or "field"
             raise ValueError(f"job_discovery.{field} must be at least 1")
         return value
+
+    @field_validator("search_backends")
+    @classmethod
+    def search_backends_non_empty(cls, value: list[str], info: ValidationInfo) -> list[str]:
+        backends = [item.strip() for item in value if item.strip()]
+        if not backends:
+            field = info.field_name or "field"
+            raise ValueError(f"job_discovery.{field} must list at least one backend")
+        return backends
 
     @field_validator("aptitude_fit_min_score")
     @classmethod

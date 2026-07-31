@@ -23,7 +23,7 @@ from app.job_discovery.url_utils import (
 
 class _TextSearchClient(Protocol):
     def text(
-        self, query: str, *, max_results: int
+        self, query: str, *, max_results: int, backend: str
     ) -> Iterable[dict[str, object]]: ...
 
 
@@ -171,7 +171,13 @@ class SearchJobPostingsTool(Tool):
             rate_limit=self.rate_limit,
             last_request_time=self._last_request_time,
         )
-        raw_results = list(self.ddgs.text(search_query, max_results=self.max_results))
+        raw_results = list(
+            self.ddgs.text(
+                search_query,
+                max_results=self.max_results,
+                backend=",".join(config.job_discovery.search_backends),
+            )
+        )
         if not raw_results:
             return json.dumps(
                 {

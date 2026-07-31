@@ -3,6 +3,7 @@ from collections.abc import Iterable
 from typing import cast
 from unittest.mock import patch
 
+from app.core.config import config
 from app.core.json_types import JsonObject
 from app.job_discovery.tool_observed_urls import ToolObservedUrlRegistry
 from app.job_discovery.tools import SearchJobPostingsTool
@@ -13,10 +14,12 @@ class _FakeDdgs:
 
     def __init__(self, results: list[dict[str, object]]) -> None:
         self._results = results
-        self.queries: list[tuple[str, int]] = []
+        self.queries: list[tuple[str, int, str]] = []
 
-    def text(self, query: str, *, max_results: int) -> Iterable[dict[str, object]]:
-        self.queries.append((query, max_results))
+    def text(
+        self, query: str, *, max_results: int, backend: str
+    ) -> Iterable[dict[str, object]]:
+        self.queries.append((query, max_results, backend))
         return self._results
 
 
@@ -73,7 +76,13 @@ def test_search_job_postings_filters_list_pages_and_scrapes_candidates() -> None
     assert payload.get("skipped") == 1
     mock_scrape.assert_called_once()
     assert mock_scrape.call_args.args[2] == "https://acme.com/careers/backend"
-    assert fake_ddgs.queries == [("python backend remote jobs hiring", 10)]
+    assert fake_ddgs.queries == [
+        (
+            "python backend remote jobs hiring",
+            10,
+            ",".join(config.job_discovery.search_backends),
+        )
+    ]
 
 
 def test_search_job_postings_skips_non_job_urls_without_scraping() -> None:
