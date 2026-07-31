@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+from collections.abc import Generator
 from pathlib import Path
 from typing import cast
 
@@ -15,6 +16,8 @@ from unittest.mock import patch
 # Disable LangSmith tracing before app imports (side effect only; discard return value).
 _ = os.environ.setdefault("LANGCHAIN_TRACING_V2", "false")
 _ = os.environ.setdefault("LANGSMITH_TRACING", "false")
+# Do not report test runs to Sentry (some tests generate intentional errors/failures).
+os.environ["SENTRY_DSN"] = ""
 
 BACKEND_DIR = Path(__file__).resolve().parents[1]
 REPO_ROOT = BACKEND_DIR.parent
@@ -28,11 +31,15 @@ config_module.config = config_module.Config.load(BACKEND_DIR / "config.test.toml
 
 
 @pytest.fixture(autouse=True)
-def _mock_input_safety_layers() -> None:
+def _mock_input_safety_layers() -> Generator[None, None, None]:  # pyright: ignore[reportUnusedFunction]
     """Keep tests offline; dedicated tests patch guard/PII behavior explicitly."""
+
+    def _passthrough(text: str) -> str:
+        return text
+
     with (
         patch("app.core.input_safety.resume_chunk_malicious", return_value=False),
-        patch("app.core.input_safety._delete_pii", side_effect=lambda text: text),
+        patch("app.core.input_safety._delete_pii", side_effect=_passthrough),
     ):
         yield
 

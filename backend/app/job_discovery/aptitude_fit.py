@@ -46,20 +46,6 @@ _STOP_WORDS = frozenset(
     }
 )
 
-_WRONG_MODE_PHRASES = frozenset(
-    {
-        "account executive",
-        "sales development representative",
-        "business development representative",
-        "data entry",
-        "tier 1 support",
-        "customer support representative",
-        "call center",
-        "cold calling",
-        "sales quota",
-    }
-)
-
 
 def _significant_tokens(phrase: str) -> list[str]:
     tokens: list[str] = re.findall(r"[a-z0-9]+", phrase.lower())
@@ -78,12 +64,12 @@ def _phrase_hits(text: str, phrase: str) -> bool:
 
 
 def _collect_avoid_terms(role_family_plan: JsonObject | None) -> list[str]:
-    terms: list[str] = list(_WRONG_MODE_PHRASES)
     if role_family_plan is None:
-        return terms
+        return []
     families = as_object_list(role_family_plan.get("recommended_role_families"))
     if families is None:
-        return terms
+        return []
+    terms: list[str] = []
     for family in families:
         family_dict = as_object_dict(family)
         if family_dict is None:
@@ -204,7 +190,7 @@ def rank_and_filter_found_jobs(
     *,
     role_family_plan: JsonObject | None = None,
 ) -> list[FoundJob]:
-    """Drop wrong-mode rows, rank survivors by aptitude fit, attach fit metadata."""
+    """Drop avoid-term rows, rank survivors by aptitude fit, attach fit metadata."""
     if not jobs:
         return []
 
