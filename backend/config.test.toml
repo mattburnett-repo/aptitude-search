@@ -59,7 +59,7 @@ min_similarity = 0.0
 [job_discovery]
 url_filters_file = "url-filters.toml"
 discovery_query_max = 6
-search_backends = ["bing", "brave", "duckduckgo", "google", "yahoo", "yandex", "wikipedia"]
+search_backends = ["brave", "duckduckgo", "google", "yahoo", "yandex", "wikipedia"]
 aptitude_fit_min_score = 1
 aptitude_fit_min_results = 2
 

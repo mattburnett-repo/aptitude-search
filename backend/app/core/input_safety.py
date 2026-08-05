@@ -147,6 +147,7 @@ def _presidio_engines() -> tuple[AnalyzerEngine, AnonymizerEngine]:
     from presidio_analyzer.predefined_recognizers import (
         EmailRecognizer,
         PhoneRecognizer,
+        SpacyRecognizer,
         UsSsnRecognizer,
     )
     from presidio_anonymizer import AnonymizerEngine
@@ -164,7 +165,12 @@ def _presidio_engines() -> tuple[AnalyzerEngine, AnonymizerEngine]:
     ).create_engine()
 
     registry = RecognizerRegistry(supported_languages=[_PRESIDIO_LANGUAGE])
-    for recognizer_cls in (EmailRecognizer, PhoneRecognizer, UsSsnRecognizer):
+    for recognizer_cls in (
+        EmailRecognizer,
+        PhoneRecognizer,
+        SpacyRecognizer,
+        UsSsnRecognizer,
+    ):
         registry.add_recognizer(recognizer_cls())
 
     analyzer = AnalyzerEngine(

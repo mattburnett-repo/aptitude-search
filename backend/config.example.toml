@@ -59,7 +59,7 @@ min_similarity = 0.0  # required
 [job_discovery]
 url_filters_file = "url-filters.toml"  # SERP/found_jobs skip lists (app/job_discovery/)
 discovery_query_max = 6  # max search_job_postings calls per pipeline run
-search_backends = ["bing", "brave", "duckduckgo", "google", "yahoo", "yandex", "wikipedia"]  # ddgs engines; omit mojeek
+search_backends = ["brave", "duckduckgo", "google", "yahoo", "yandex", "wikipedia"]  # ddgs engines; omit bing (disabled) and mojeek
 aptitude_fit_min_score = 1  # min work-pattern fit score to keep a found job
 aptitude_fit_min_results = 2  # keep at least this many jobs when none meet min_score
 
