@@ -3,16 +3,28 @@
 // executionEnvironments tells the type checker to resolve `from app...` imports
 // from backend/ (same layout as `uvicorn app.main:app` run from that directory).
 {
+  "venvPath": "backend",
+  "venv": ".venv",
   "include": [
     "backend/app",
     "backend/scripts",
     "backend/tests",
+    "backend/lg_spike",
     "data/embed",
     "data/smoke_onet_postgres.py"
+  ],
+  "exclude": [
+    "**/*.ipynb",
+    "**/__pycache__"
   ],
   "executionEnvironments": [
     {
       "root": "backend",
+      "pythonVersion": "3.12"
+    },
+    {
+      "root": "backend/lg_spike",
+      "extraPaths": ["backend"],
       "pythonVersion": "3.12"
     },
     {
