@@ -9,12 +9,23 @@ Search uses spike-local ``search.py`` (one DDGS engine per worker), not
 # pyright: reportUnknownVariableType=false
 # pyright: reportUnknownArgumentType=false
 # pyright: reportUnusedCallResult=false
+# ruff: noqa: E402  — path bootstrap below must run before app/search imports
 
 from __future__ import annotations
 
 import logging
 import operator
+import sys
+from pathlib import Path
 from typing import Annotated, NotRequired, TypedDict
+
+# Notebook/cwd may be lg_spike/; ensure backend/ and this spike dir are importable.
+_SPIKE_DIR = Path(__file__).resolve().parent
+_BACKEND_ROOT = _SPIKE_DIR.parent
+for _path in (_BACKEND_ROOT, _SPIKE_DIR):
+    _path_str = str(_path)
+    if _path_str not in sys.path:
+        sys.path.insert(0, _path_str)
 
 from langgraph.graph import END, START, StateGraph  # pyright: ignore[reportMissingTypeStubs]
 from langgraph.graph.state import CompiledStateGraph  # pyright: ignore[reportMissingTypeStubs]
@@ -35,7 +46,6 @@ from app.job_discovery.tool_observed_urls import (
     ToolObservedUrlRegistry,
     filter_results_to_tool_observed_urls,
 )
-from app.job_discovery.url_utils import filter_found_jobs
 from search import search_queries_on_backend  # pyright: ignore[reportImplicitRelativeImport]
 
 logger = logging.getLogger(__name__)
@@ -139,14 +149,9 @@ def reduce_filter_fit(
     *,
     on_progress: ProgressCallback | None = None,
 ) -> Stage3StateUpdate:
+    # Spike: do not run production filter_found_jobs (it drops list/search URLs
+    # that lg_spike/search.py intentionally keeps and scrapes).
     found_jobs = _dedupe_jobs_by_url(list(state.get("partial_jobs") or []))
-    if found_jobs:
-        emit_progress("Filtering search results…", on_progress=on_progress)
-        kept = filter_found_jobs(found_jobs)
-        removed = len(found_jobs) - len(kept)
-        if removed:
-            logger.info("stage3 removed %s non-job row(s) from found_jobs", removed)
-        found_jobs = kept
     if found_jobs:
         emit_progress("Ranking by aptitude work-pattern fit…", on_progress=on_progress)
         ranked = rank_and_filter_found_jobs(
@@ -223,7 +228,11 @@ def build_stage3_graph(
     builder.add_node("synthesize", _synthesize)
 
     builder.add_edge(START, "plan_queries")
-    builder.add_conditional_edges("plan_queries", route_engines)
+    builder.add_conditional_edges(
+        "plan_queries",
+        route_engines,
+        ["run_engine_search", "reduce_filter_fit"],
+    )
     builder.add_edge("run_engine_search", "reduce_filter_fit")
     builder.add_edge("reduce_filter_fit", "synthesize")
     builder.add_edge("synthesize", END)
