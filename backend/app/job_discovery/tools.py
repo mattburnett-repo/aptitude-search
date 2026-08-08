@@ -1,16 +1,16 @@
-"""Stage 3 discovery tools (composite search + scrape per query)."""
+"""Stage 3 discovery tools (Tavily search + extract per query)."""
 
 from __future__ import annotations
 
 import json
 import time
-from collections.abc import Iterable
 from typing import Protocol, cast, override
 
 from langsmith import traceable  # pyright: ignore[reportUnknownVariableType]
-from smolagents import Tool, VisitWebpageTool  # pyright: ignore[reportMissingTypeStubs]
+from smolagents import Tool  # pyright: ignore[reportMissingTypeStubs]
 
 from app.core.config import config
+from app.core.json_types import JsonObject, as_object_dict, as_object_list
 from app.job_discovery.page_extract import job_page_dict_for_agent
 from app.job_discovery.tool_observed_urls import ToolObservedUrlRegistry
 from app.job_discovery.url_utils import (
@@ -21,10 +21,74 @@ from app.job_discovery.url_utils import (
     should_skip_search_result,
 )
 
-class _TextSearchClient(Protocol):
-    def text(
-        self, query: str, *, max_results: int, backend: str
-    ) -> Iterable[dict[str, object]]: ...
+
+class TavilySearchClient(Protocol):
+    """Search + extract surface used by SearchJobPostingsTool (swap-friendly)."""
+
+    def search(self, query: str, *, max_results: int) -> list[dict[str, object]]: ...
+
+    def extract(self, url: str) -> str: ...
+
+
+class _TavilyHttpClient(Protocol):
+    """Subset of ``tavily.TavilyClient`` used by the adapter."""
+
+    def search(self, query: str, *, max_results: int) -> object: ...
+
+    def extract(self, urls: list[str]) -> object: ...
+
+
+class TavilySdkClient:
+    """Adapter around ``tavily.TavilyClient`` (search then extract)."""
+
+    _client: _TavilyHttpClient
+    _max_extract_chars: int
+
+    def __init__(self, api_key: str, *, max_extract_chars: int) -> None:
+        try:
+            from tavily import TavilyClient  # pyright: ignore[reportMissingTypeStubs]
+        except ImportError as exc:
+            raise ImportError(
+                "You must install package `tavily-python` to run this tool: "
+                + "for instance run `pip install tavily-python`."
+            ) from exc
+        self._client = cast(_TavilyHttpClient, cast(object, TavilyClient(api_key=api_key)))
+        self._max_extract_chars = max_extract_chars
+
+    def search(self, query: str, *, max_results: int) -> list[dict[str, object]]:
+        response = cast(JsonObject, self._client.search(query=query, max_results=max_results))
+        rows: list[dict[str, object]] = []
+        for item in as_object_list(response.get("results")) or []:
+            item_dict = as_object_dict(item)
+            if item_dict is None:
+                continue
+            rows.append(
+                {
+                    "title": str(item_dict.get("title") or ""),
+                    "href": str(item_dict.get("url") or ""),
+                    "body": str(item_dict.get("content") or ""),
+                }
+            )
+        return rows
+
+    def extract(self, url: str) -> str:
+        response = cast(JsonObject, self._client.extract(urls=[url]))
+        results = as_object_list(response.get("results")) or []
+        first = as_object_dict(results[0]) if results else None
+        if first is not None:
+            raw = str(first.get("raw_content") or "").strip()
+            if not raw:
+                return "Error fetching the webpage: Empty extract content."
+            if len(raw) > self._max_extract_chars:
+                return raw[: self._max_extract_chars]
+            return raw
+
+        failed = as_object_list(response.get("failed_results")) or []
+        failed_first = as_object_dict(failed[0]) if failed else None
+        if failed_first is not None:
+            message = str(failed_first.get("error") or failed_first)
+            return f"Error fetching the webpage: {message}"
+        return "Error fetching the webpage: No content extracted."
 
 
 def _enforce_rate_limit(
@@ -65,13 +129,13 @@ def _filter_search_rows(
 
 
 def _scrape_candidates(rows: list[dict[str, str]]) -> list[dict[str, str]]:
-    """Only direct posting/careers URLs are scraped—not generic articles."""
+    """Only direct posting/careers URLs are extracted—not generic articles."""
     return [row for row in rows if looks_like_job_posting_url(row["url"])]
 
 
 def _scrape_job_page(
     observed_urls: ToolObservedUrlRegistry,
-    visit_tool: VisitWebpageTool,
+    tavily: TavilySearchClient,
     url: str,
 ) -> dict[str, str]:
     normalized, error = prepare_scrape_url(url)
@@ -83,7 +147,7 @@ def _scrape_job_page(
         )
 
     observed_urls.record_url(normalized)
-    output = VisitWebpageTool.forward(visit_tool, normalized)
+    output = tavily.extract(normalized)
     observed_urls.record_tool_output(output)
     return job_page_dict_for_agent(normalized, output)
 
@@ -108,7 +172,7 @@ def _job_row_from_page(page: dict[str, str]) -> dict[str, str] | None:
 
 
 class SearchJobPostingsTool(Tool):
-    """Search, filter SERP rows, and scrape posting URLs per query."""
+    """Search, filter SERP rows, and extract posting URLs per query."""
 
     name: str = "search_job_postings"
     description: str = ""
@@ -125,8 +189,7 @@ class SearchJobPostingsTool(Tool):
     scrape_max: int
     rate_limit: float | None
     _last_request_time: float
-    _visit_tool: VisitWebpageTool
-    ddgs: _TextSearchClient
+    tavily: TavilySearchClient
 
     def __init__(
         self,
@@ -135,7 +198,7 @@ class SearchJobPostingsTool(Tool):
         scrape_max: int,
         rate_limit: float | None,
         max_output_length: int,
-        **kwargs: object,
+        tavily: TavilySearchClient | None = None,
     ) -> None:
         super().__init__()  # pyright: ignore[reportUnknownMemberType]
         self._observed_urls = observed_urls
@@ -143,22 +206,15 @@ class SearchJobPostingsTool(Tool):
         self.scrape_max = scrape_max
         self.description = (
             "Searches the web for job postings matching a query, filters out list pages "
-            f"and non-job pages, scrapes up to {scrape_max} posting URLs, and returns JSON "
+            f"and non-job pages, extracts up to {scrape_max} posting URLs, and returns JSON "
             "with keys jobs (list of title, company, url, location), skipped, and message."
         )
         self.rate_limit = rate_limit
         self._last_request_time = 0.0
-        self._visit_tool = VisitWebpageTool(max_output_length=max_output_length)
-        try:
-            from ddgs import DDGS  # pyright: ignore[reportUnknownVariableType]
-        except ImportError as exc:
-            raise ImportError(
-                (
-                    "You must install package `ddgs` to run this tool: "
-                    "for instance run `pip install ddgs`."
-                )
-            ) from exc
-        self.ddgs = cast(_TextSearchClient, DDGS(**kwargs))
+        self.tavily = tavily or TavilySdkClient(
+            config.job_discovery.tavily_api_key,
+            max_extract_chars=max_output_length,
+        )
 
     @override
     def forward(self, query: str) -> str:
@@ -171,12 +227,9 @@ class SearchJobPostingsTool(Tool):
             rate_limit=self.rate_limit,
             last_request_time=self._last_request_time,
         )
-        raw_results = list(
-            self.ddgs.text(
-                search_query,
-                max_results=self.max_results,
-                backend=",".join(config.job_discovery.search_backends),
-            )
+        raw_results = self.tavily.search(
+            search_query,
+            max_results=self.max_results,
         )
         if not raw_results:
             return json.dumps(
@@ -208,7 +261,7 @@ class SearchJobPostingsTool(Tool):
         for row in candidates:
             if len(jobs) >= self.scrape_max:
                 break
-            page = _scrape_job_page(self._observed_urls, self._visit_tool, row["url"])
+            page = _scrape_job_page(self._observed_urls, self.tavily, row["url"])
             job = _job_row_from_page(page)
             if job is None:
                 continue

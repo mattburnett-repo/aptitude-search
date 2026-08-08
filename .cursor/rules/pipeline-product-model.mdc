@@ -15,7 +15,7 @@ Authoritative detail: `docs/PROMPT-CONTRACT.md` (Product model section).
 
 ## Optional nuance (implementation, not user-facing)
 
-- Stage 3 discovery: `discovery.py` + `search_job_postings` (DuckDuckGo, URL filters, scrape) — no LLM for query planning.
+- Stage 3 discovery: `discovery.py` + `search_job_postings` (Tavily search + extract, URL filters) — no LLM for query planning.
 - Stage 3 synthesis is a chat call (`[llm.aptitude].model`, `[llm.job_discovery].temperature`) — not a separate jobs API wired in Python.
 - The API jsonschema-validates `verified_matches` against `job-discovery-results.schema.json`.
 

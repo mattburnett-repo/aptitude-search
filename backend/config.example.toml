@@ -29,13 +29,11 @@ pii_entities = ["EMAIL_ADDRESS", "PHONE_NUMBER", "PERSON", "LOCATION", "US_SSN"]
 model_key = ""  # required: Hugging Face key for Stage 3 synthesis
 model = ""  # Stage 3: found_jobs → verified_matches JSON
 temperature = 0.0  # synthesis JSON temperature
-visit_max_output_length = 8000  # max chars fetched per page scrape
-search_max_results = 10  # DuckDuckGo results per search query
-search_scrape_max = 3  # max posting URLs scraped per search_job_postings call
-search_snippet_max_chars = 300  # max chars per DuckDuckGo result body in tool output
+visit_max_output_length = 8000  # max chars kept from Tavily extract per page
+search_max_results = 10  # Tavily search results per query
+search_scrape_max = 3  # max posting URLs extracted per search_job_postings call
+search_snippet_max_chars = 300  # max chars per Tavily result snippet in tool output
 search_rate_limit = 1.0  # min seconds between searches; omit or set null to disable
-page_summary_max_chars = 1500  # max chars returned per visited page
-page_bullet_max_count = 8  # max bullet points extracted per visited page
 page_snippet_max_chars = 400  # max chars in body snippet per visited page
 
 [embedding]
@@ -59,7 +57,7 @@ min_similarity = 0.0  # required
 [job_discovery]
 url_filters_file = "url-filters.toml"  # SERP/found_jobs skip lists (app/job_discovery/)
 discovery_query_max = 6  # max search_job_postings calls per pipeline run
-search_backends = ["brave", "duckduckgo", "google", "yahoo", "yandex", "wikipedia"]  # ddgs engines; omit bing (disabled) and mojeek
+tavily_api_key = ""  # required: Tavily API key for Stage 3 search + extract
 aptitude_fit_min_score = 1  # min work-pattern fit score to keep a found job
 aptitude_fit_min_results = 2  # keep at least this many jobs when none meet min_score
 

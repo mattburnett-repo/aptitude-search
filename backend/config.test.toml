@@ -34,8 +34,6 @@ search_max_results = 10
 search_scrape_max = 3
 search_snippet_max_chars = 300
 search_rate_limit = 1.0
-page_summary_max_chars = 1500
-page_bullet_max_count = 8
 page_snippet_max_chars = 400
 
 [embedding]
@@ -59,7 +57,7 @@ min_similarity = 0.0
 [job_discovery]
 url_filters_file = "url-filters.toml"
 discovery_query_max = 6
-search_backends = ["brave", "duckduckgo", "google", "yahoo", "yandex", "wikipedia"]
+tavily_api_key = "test-tavily-key"
 aptitude_fit_min_score = 1
 aptitude_fit_min_results = 2
 

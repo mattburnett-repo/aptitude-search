@@ -31,7 +31,6 @@ from langgraph.graph import END, START, StateGraph  # pyright: ignore[reportMiss
 from langgraph.graph.state import CompiledStateGraph  # pyright: ignore[reportMissingTypeStubs]
 from langgraph.types import Send
 
-from app.core.config import config
 from app.core.json_types import FoundJob, JsonObject, as_object_dict
 from app.core.models import Constraints
 from app.core.progress import ProgressCallback, emit_progress
@@ -47,6 +46,9 @@ from app.job_discovery.tool_observed_urls import (
     filter_results_to_tool_observed_urls,
 )
 from search import search_queries_on_backend  # pyright: ignore[reportImplicitRelativeImport]
+
+# Spike-local DDGS engines only (production Stage 3 uses Tavily; not in config).
+_SPIKE_SEARCH_BACKENDS = ("brave", "yahoo", "yandex")
 
 logger = logging.getLogger(__name__)
 
@@ -119,7 +121,7 @@ def plan_queries(
 def route_engines(state: Stage3State) -> list[Send] | str:
     """One parallel worker per configured search engine (not a serial loop)."""
     queries = state.get("queries") or []
-    backends = list(config.job_discovery.search_backends)
+    backends = list(_SPIKE_SEARCH_BACKENDS)
     if not queries or not backends:
         return "reduce_filter_fit"
     return [
@@ -251,7 +253,7 @@ def run_stage3(
     c = constraints or DEFAULT_CONSTRAINTS
     validate_stage("constraints", c.model_dump())
 
-    backends = list(config.job_discovery.search_backends)
+    backends = list(_SPIKE_SEARCH_BACKENDS)
     concurrency = max_concurrency if max_concurrency is not None else max(len(backends), 1)
 
     graph = build_stage3_graph(on_progress=on_progress)

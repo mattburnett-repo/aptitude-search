@@ -18,12 +18,12 @@ Spike directory: `backend/lg_spike/` (named to avoid shadowing the installed `la
 
 ```text
 plan_queries
-  → [Send] run_engine_search   # one worker per config.job_discovery.search_backends entry
+  → [Send] run_engine_search   # one worker per spike-local DDGS engine
   → reduce_filter_fit          # dedupe + URL filter + aptitude fit (defer=True)
   → synthesize
 ```
 
-- **N = len(search_backends)** parallel workers (not a serial `for backend in …` loop).
+- **N** parallel workers from spike-local engines (not `job_discovery.search_backends`; production uses Tavily).
 - Each worker runs discovery queries against **one** DDGS engine via `search.search_queries_on_backend`.
 - `max_concurrency` defaults to `N` so all engines can run together.
 - Downstream filter / fit / synthesize still import helpers from `app.job_discovery` (read-only).

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import re
 from urllib.parse import urlparse
 
@@ -12,8 +11,6 @@ from app.job_discovery.url_utils import looks_like_job_posting_url
 _GENERIC_HOST_LABELS = frozenset(
     {"www", "jobs", "careers", "job", "boards", "apply", "wd5"}
 )
-
-_BULLET_MAX_CHARS = 200
 
 _META_PREFIXES = (
     "company",
@@ -28,6 +25,7 @@ _META_PREFIXES = (
     "job type",
     "employment type",
 )
+
 _BULLET_LINE = re.compile(r"^(\d+[\.)]\s+|[-*•]\s+)")
 
 
@@ -70,34 +68,6 @@ def job_page_dict_for_agent(url: str, page_text: str) -> dict[str, str]:
         "snippet": _truncate(snippet, config.llm.job_discovery.page_snippet_max_chars),
         "error": "",
     }
-
-
-def job_page_json_for_agent(url: str, page_text: str) -> str:
-    """JSON string returned by scrape_webpage."""
-    return json.dumps(job_page_dict_for_agent(url, page_text))
-
-
-def compact_job_page_for_agent(url: str, page_text: str) -> str:
-    """Return title, metadata, bullets, and a short snippet instead of full page text."""
-    fields = job_page_dict_for_agent(url, page_text)
-    if fields["error"]:
-        return f"URL: {url}\n{fields['error']}"
-
-    parts = [f"URL: {url}"]
-    if fields["title"]:
-        parts.append(f"Title: {fields['title']}")
-    if fields["company"]:
-        parts.append(f"company: {fields['company']}")
-    if fields["location"]:
-        parts.append(f"location: {fields['location']}")
-    if fields["snippet"]:
-        parts.append(f"Snippet: {fields['snippet']}")
-
-    compact = "\n".join(parts)
-    if len(compact) < 200 and page_text.strip():
-        compact = f"URL: {url}\n{page_text.strip()[:1500]}"
-
-    return _truncate(compact, config.llm.job_discovery.page_summary_max_chars)
 
 
 def _first_heading(lines: list[str]) -> str:

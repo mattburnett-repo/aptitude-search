@@ -22,11 +22,6 @@ def system_prompt_role_family_plan() -> str:
     return load_system_prompt(config.prompts.stage2_file)
 
 
-def system_prompt_stage3() -> str:
-    """Alias for synthesis prompt (schema JSON phase)."""
-    return system_prompt_stage3_synthesis()
-
-
 def _load_user_task_file(filename: str) -> str:
     return (PROMPTS_DIR / filename).read_text(encoding="utf-8").strip()
 

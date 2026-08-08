@@ -46,7 +46,7 @@ class AptitudeLlmConfig(BaseModel):
 class JobDiscoveryConfig(BaseModel):
     url_filters_file: str
     discovery_query_max: int
-    search_backends: list[str]
+    tavily_api_key: str
     aptitude_fit_min_score: int = 1
     aptitude_fit_min_results: int = 2
 
@@ -71,14 +71,14 @@ class JobDiscoveryConfig(BaseModel):
             raise ValueError(f"job_discovery.{field} must be at least 1")
         return value
 
-    @field_validator("search_backends")
+    @field_validator("tavily_api_key")
     @classmethod
-    def search_backends_non_empty(cls, value: list[str], info: ValidationInfo) -> list[str]:
-        backends = [item.strip() for item in value if item.strip()]
-        if not backends:
+    def tavily_api_key_must_be_set(cls, value: str, info: ValidationInfo) -> str:
+        stripped = value.strip()
+        if not stripped:
             field = info.field_name or "field"
-            raise ValueError(f"job_discovery.{field} must list at least one backend")
-        return backends
+            raise ValueError(f"job_discovery.{field} must be set in config.toml")
+        return stripped
 
     @field_validator("aptitude_fit_min_score")
     @classmethod
@@ -161,8 +161,6 @@ class JobDiscoveryLlmConfig(BaseModel):
     search_scrape_max: int
     search_snippet_max_chars: int
     search_rate_limit: float | None
-    page_summary_max_chars: int
-    page_bullet_max_count: int
     page_snippet_max_chars: int
 
     @field_validator("model_key", "model")
@@ -179,8 +177,6 @@ class JobDiscoveryLlmConfig(BaseModel):
         "search_max_results",
         "search_scrape_max",
         "search_snippet_max_chars",
-        "page_summary_max_chars",
-        "page_bullet_max_count",
         "page_snippet_max_chars",
     )
     @classmethod

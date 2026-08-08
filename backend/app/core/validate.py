@@ -3,7 +3,6 @@ import re
 from typing import cast
 
 from jsonschema import Draft202012Validator
-from jsonschema import RefResolver  # pyright: ignore[reportDeprecated]
 from jsonschema.exceptions import ValidationError
 
 from app.core.config import config
@@ -22,49 +21,19 @@ def _load_schema(name: str) -> JsonObject:
 
 
 def _build_validators() -> dict[str, Draft202012Validator]:
-    constraints = _load_schema(config.schemas.constraints)
-    aptitude = _load_schema(config.schemas.aptitude_profile)
-    role_family_plan = _load_schema(config.schemas.role_family_plan)
-    job_discovery = _load_schema(config.schemas.job_discovery_results)
-    input_guard = _load_schema(config.schemas.input_guard)
-    store: dict[str, JsonObject] = {
-        str(constraints["$id"]): constraints,
-        str(aptitude["$id"]): aptitude,
-        str(role_family_plan["$id"]): role_family_plan,
-        str(job_discovery["$id"]): job_discovery,
-        str(input_guard["$id"]): input_guard,
-    }
+    # Local ``#/$defs/...`` refs resolve without a Registry/RefResolver.
     return {
         "aptitudeProfile": Draft202012Validator(
-            aptitude,
-            resolver=RefResolver.from_schema(  # pyright: ignore[reportDeprecated, reportUnknownMemberType]
-                aptitude, store=store
-            ),
+            _load_schema(config.schemas.aptitude_profile)
         ),
         "roleFamilyPlan": Draft202012Validator(
-            role_family_plan,
-            resolver=RefResolver.from_schema(  # pyright: ignore[reportDeprecated, reportUnknownMemberType]
-                role_family_plan, store=store
-            ),
+            _load_schema(config.schemas.role_family_plan)
         ),
-        "constraints": Draft202012Validator(
-            constraints,
-            resolver=RefResolver.from_schema(  # pyright: ignore[reportDeprecated, reportUnknownMemberType]
-                constraints, store=store
-            ),
-        ),
+        "constraints": Draft202012Validator(_load_schema(config.schemas.constraints)),
         "jobDiscovery": Draft202012Validator(
-            job_discovery,
-            resolver=RefResolver.from_schema(  # pyright: ignore[reportDeprecated, reportUnknownMemberType]
-                job_discovery, store=store
-            ),
+            _load_schema(config.schemas.job_discovery_results)
         ),
-        "inputGuard": Draft202012Validator(
-            input_guard,
-            resolver=RefResolver.from_schema(  # pyright: ignore[reportDeprecated, reportUnknownMemberType]
-                input_guard, store=store
-            ),
-        ),
+        "inputGuard": Draft202012Validator(_load_schema(config.schemas.input_guard)),
     }
 
 
