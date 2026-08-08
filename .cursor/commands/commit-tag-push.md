@@ -1,6 +1,6 @@
-# Release housekeeping
+# Commit, tag, push
 
-Run the standard **aptitude-search** release housekeeping workflow for a versioned ship.
+Run the standard **aptitude-search** release workflow: docs, version bump if needed, commit, tag, and push.
 
 ## Version (required)
 

@@ -19,7 +19,7 @@ After v0.6.0/v0.6.1 (BMC support and Lighthouse/security), messaging still descr
 
 ## Tooling
 
-- **`.cursor/commands/release-housekeeping.md`** — project slash command for versioned release docs, bump, commit, tag, and push.
+- **`.cursor/commands/commit-tag-push.md`** — project slash command for versioned release docs, bump, commit, tag, and push.
 
 ## Backend
 
