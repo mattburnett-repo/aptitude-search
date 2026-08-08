@@ -18,11 +18,6 @@ from app.job_discovery import (
     run_job_discovery,
     synthesize_job_discovery_results,
 )
-from app.job_discovery.tool_observed_urls import (
-    ToolObservedUrlRegistry,
-    filter_results_to_tool_observed_urls,
-)
-from app.job_discovery.url_utils import filter_found_jobs
 from app.core.progress import ProgressCallback, emit_progress
 from app.core.input_safety import prepare_resume
 from app.role_family_plan import run_stage2
@@ -72,7 +67,6 @@ def run_stage3(
 ) -> JsonObject:
     c = constraints or DEFAULT_CONSTRAINTS
     validate_stage("constraints", c.model_dump())
-    tool_observed_urls = ToolObservedUrlRegistry()
     emit_progress(
         "Stage 3: Searching the web for job postings…",
         on_progress=on_progress,
@@ -81,16 +75,8 @@ def run_stage3(
         aptitude_profile,
         c,
         role_family_plan=role_family_plan,
-        observed_urls=tool_observed_urls,
         on_progress=on_progress,
     )
-    if found_jobs:
-        emit_progress("Filtering search results…", on_progress=on_progress)
-        kept = filter_found_jobs(found_jobs)
-        removed = len(found_jobs) - len(kept)
-        if removed:
-            logger.info("stage3 removed %s non-job row(s) from found_jobs", removed)
-        found_jobs = kept
     if found_jobs:
         emit_progress("Ranking by aptitude work-pattern fit…", on_progress=on_progress)
         ranked = rank_and_filter_found_jobs(
@@ -113,7 +99,6 @@ def run_stage3(
             found_jobs,
             role_family_plan=role_family_plan,
         )
-        result = filter_results_to_tool_observed_urls(result, tool_observed_urls)
     else:
         emit_progress(
             "No job postings found; preparing empty results…",

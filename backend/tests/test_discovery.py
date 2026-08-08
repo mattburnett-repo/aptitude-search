@@ -3,7 +3,6 @@ import json
 from app.core.json_types import JsonObject
 from app.core.models import Constraints
 from app.job_discovery.discovery import run_job_discovery
-from app.job_discovery.tool_observed_urls import ToolObservedUrlRegistry
 
 
 class _FakeSearchTool:
@@ -24,7 +23,6 @@ class _FakeSearchTool:
 def test_run_job_discovery_merges_and_dedupes_jobs(
     stage1_fixture: dict[str, object],
 ) -> None:
-    registry = ToolObservedUrlRegistry()
     profile: JsonObject = stage1_fixture
     tool = _FakeSearchTool(
         [
@@ -74,11 +72,7 @@ def test_run_job_discovery_merges_and_dedupes_jobs(
         "app.job_discovery.discovery.build_discovery_queries",
         return_value=["senior Python jobs", "senior Django jobs"],
     ):
-        found_jobs = run_job_discovery(
-            profile,
-            Constraints(),
-            observed_urls=registry,
-        )
+        found_jobs = run_job_discovery(profile, Constraints())
 
     assert len(found_jobs) == 2
     assert tool.call_count == 2

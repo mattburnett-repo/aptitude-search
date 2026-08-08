@@ -7,8 +7,7 @@
   <a href="backend/README.md"><img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI"/></a>
   <a href="backend/README.md"><img src="https://img.shields.io/badge/Uvicorn-4B32C3?style=for-the-badge" alt="Uvicorn"/></a>
   <a href="https://huggingface.co/"><img src="https://img.shields.io/badge/Hugging%20Face-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black" alt="Hugging Face"/></a>
-  <a href="backend/README.md"><img src="https://img.shields.io/badge/smolagents-tools-6366F1?style=for-the-badge" alt="smolagents"/></a>
-  <a href="frontend/README.md"><img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React"/></a>
+  <a href="frontend/README.md"><img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=white" alt="React"/></a>
   <a href="frontend/README.md"><img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite"/></a>
   <a href="frontend/README.md"><img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript"/></a>
   <a href="schemas/"><img src="https://img.shields.io/badge/JSON%20Schema-20232A?style=for-the-badge&logo=json&logoColor=white" alt="JSON Schema"/></a>

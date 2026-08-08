@@ -21,11 +21,12 @@ class UrlFilters:
     skip_listing_path_markers: tuple[str, ...]
     skip_listing_path_markers_case_sensitive: tuple[str, ...]
     skip_title_phrases: tuple[str, ...]
-    job_url_markers: tuple[str, ...]
 
 
-def _as_str_list(raw: object, *, field: str) -> list[str]:
-    if not isinstance(raw, list) or not raw:
+def _as_str_list(raw: object, *, field: str, allow_empty: bool = False) -> list[str]:
+    if not isinstance(raw, list):
+        raise ValueError(f"{field} must be an array of strings")
+    if not raw and not allow_empty:
         raise ValueError(f"{field} must be a non-empty array of strings")
     values: list[str] = []
     for item in cast(list[object], raw):
@@ -46,6 +47,7 @@ def load_url_filters() -> UrlFilters:
             _as_str_list(
                 data.get("skip_domain_suffixes"),
                 field="skip_domain_suffixes",
+                allow_empty=True,
             )
         ),
         skip_path_markers=tuple(
@@ -55,18 +57,17 @@ def load_url_filters() -> UrlFilters:
             _as_str_list(
                 data.get("skip_listing_path_markers"),
                 field="skip_listing_path_markers",
+                allow_empty=True,
             )
         ),
         skip_listing_path_markers_case_sensitive=tuple(
             _as_str_list(
                 data.get("skip_listing_path_markers_case_sensitive"),
                 field="skip_listing_path_markers_case_sensitive",
+                allow_empty=True,
             )
         ),
         skip_title_phrases=tuple(
             _as_str_list(data.get("skip_title_phrases"), field="skip_title_phrases")
-        ),
-        job_url_markers=tuple(
-            _as_str_list(data.get("job_url_markers"), field="job_url_markers")
         ),
     )

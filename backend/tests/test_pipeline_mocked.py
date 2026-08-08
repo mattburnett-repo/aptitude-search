@@ -7,7 +7,6 @@ from app.core.json_types import JsonObject
 
 from app.core.models import Constraints
 from app.core.validate import validate_stage
-from app.job_discovery.tool_observed_urls import ToolObservedUrlRegistry
 from app.pipeline import run_pipeline, run_stage3
 from app.role_family_plan import Stage2Result
 
@@ -21,13 +20,6 @@ def found_jobs() -> list[dict[str, object]]:
             "url": "https://acme.com/careers/senior-engineer",
         }
     ]
-
-
-def _passthrough_verified_results(
-    data: dict[str, object],
-    _registry: ToolObservedUrlRegistry,
-) -> dict[str, object]:
-    return data
 
 
 @patch("app.pipeline.synthesize_job_discovery_results")
@@ -51,11 +43,7 @@ def test_run_pipeline_wires_stages_and_validates_output(
     mock_run_job_discovery.return_value = found_jobs
     mock_synthesize.return_value = verified_matches_fixture
 
-    with patch(
-        "app.pipeline.filter_results_to_tool_observed_urls",
-        side_effect=_passthrough_verified_results,
-    ):
-        result = run_pipeline("Jane Doe resume text", Constraints())
+    result = run_pipeline("Jane Doe resume text", Constraints())
 
     validate_stage("aptitudeProfile", result["aptitude_profile"])
     validate_stage("roleFamilyPlan", result["role_family_plan"])
@@ -78,10 +66,10 @@ def test_run_stage3_returns_empty_results_when_discovery_finds_nothing(
         "search_plan": [
             "Searched for senior roles matching core skills in open location.",
             "Explored adjacent role families from the aptitude profile.",
-            "Ran web search and page scraping; no verified postings met criteria.",
+            "Ran web search; no verified postings met criteria.",
         ],
         "results": [],
-        "notes": ["No job postings were found via web search and page scraping."],
+        "notes": ["No job postings were found via web search for this profile and constraints."],
     }
     mock_empty_results.return_value = empty
 

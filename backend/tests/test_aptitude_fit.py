@@ -70,6 +70,8 @@ def test_rank_and_filter_found_jobs_orders_by_fit(
         stage1_fixture,
         role_family_plan=role_family_plan_fixture,
     )
-    assert len(ranked) == 1
-    assert ranked[0]["title"] == "Platform Engineer - Internal Tools"
+    titles = [str(row["title"]) for row in ranked]
+    assert "Account Executive" not in titles
+    assert titles[0] == "Platform Engineer - Internal Tools"
     assert ranked[0].get("aptitude_fit_signals")
+    assert len(ranked) >= 1

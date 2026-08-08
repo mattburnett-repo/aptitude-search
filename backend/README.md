@@ -8,7 +8,7 @@ Orchestration for **Stage 1** (aptitude profile), **Stage 2** (O\*NET vector mat
 - **Ingress safety:** `[llm.input_guard]` — Prompt Guard 2 22M text-classification before Stage 1; Presidio PII deletion (`[input_safety]`). See [`docs/v0.5.0/input-safety.md`](../docs/v0.5.0/input-safety.md).
 - **Stage 2:** same model/key — aptitude profile → role family plan (chat JSON).
 - **Stage 3 discovery:** Python builds queries from the role family plan `search_terms` (fallback: profile `adjacent_roles` / `domains` / skills) and runs `search_job_postings` (`[job_discovery].discovery_query_max`). No LLM for discovery.
-- **Stage 3 fit:** Python ranks/filters scraped jobs by work-pattern fit (`aptitude_fit.py`; `[job_discovery].aptitude_fit_min_score`). No LLM.
+- **Stage 3 fit:** Python ranks found jobs by work-pattern fit and keeps `result_top_k` (`aptitude_fit.py`). No LLM.
 - **Stage 3 synthesis:** `[llm.job_discovery].model_key` + `[llm.job_discovery].model` + `[llm.job_discovery].temperature` — maps ranked `found_jobs` to verified matches JSON.
 - **O\*NET matching (Stage 2):** `[onet_matching]` in `config.toml` (required) — embeds the Stage 1 profile (`[embedding]`), queries `occupation_embeddings` via `[onet]` + pgvector, and grounds the Stage 2 LLM. Requires offline load: [`data/README.md`](../data/README.md).
 
@@ -116,5 +116,5 @@ curl -s -X POST http://localhost:3001/v1/pipeline \
 - **Stage 3 discovery:** `app/job_discovery/discovery.py` — profile-driven queries + `search_job_postings` (see [PROMPT-CONTRACT](../docs/PROMPT-CONTRACT.md)).
 - Stage 3 synthesis: `prompts/03-job-discovery-synthesis.md` (chat JSON → `verified_matches`).
 - Filenames are configured in `config.toml` under `[prompts]`.
-- **URL filters (Stage 3):** blocked domains, path markers, and related SERP/`found_jobs` rules live in `app/job_discovery/url-filters.toml` (filename set by `[job_discovery].url_filters_file` in `config.toml`, resolved relative to `app/job_discovery/`). Add or remove entries in that file’s arrays (`skip_domains`, `skip_path_markers`, `skip_title_phrases`, `job_url_markers`); restart the API to pick up changes.
+- **URL filters (Stage 3):** junk denylist for SERP rows lives in `app/job_discovery/url-filters.toml` (filename set by `[job_discovery].url_filters_file` in `config.toml`, resolved relative to `app/job_discovery/`). Edit `skip_domains`, `skip_path_markers`, `skip_title_phrases`; restart the API to pick up changes.
 - CORS allows `http://localhost:5173` and `http://127.0.0.1:5173` for the Vite dev server.

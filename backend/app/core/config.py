@@ -47,8 +47,7 @@ class JobDiscoveryConfig(BaseModel):
     url_filters_file: str
     discovery_query_max: int
     tavily_api_key: str
-    aptitude_fit_min_score: int = 1
-    aptitude_fit_min_results: int = 2
+    result_top_k: int = 25
 
     @field_validator("url_filters_file")
     @classmethod
@@ -80,17 +79,9 @@ class JobDiscoveryConfig(BaseModel):
             raise ValueError(f"job_discovery.{field} must be set in config.toml")
         return stripped
 
-    @field_validator("aptitude_fit_min_score")
+    @field_validator("result_top_k")
     @classmethod
-    def aptitude_fit_min_score_non_negative(cls, value: int, info: ValidationInfo) -> int:
-        if value < 0:
-            field = info.field_name or "field"
-            raise ValueError(f"job_discovery.{field} must be non-negative")
-        return value
-
-    @field_validator("aptitude_fit_min_results")
-    @classmethod
-    def aptitude_fit_min_results_positive(cls, value: int, info: ValidationInfo) -> int:
+    def result_top_k_positive(cls, value: int, info: ValidationInfo) -> int:
         if value < 1:
             field = info.field_name or "field"
             raise ValueError(f"job_discovery.{field} must be at least 1")
@@ -156,12 +147,14 @@ class JobDiscoveryLlmConfig(BaseModel):
     model_key: str
     model: str
     temperature: float
-    visit_max_output_length: int
+    max_tokens: int = 8192
     search_max_results: int
-    search_scrape_max: int
     search_snippet_max_chars: int
     search_rate_limit: float | None
-    page_snippet_max_chars: int
+    # Spike (`lg_spike/`) / page_extract only — unused by production search.
+    visit_max_output_length: int = 8000
+    search_scrape_max: int = 3
+    page_snippet_max_chars: int = 400
 
     @field_validator("model_key", "model")
     @classmethod
@@ -172,11 +165,19 @@ class JobDiscoveryLlmConfig(BaseModel):
             raise ValueError(f"llm.job_discovery.{field} must be set in config.toml")
         return stripped
 
+    @field_validator("max_tokens")
+    @classmethod
+    def max_tokens_positive(cls, value: int, info: ValidationInfo) -> int:
+        if value < 256:
+            field = info.field_name or "field"
+            raise ValueError(f"llm.job_discovery.{field} must be at least 256")
+        return value
+
     @field_validator(
-        "visit_max_output_length",
         "search_max_results",
-        "search_scrape_max",
         "search_snippet_max_chars",
+        "visit_max_output_length",
+        "search_scrape_max",
         "page_snippet_max_chars",
     )
     @classmethod

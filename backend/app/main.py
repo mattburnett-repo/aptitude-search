@@ -8,7 +8,6 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from openinference.instrumentation.smolagents import SmolagentsInstrumentor
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.trace import TracerProvider
@@ -52,7 +51,6 @@ if _sentry_dsn:
 provider = TracerProvider()
 provider.add_span_processor(BatchSpanProcessor(OTLPSpanExporter()))
 trace.set_tracer_provider(provider)
-SmolagentsInstrumentor().instrument()
 
 app = FastAPI(
     title=config.app.title,

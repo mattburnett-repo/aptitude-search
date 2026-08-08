@@ -190,12 +190,11 @@ def rank_and_filter_found_jobs(
     *,
     role_family_plan: JsonObject | None = None,
 ) -> list[FoundJob]:
-    """Drop avoid-term rows, rank survivors by aptitude fit, attach fit metadata."""
+    """Drop avoid-term rows, rank by aptitude fit, return top_k."""
     if not jobs:
         return []
 
-    min_score = config.job_discovery.aptitude_fit_min_score
-    min_results = config.job_discovery.aptitude_fit_min_results
+    top_k = config.job_discovery.result_top_k
 
     scored: list[tuple[FoundJob, int, list[str]]] = []
     for job in jobs:
@@ -214,17 +213,10 @@ def rank_and_filter_found_jobs(
         scored.append((job, fit_score, fit_signals))
 
     scored.sort(key=lambda row: row[1], reverse=True)
-    passing = [row for row in scored if row[1] >= min_score]
-    selected = passing if passing else scored[:min_results]
-    if not passing and scored:
-        logger.info(
-            "aptitude_fit kept %s fallback row(s) below min_score=%s",
-            len(selected),
-            min_score,
-        )
+    selected = scored[:top_k]
 
     ranked: list[FoundJob] = []
-    for job, fit_score, fit_signals in selected[: len(scored)]:
+    for job, fit_score, fit_signals in selected:
         enriched = dict(job)
         enriched["aptitude_fit_score"] = fit_score
         enriched["aptitude_fit_signals"] = fit_signals

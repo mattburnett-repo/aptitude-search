@@ -1,13 +1,12 @@
 """Stage 3 synthesis: map ranked found_jobs → verified_matches JSON.
 
-After discovery collects compact job rows via web search and page scraping,
-this module runs a single Hugging Face chat call to map those rows plus the
-fixed aptitude profile and constraints into schema-strict
-``job-discovery-results`` JSON (``search_plan``, ``results``, ``notes``).
+After discovery and aptitude ranking, runs a Hugging Face chat call to map
+those rows plus the aptitude profile and constraints into schema-strict
+``job-discovery-results`` JSON (``search_plan``, ``results``, ``notes``),
+including match explanations.
 
-The model does not search the web here; it only formats and verifies postings
-already in ``found_jobs``. ``pipeline.run_stage3`` may still drop result URLs
-that never appeared in tool output (see ``tool_observed_urls.py``).
+The model does not search the web here; it only formats and explains postings
+already in ``found_jobs``.
 """
 
 from __future__ import annotations
@@ -24,7 +23,7 @@ from app.core.validate import normalize_job_discovery_results
 from app.job_discovery.tool_observed_urls import normalize_url
 
 _EMPTY_NOTE = (
-    "No job postings were found via web search and page scraping "
+    "No job postings were found via web search "
     "for this profile and constraints."
 )
 
@@ -98,7 +97,7 @@ def _build_empty_search_plan(
 
     while len(plan) < 3:
         plan.append(
-            "Ran web search and page scraping; no verified postings met criteria."
+            "Ran web search; no verified postings met criteria."
         )
 
     return plan[:8]
@@ -210,6 +209,7 @@ def synthesize_job_discovery_results(
             prompt_loader.system_prompt_stage3_synthesis(),
             user,
             temperature=config.llm.job_discovery.temperature,
+            max_tokens=config.llm.job_discovery.max_tokens,
         )
     )
     return ensure_all_found_jobs_in_results(result, found_jobs)

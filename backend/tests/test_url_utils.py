@@ -1,6 +1,5 @@
+from app.job_discovery.url_filters import load_url_filters
 from app.job_discovery.url_utils import (
-    filter_found_jobs,
-    is_verified_job_posting,
     looks_like_job_posting_url,
     normalize_job_search_query,
     prepare_scrape_url,
@@ -44,32 +43,15 @@ def test_should_skip_search_result_filters_example_domains():
     assert should_skip_search_result("https://example.com/") is True
 
 
-def test_should_skip_search_result_filters_list_pages():
-    assert should_skip_search_result("https://www.indeed.com/q-senior-engineer-jobs") is True
+def test_should_skip_search_result_keeps_board_and_careers_urls():
+    assert should_skip_search_result("https://www.indeed.com/q-senior-engineer-jobs") is False
     assert (
         should_skip_search_result(
             "https://www.linkedin.com/jobs/search/?keywords=python"
         )
-        is True
-    )
-    assert (
-        should_skip_search_result(
-            "https://ca.linkedin.com/jobs/full-stack-developer-jobs-toronto-on"
-        )
-        is True
-    )
-    assert should_skip_search_result("https://www.ziprecruiter.com/Jobs/Remote") is True
-    assert should_skip_search_result("https://www.upwork.com/freelance-jobs/") is True
-
-
-def test_should_skip_search_result_keeps_ziprecruiter_job_posting():
-    assert (
-        should_skip_search_result(
-            "https://www.ziprecruiter.com/c/Acme/Job/Senior-Engineer",
-            title="Senior Engineer",
-        )
         is False
     )
+    assert should_skip_search_result("https://www.upwork.com/freelance-jobs/") is True
     assert (
         should_skip_search_result(
             "https://acme.com/careers/software-engineer",
@@ -93,36 +75,8 @@ def test_should_skip_job_title_rejects_article_headlines():
     assert should_skip_job_title("Senior Backend Engineer") is False
 
 
-def test_is_verified_job_posting_requires_job_like_url():
-    blog: dict[str, object] = {
-        "url": "https://medium.com/post",
-        "title": "How to interview",
-        "company": "",
-    }
-    article_with_fake_company: dict[str, object] = {
-        "url": "https://geeksforgeeks.org/django-overview",
-        "title": "Django Overview",
-        "company": "Geeksforgeeks",
-    }
-    job: dict[str, object] = {
-        "url": "https://acme.com/careers/backend",
-        "title": "Backend Engineer",
-        "company": "Acme",
-    }
-    assert is_verified_job_posting(blog) is False
-    assert is_verified_job_posting(article_with_fake_company) is False
-    assert is_verified_job_posting(job) is True
-
-
-def test_filter_found_jobs_drops_noise():
-    jobs: list[dict[str, object]] = [
-        {"url": "https://medium.com/post", "title": "Tutorial", "company": ""},
-        {
-            "url": "https://acme.com/jobs/backend",
-            "title": "Backend Engineer",
-            "company": "Acme",
-        },
-    ]
-    kept = filter_found_jobs(jobs)
-    assert len(kept) == 1
-    assert kept[0]["company"] == "Acme"
+def test_url_filters_allow_empty_optional_lists():
+    load_url_filters.cache_clear()
+    filters = load_url_filters()
+    assert filters.skip_domain_suffixes == ()
+    assert filters.skip_listing_path_markers == ()

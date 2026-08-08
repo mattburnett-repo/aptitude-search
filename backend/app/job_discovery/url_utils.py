@@ -12,6 +12,23 @@ _ALLOWED_SCHEMES = frozenset({"http", "https"})
 _JOB_QUERY_HINTS = frozenset(
     {"jobs", "job", "careers", "career", "hiring", "openings", "recruit"}
 )
+# Spike/page_extract only — production discovery does not gate on these.
+_JOB_URL_MARKERS = (
+    "boards.greenhouse.io",
+    "jobs.lever.co",
+    "jobs.ashbyhq.com",
+    "apply.workable.com",
+    "myworkdayjobs.com",
+    "icims.com",
+    "smartrecruiters.com",
+    "job-boards.",
+    "javascript.jobs",
+    "/jobs/",
+    "/job/",
+    "/careers/",
+    "/career/",
+    "/hiring/",
+)
 
 
 def _is_placeholder_scrape_url(url: str) -> bool:
@@ -144,26 +161,12 @@ def should_skip_search_result(href: str, *, title: str = "") -> bool:
 
 
 def looks_like_job_posting_url(url: str) -> bool:
-    """True when URL path/host resembles a careers page or ATS posting."""
-    filters = load_url_filters()
+    """True when URL path/host resembles a careers page or ATS posting.
+
+    Kept for spike/page_extract helpers; production search no longer gates on this.
+    """
     prepared, error = prepare_scrape_url(url)
     if error or not prepared:
         return False
     lower = prepared.lower()
-    return any(marker in lower for marker in filters.job_url_markers)
-
-
-def is_verified_job_posting(job: dict[str, object]) -> bool:
-    """Keep rows that look like real postings (job-like URL, not article titles)."""
-    url = str(job.get("url") or "")
-    title = str(job.get("title") or job.get("role") or "")
-    if should_skip_search_result(url, title=title):
-        return False
-    if should_skip_job_title(title):
-        return False
-    return looks_like_job_posting_url(url)
-
-
-def filter_found_jobs(jobs: list[dict[str, object]]) -> list[dict[str, object]]:
-    """Keep only rows that look like verified job postings."""
-    return [job for job in jobs if is_verified_job_posting(job)]
+    return any(marker in lower for marker in _JOB_URL_MARKERS)

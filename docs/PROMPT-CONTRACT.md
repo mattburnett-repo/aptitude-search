@@ -6,7 +6,7 @@
 - **Stage 3 is job search.** The API runs role-family-driven web discovery, ranks scraped postings by work-pattern fit, then a synthesis LLM call, and returns currently open postings in **`verified_matches`**.
 - **Primary path:** API + UI (or Swagger). Prompt text lives under `prompts/` (see Stages table); filenames are wired in `backend/config.toml`.
 - **Testing:** Swagger UI at `/docs` on the running API (see [backend/README.md](../backend/README.md)).
-- **Implementation (not user-facing):** Stage 3 is three phases: (1) **discovery** — Python builds search queries from the **role family plan** `search_terms` (fallback: `adjacent_roles`, `domains`, skills), plus constraints, then runs `search_job_postings`; (2) **aptitude fit** — rank/filter `found_jobs` using `strengths`, `working_style_signals`, plan `work_modes` / `avoid_terms`; (3) **synthesis** — chat completion maps ranked `found_jobs` into schema-strict JSON. Result URLs are filtered to those observed in tool output. The API jsonschema-validates `verified_matches` against `job-discovery-results.schema.json`.
+- **Implementation (not user-facing):** Stage 3 is three phases: (1) **discovery** — Python builds search queries from the **role family plan** `search_terms` (fallback: `adjacent_roles`, `domains`, skills), plus constraints, then runs `search_job_postings`; (2) **aptitude fit** — rank/`top_k` filter on `found_jobs`; (3) **synthesis** — chat completion maps ranked `found_jobs` into schema-strict JSON with match explanations. The API jsonschema-validates `verified_matches` against `job-discovery-results.schema.json`.
 
 ---
 
@@ -41,9 +41,8 @@ Cross-cutting:
 Related settings in `backend/config.toml`:
 
 - **`[job_discovery].discovery_query_max`** — max `search_job_postings` calls per pipeline run (default `6`).
-- **`[job_discovery].aptitude_fit_min_score`** — minimum work-pattern fit score to keep a scraped job (default `1`).
-- **`[job_discovery].aptitude_fit_min_results`** — minimum jobs passed to synthesis when none meet `aptitude_fit_min_score` (default `2`).
-- **`[llm.job_discovery]`** — search/scrape limits and synthesis temperature (`[llm.aptitude].model` is used for synthesis and stage 2 chat calls).
+- **`[job_discovery].result_top_k`** — max ranked jobs passed to synthesis after aptitude fit (default `25`).
+- **`[llm.job_discovery]`** — synthesis model/temperature and search limits (`search_max_results`, `search_rate_limit`). Spike-only scrape knobs have defaults.
 
 ## API validation
 

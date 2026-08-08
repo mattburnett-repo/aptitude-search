@@ -13,7 +13,6 @@ from app.core.json_types import FoundJob, JsonObject, JsonValue, as_object_dict,
 from app.core.models import Constraints
 from app.core.profile_text import profile_labels
 from app.core.progress import ProgressCallback, emit_progress
-from app.job_discovery.tool_observed_urls import ToolObservedUrlRegistry
 from app.job_discovery.tools import build_job_discovery_tools
 
 logger = logging.getLogger(__name__)
@@ -244,12 +243,10 @@ def run_job_discovery(
     constraints: Constraints,
     *,
     role_family_plan: JsonObject | None = None,
-    observed_urls: ToolObservedUrlRegistry | None = None,
     on_progress: ProgressCallback | None = None,
 ) -> list[FoundJob]:
     """Run profile-driven searches via search_job_postings; returns found_jobs."""
-    registry = observed_urls if observed_urls is not None else ToolObservedUrlRegistry()
-    tool = build_job_discovery_tools(registry)[0]
+    tool = build_job_discovery_tools()[0]
 
     queries = build_discovery_queries(
         aptitude_profile,

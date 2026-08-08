@@ -1,8 +1,8 @@
-# SERP and found_jobs URL filters for Stage 3 job discovery.
+# SERP junk filters for Stage 3 job discovery.
 # Edit lists here; loaded via config.toml [job_discovery].url_filters_file (relative to this package).
 #
 # skip_domains: exact hostname match (after stripping www.), e.g. medium.com blocks www.medium.com only.
-# skip_domain_suffixes: hostname equals entry or ends with ".entry", e.g. linkedin.com blocks ca.linkedin.com.
+# skip_domain_suffixes: hostname equals entry or ends with ".entry" (optional; may be empty).
 
 skip_domains = [
   "baeldung.com",
@@ -31,10 +31,7 @@ skip_domains = [
   "youtube.com",
 ]
 
-# Skip things like ca.linkedin.com
-skip_domain_suffixes = [
-  "linkedin.com",
-]
+skip_domain_suffixes = []
 
 skip_path_markers = [
   "/docs/",
@@ -48,18 +45,10 @@ skip_path_markers = [
   "/blog/",
 ]
 
-# Job-board search/list pages (not individual postings).
-skip_listing_path_markers = [
-  "/q-",
-  "/jobs/search",
-  "/job/search",
-  "/browsejobs",
-]
+# Optional; empty = do not skip board list/search URLs (higher recall).
+skip_listing_path_markers = []
 
-# Case-sensitive path fragments (e.g. ZipRecruiter /Jobs/ index).
-skip_listing_path_markers_case_sensitive = [
-  "/Jobs/",
-]
+skip_listing_path_markers_case_sensitive = []
 
 skip_title_phrases = [
   "documentation",
@@ -79,21 +68,4 @@ skip_title_phrases = [
   "top ",
   "salary guide",
   "career path",
-]
-
-job_url_markers = [
-  "boards.greenhouse.io",
-  "jobs.lever.co",
-  "jobs.ashbyhq.com",
-  "apply.workable.com",
-  "myworkdayjobs.com",
-  "icims.com",
-  "smartrecruiters.com",
-  "job-boards.",
-  "javascript.jobs",
-  "/jobs/",
-  "/job/",
-  "/careers/",
-  "/career/",
-  "/hiring/",
 ]

@@ -1,10 +1,8 @@
 import json
 from typing import cast
-from unittest.mock import patch
 
 from app.core.json_types import JsonObject
-from app.job_discovery.tool_observed_urls import ToolObservedUrlRegistry
-from app.job_discovery.tools import SearchJobPostingsTool
+from app.job_discovery.tools import SearchJobPostings
 
 
 class _StubTavily:
@@ -12,29 +10,20 @@ class _StubTavily:
 
     _results: list[dict[str, object]]
     queries: list[tuple[str, int]]
-    extract_urls: list[str]
 
     def __init__(self, results: list[dict[str, object]]) -> None:
         self._results = results
         self.queries = []
-        self.extract_urls = []
 
     def search(self, query: str, *, max_results: int) -> list[dict[str, object]]:
         self.queries.append((query, max_results))
         return self._results
 
-    def extract(self, url: str) -> str:
-        self.extract_urls.append(url)
-        return f"# Job\n\nExtracted {url}"
 
-
-def _make_tool(*, tavily: _StubTavily | None = None) -> SearchJobPostingsTool:
-    return SearchJobPostingsTool(
-        ToolObservedUrlRegistry(),
+def _make_search(*, tavily: _StubTavily | None = None) -> SearchJobPostings:
+    return SearchJobPostings(
         max_results=10,
-        scrape_max=3,
         rate_limit=None,
-        max_output_length=5000,
         tavily=tavily or _StubTavily([]),
     )
 
@@ -43,53 +32,45 @@ def _parse_payload(output: str) -> JsonObject:
     return cast(JsonObject, json.loads(output))
 
 
-def test_search_job_postings_filters_list_pages_and_scrapes_candidates() -> None:
+def test_search_job_postings_keeps_serp_rows_after_junk_filter() -> None:
     stub = _StubTavily(
         [
             {
-                "title": "Indeed search",
-                "href": "https://www.indeed.com/q-python-jobs",
-                "body": "list",
+                "title": "How to learn Python",
+                "href": "https://medium.com/some-article",
+                "body": "blog",
             },
             {
                 "title": "Backend Engineer",
                 "href": "https://acme.com/careers/backend",
                 "body": "hiring",
             },
+            {
+                "title": "Indeed python jobs",
+                "href": "https://www.indeed.com/q-python-jobs",
+                "body": "list",
+            },
         ]
     )
-    tool = _make_tool(tavily=stub)
-
-    with patch(
-        "app.job_discovery.tools._scrape_job_page",
-        return_value={
-            "url": "https://acme.com/careers/backend",
-            "title": "Backend Engineer",
-            "company": "Acme",
-            "location": "Remote",
-            "snippet": "Build APIs",
-            "error": "",
-        },
-    ) as mock_scrape:
-        output = tool.run_search_job_postings("python backend remote")
+    search = _make_search(tavily=stub)
+    output = search.run_search_job_postings("python backend remote")
 
     payload = _parse_payload(output)
     jobs = cast(list[object], payload.get("jobs"))
-    assert len(jobs) == 1
-    first_job = cast(JsonObject, jobs[0])
-    assert first_job.get("company") == "Acme"
+    assert len(jobs) == 2
+    urls = {cast(JsonObject, job).get("url") for job in jobs}
+    assert "https://acme.com/careers/backend" in urls
+    assert "https://indeed.com/q-python-jobs" in urls
     assert payload.get("skipped") == 1
-    mock_scrape.assert_called_once()
-    assert mock_scrape.call_args.args[2] == "https://acme.com/careers/backend"
     assert stub.queries == [("python backend remote jobs hiring", 10)]
 
 
-def test_search_job_postings_skips_non_job_urls_without_scraping() -> None:
-    tool = _make_tool(
+def test_search_job_postings_skips_article_titles() -> None:
+    search = _make_search(
         tavily=_StubTavily(
             [
                 {
-                    "title": "Django vs Node",
+                    "title": "Django vs Node: Complete Guide",
                     "href": "https://somecompany.com/articles/django-vs-node",
                     "body": "comparison",
                 },
@@ -97,21 +78,17 @@ def test_search_job_postings_skips_non_job_urls_without_scraping() -> None:
         )
     )
 
-    with patch("app.job_discovery.tools._scrape_job_page") as mock_scrape:
-        payload = _parse_payload(tool.run_search_job_postings("Node.js Django"))
-
-    jobs = payload.get("jobs")
-    assert jobs == []
+    payload = _parse_payload(search.run_search_job_postings("Node.js Django"))
+    assert payload.get("jobs") == []
     message = payload.get("message")
     assert isinstance(message, str)
-    assert "No direct job posting URLs" in message
-    mock_scrape.assert_not_called()
+    assert "junk" in message.lower() or "Omitted" in message
 
 
 def test_search_job_postings_returns_message_when_no_results() -> None:
-    tool = _make_tool(tavily=_StubTavily([]))
+    search = _make_search(tavily=_StubTavily([]))
 
-    payload = _parse_payload(tool.run_search_job_postings("nonsense query xyz"))
+    payload = _parse_payload(search.run_search_job_postings("nonsense query xyz"))
     assert payload.get("jobs") == []
     message = payload.get("message")
     assert isinstance(message, str)
