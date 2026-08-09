@@ -1,29 +1,14 @@
-"""Track URLs from search_job_postings and filter final results to those URLs."""
+"""Spike/notebook helpers: track tool URLs and filter synthesis to observed links."""
 
 from __future__ import annotations
 
 import re
-from urllib.parse import urlparse, urlunparse
 
 from app.core.json_types import JsonObject, as_object_dict, as_object_list
+from app.job_discovery.url_utils import normalize_url
 
 _MARKDOWN_LINK_URL = re.compile(r"\]\((https?://[^)\s]+)\)")
 _PLAIN_HTTP_URL = re.compile(r"https?://[^\s\)\]>\",']+")
-
-
-def normalize_url(url: str) -> str:
-    """Canonical form for comparing URLs from tools vs model JSON."""
-    cleaned = url.strip().rstrip(".,;)")
-    if "://" not in cleaned and not cleaned.startswith("//"):
-        cleaned = f"https://{cleaned}"
-    parsed = urlparse(cleaned)
-    if not parsed.scheme or not parsed.netloc:
-        return cleaned
-    netloc = parsed.netloc.lower()
-    if netloc.startswith("www."):
-        netloc = netloc[4:]
-    path = parsed.path.rstrip("/") or ""
-    return urlunparse((parsed.scheme.lower(), netloc, path, "", parsed.query, ""))
 
 
 def extract_urls_from_tool_output(text: str) -> set[str]:

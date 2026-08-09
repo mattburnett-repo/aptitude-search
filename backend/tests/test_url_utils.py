@@ -1,38 +1,45 @@
 from app.job_discovery.url_filters import load_url_filters
 from app.job_discovery.url_utils import (
-    looks_like_job_posting_url,
     normalize_job_search_query,
-    prepare_scrape_url,
+    normalize_result_url,
+    normalize_url,
     should_skip_job_title,
     should_skip_search_result,
 )
 
 
-def test_prepare_scrape_url_normalizes_bare_host():
-    url, error = prepare_scrape_url("Acme.com/careers/engineer")
+def test_normalize_result_url_normalizes_bare_host():
+    url, error = normalize_result_url("Acme.com/careers/engineer")
     assert error is None
     assert url == "https://acme.com/careers/engineer"
 
 
-def test_prepare_scrape_url_strips_www_and_trailing_punctuation():
-    url, error = prepare_scrape_url("https://www.example.com/jobs/1.")
+def test_normalize_result_url_strips_www_and_trailing_punctuation():
+    url, error = normalize_result_url("https://www.example.com/jobs/1.")
     assert error is None
     assert url == "https://example.com/jobs/1"
 
 
-def test_prepare_scrape_url_rejects_placeholder_urls():
+def test_normalize_result_url_rejects_placeholder_urls():
     for bad in ("https://...", "http://...", "  https://...  "):
-        url, error = prepare_scrape_url(bad)
+        url, error = normalize_result_url(bad)
         assert url is None
         assert error is not None
         assert "Placeholder" in error
 
 
-def test_prepare_scrape_url_rejects_unsupported_scheme():
-    url, error = prepare_scrape_url("mailto:jobs@example.com")
+def test_normalize_result_url_rejects_unsupported_scheme():
+    url, error = normalize_result_url("mailto:jobs@example.com")
     assert url is None
     assert error is not None
     assert "Unsupported URL scheme" in error
+
+
+def test_normalize_url_strips_www_and_trailing_slash():
+    assert (
+        normalize_url("https://www.example.com/jobs/1/")
+        == "https://example.com/jobs/1"
+    )
 
 
 def test_should_skip_search_result_filters_blog_domains():
@@ -59,10 +66,6 @@ def test_should_skip_search_result_keeps_board_and_careers_urls():
         )
         is False
     )
-
-
-def test_looks_like_job_posting_url_detects_careers_path():
-    assert looks_like_job_posting_url("https://acme.com/careers/backend") is True
 
 
 def test_normalize_job_search_query_appends_hiring_keywords():

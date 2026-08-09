@@ -20,7 +20,7 @@ from app.core.llm import complete_job_discovery_chat_json
 from app.core.json_types import FoundJob, JsonObject, as_object_dict, as_object_list
 from app.core.models import Constraints
 from app.core.validate import normalize_job_discovery_results
-from app.job_discovery.tool_observed_urls import normalize_url
+from app.job_discovery.url_utils import normalize_url
 
 _EMPTY_NOTE = (
     "No job postings were found via web search "

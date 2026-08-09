@@ -44,6 +44,25 @@ def test_score_job_aptitude_fit_rewards_integration_title(
     assert signals
 
 
+def test_score_job_aptitude_fit_uses_snippet_text(
+    stage1_fixture: dict[str, object],
+    role_family_plan_fixture: dict[str, object],
+) -> None:
+    job = {
+        "title": "Engineer",
+        "company": "Acme",
+        "url": "https://acme.com/jobs/1",
+        "snippet": "Solutions engineer integrations warehouse APIs mentoring",
+    }
+    score, signals = score_job_aptitude_fit(
+        job,
+        stage1_fixture,
+        role_family_plan=role_family_plan_fixture,
+    )
+    assert score > 0
+    assert signals
+
+
 def test_rank_and_filter_found_jobs_orders_by_fit(
     stage1_fixture: dict[str, object],
     role_family_plan_fixture: dict[str, object],

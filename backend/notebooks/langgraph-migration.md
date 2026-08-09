@@ -2,16 +2,16 @@
 
 Orchestrate the aptitude-search pipeline with LangGraph. Keep stage internals as plain Python. Do not turn this into an agent-framework rewrite.
 
-Spike directory: `backend/lg_spike/` (named to avoid shadowing the installed `langgraph` package).
+Spike directory: `backend/notebooks/` (LangGraph experiments and notebooks; kept out of `app/`).
 
-- Notebook: `backend/lg_spike/langgraph-migration.ipynb`
-- Stage 3 module: `backend/lg_spike/stage3.py`
-- Search substitute: `backend/lg_spike/search.py` (does **not** use `app.job_discovery.tools`)
+- Notebook: `backend/notebooks/langgraph-migration.ipynb`
+- Stage 3 module: `backend/notebooks/stage3.py`
+- Search substitute: `backend/notebooks/search.py` (does **not** use `app.job_discovery.tools`)
 
 ## Working assumptions
 
 1. **Leave existing `backend/app/` code as-is** — including `tools.py` and `pipeline.run_stage3`.
-2. **All spike changes live under** `backend/lg_spike/` only.
+2. **All spike changes live under** `backend/notebooks/` only.
 3. Production FastAPI still uses the old sequential Stage 3 until an explicit swap.
 
 ## Spike Stage 3 search flow
@@ -38,7 +38,7 @@ START → prepare_resume → stage1 → stage2 → stage3 → END
 
 ## Do / don’t
 
-**Do:** change only files under `backend/lg_spike/`.
+**Do:** change only files under `backend/notebooks/`.
 
 **Do not:** edit `app/job_discovery/tools.py` or any other `app/` module for this effort.
 

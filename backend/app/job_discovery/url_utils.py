@@ -1,9 +1,9 @@
-"""URL normalization for scraping and post-search SERP filtering."""
+"""URL normalization and post-search SERP filtering."""
 
 from __future__ import annotations
 
 import re
-from urllib.parse import urlparse, urlunparse
+from urllib.parse import ParseResult, urlparse, urlunparse
 
 from app.job_discovery.url_filters import load_url_filters
 
@@ -12,27 +12,10 @@ _ALLOWED_SCHEMES = frozenset({"http", "https"})
 _JOB_QUERY_HINTS = frozenset(
     {"jobs", "job", "careers", "career", "hiring", "openings", "recruit"}
 )
-# Spike/page_extract only — production discovery does not gate on these.
-_JOB_URL_MARKERS = (
-    "boards.greenhouse.io",
-    "jobs.lever.co",
-    "jobs.ashbyhq.com",
-    "apply.workable.com",
-    "myworkdayjobs.com",
-    "icims.com",
-    "smartrecruiters.com",
-    "job-boards.",
-    "javascript.jobs",
-    "/jobs/",
-    "/job/",
-    "/careers/",
-    "/career/",
-    "/hiring/",
-)
 
 
-def _is_placeholder_scrape_url(url: str) -> bool:
-    """True for documentation placeholders that must not be scraped."""
+def _is_placeholder_url(url: str) -> bool:
+    """True for documentation placeholders that are not real result URLs."""
     lower = url.strip().lower()
     if "..." in lower or lower.endswith("…"):
         return True
@@ -41,18 +24,46 @@ def _is_placeholder_scrape_url(url: str) -> bool:
     return False
 
 
-def prepare_scrape_url(url: str) -> tuple[str | None, str | None]:
+def _clean_url_input(url: str) -> str:
+    return url.strip().rstrip(".,;)")
+
+
+def _ensure_scheme(cleaned: str) -> str:
+    if "://" not in cleaned and not cleaned.startswith("//"):
+        return f"https://{cleaned}"
+    return cleaned
+
+
+def _format_canonical_url(
+    parsed: ParseResult,
+    *,
+    strip_trailing_slash: bool,
+) -> str | None:
+    """Lowercase scheme/host, drop www., keep query; None if scheme or host missing."""
+    scheme = (parsed.scheme or "").lower()
+    netloc = (parsed.netloc or "").lower()
+    if not scheme or not netloc:
+        return None
+    if netloc.startswith("www."):
+        netloc = netloc[4:]
+    path = parsed.path or ""
+    if strip_trailing_slash:
+        path = path.rstrip("/") or ""
+    return urlunparse((scheme, netloc, path, "", parsed.query, ""))
+
+
+def normalize_result_url(url: str) -> tuple[str | None, str | None]:
     """
-    Normalize a scrape target and reject unsupported schemes.
+    Normalize a search-result URL and reject unsupported schemes.
 
     Returns ``(normalized_url, error_message)``. ``error_message`` is set when
-    the URL cannot be fetched.
+    the URL is invalid for use as a result link.
     """
-    cleaned = url.strip().rstrip(".,;)")
+    cleaned = _clean_url_input(url)
     if not cleaned:
         return None, "Empty URL."
 
-    if _is_placeholder_scrape_url(cleaned):
+    if _is_placeholder_url(cleaned):
         return None, (
             "Placeholder URL is not allowed; use URLs from search_job_postings JSON."
         )
@@ -73,16 +84,22 @@ def prepare_scrape_url(url: str) -> tuple[str | None, str | None]:
             f"Unsupported URL scheme {scheme!r}; only http and https are allowed."
         )
 
-    netloc = parsed.netloc.lower()
-    if not netloc:
+    if not parsed.netloc:
         return None, f"Invalid URL {url!r}: no hostname."
 
-    if netloc.startswith("www."):
-        netloc = netloc[4:]
-
-    path = parsed.path or ""
-    normalized = urlunparse((scheme, netloc, path, "", parsed.query, ""))
+    normalized = _format_canonical_url(parsed, strip_trailing_slash=False)
+    if normalized is None:
+        return None, f"Invalid URL {url!r}: no hostname."
     return normalized, None
+
+
+def normalize_url(url: str) -> str:
+    """Canonical form for comparing URLs (dedupe / merge)."""
+    cleaned = _clean_url_input(url)
+    if not cleaned:
+        return cleaned
+    parsed = urlparse(_ensure_scheme(cleaned))
+    return _format_canonical_url(parsed, strip_trailing_slash=True) or cleaned
 
 
 def normalize_job_search_query(query: str) -> str:
@@ -113,7 +130,7 @@ def should_skip_search_result(href: str, *, title: str = "") -> bool:
     if not href.strip():
         return True
 
-    prepared, error = prepare_scrape_url(href)
+    prepared, error = normalize_result_url(href)
     if error or not prepared:
         return True
 
@@ -158,15 +175,3 @@ def should_skip_search_result(href: str, *, title: str = "") -> bool:
         return True
 
     return False
-
-
-def looks_like_job_posting_url(url: str) -> bool:
-    """True when URL path/host resembles a careers page or ATS posting.
-
-    Kept for spike/page_extract helpers; production search no longer gates on this.
-    """
-    prepared, error = prepare_scrape_url(url)
-    if error or not prepared:
-        return False
-    lower = prepared.lower()
-    return any(marker in lower for marker in _JOB_URL_MARKERS)

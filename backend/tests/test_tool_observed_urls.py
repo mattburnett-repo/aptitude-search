@@ -1,19 +1,22 @@
+"""Tests for spike/notebook tool-observed URL helpers."""
+
+from __future__ import annotations
+
+import sys
+from pathlib import Path
 from typing import cast
 
 from app.core.json_types import JsonObject
-from app.job_discovery.tool_observed_urls import (
+
+_NOTEBOOKS = Path(__file__).resolve().parents[1] / "notebooks"
+if str(_NOTEBOOKS) not in sys.path:
+    sys.path.insert(0, str(_NOTEBOOKS))
+
+from tool_observed_urls import (  # noqa: E402  # pyright: ignore[reportImplicitRelativeImport]
     ToolObservedUrlRegistry,
     extract_urls_from_tool_output,
     filter_results_to_tool_observed_urls,
-    normalize_url,
 )
-
-
-def test_normalize_url_strips_www_and_trailing_slash():
-    assert (
-        normalize_url("https://www.example.com/jobs/1/")
-        == "https://example.com/jobs/1"
-    )
 
 
 def test_extract_urls_from_tool_output_finds_markdown_and_plain_links():

@@ -21,7 +21,7 @@ Current path (as of **0.8.1**):
 - **Search only:** `TavilyClient.search` → junk URL filter → SERP rows as `found_jobs` (title + URL; no page scrape / extract).
 - **Config:** `job_discovery.tavily_api_key` (see `config.example.toml`). Removed `job_discovery.search_backends` (ddgs).
 - **Code:** `backend/app/job_discovery/tools.py` — `TavilySdkClient` behind `TavilySearchClient`; `search_job_postings` JSON contract unchanged (`jobs` / `skipped` / `message`).
-- **Deps:** `tavily-python` for production discovery; `ddgs` retained only for `lg_spike/`.
-- **Out of scope here:** `backend/lg_spike/` still uses local DDGS until separately ported.
+- **Deps:** `tavily-python` for production discovery; `ddgs` retained only for `notebooks/`.
+- **Out of scope here:** `backend/notebooks/` still uses local DDGS until separately ported.
 
 v0.8.0 briefly described a two-step search-then-extract design; **0.8.1** dropped extract for higher recall and a simpler Stage 3 path. See `docs/changelog/0.8.1.md`.

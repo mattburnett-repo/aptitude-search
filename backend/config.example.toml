@@ -31,9 +31,8 @@ model = ""  # Stage 3: found_jobs → verified_matches JSON (match explanations)
 temperature = 0.0  # synthesis JSON temperature
 max_tokens = 8192  # Stage 3 synthesis JSON output cap; raise if responses truncate
 search_max_results = 10  # Tavily search results per query
-search_snippet_max_chars = 300  # max chars per Tavily result snippet in tool output
+search_snippet_max_chars = 300  # max chars per Tavily result snippet on found_jobs
 search_rate_limit = 1.0  # min seconds between searches; omit or set null to disable
-# Optional spike defaults (lg_spike/page_extract): visit_max_output_length, search_scrape_max, page_snippet_max_chars
 
 [embedding]
 model_key = ""  # required: Hugging Face key for occupation + aptitude vectors
@@ -58,6 +57,8 @@ url_filters_file = "url-filters.toml"  # SERP/found_jobs skip lists (app/job_dis
 discovery_query_max = 6  # max search_job_postings calls per pipeline run
 tavily_api_key = ""  # required: Tavily API key for Stage 3 search
 result_top_k = 25  # max ranked jobs passed to synthesis after aptitude fit
+search_depth = "basic"  # Tavily: basic | advanced | fast | ultra-fast
+search_min_score = 0.0  # drop Tavily hits below this score (0–1); 0 keeps all
 
 [prompts]
 stage1_file = "01-resume-to-aptitude-profile.md"

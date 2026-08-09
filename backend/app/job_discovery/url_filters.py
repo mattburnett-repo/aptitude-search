@@ -16,6 +16,7 @@ _JOB_DISCOVERY_DIR = Path(__file__).resolve().parent
 @dataclass(frozen=True)
 class UrlFilters:
     skip_domains: frozenset[str]
+    include_domains: frozenset[str]
     skip_domain_suffixes: tuple[str, ...]
     skip_path_markers: tuple[str, ...]
     skip_listing_path_markers: tuple[str, ...]
@@ -24,6 +25,10 @@ class UrlFilters:
 
 
 def _as_str_list(raw: object, *, field: str, allow_empty: bool = False) -> list[str]:
+    if raw is None:
+        if allow_empty:
+            return []
+        raise ValueError(f"{field} must be an array of strings")
     if not isinstance(raw, list):
         raise ValueError(f"{field} must be an array of strings")
     if not raw and not allow_empty:
@@ -40,9 +45,16 @@ def _as_str_list(raw: object, *, field: str, allow_empty: bool = False) -> list[
 def load_url_filters() -> UrlFilters:
     path = _JOB_DISCOVERY_DIR / config.job_discovery.url_filters_file
     with path.open("rb") as f:
-        data = tomllib.load(f)
+        data = cast(dict[str, object], tomllib.load(f))
     return UrlFilters(
         skip_domains=frozenset(_as_str_list(data.get("skip_domains"), field="skip_domains")),
+        include_domains=frozenset(
+            _as_str_list(
+                data.get("include_domains"),
+                field="include_domains",
+                allow_empty=True,
+            )
+        ),
         skip_domain_suffixes=tuple(
             _as_str_list(
                 data.get("skip_domain_suffixes"),

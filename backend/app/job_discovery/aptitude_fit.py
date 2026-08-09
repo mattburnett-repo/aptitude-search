@@ -128,6 +128,7 @@ def _job_text(job: FoundJob) -> str:
         str(job.get("title") or job.get("role") or ""),
         str(job.get("company") or ""),
         str(job.get("location") or ""),
+        str(job.get("snippet") or job.get("content") or ""),
     ]
     return " ".join(parts).lower()
 

@@ -23,15 +23,23 @@ from smolagents import VisitWebpageTool  # pyright: ignore[reportMissingTypeStub
 
 from app.core.config import config
 from app.core.json_types import FoundJob, JsonObject, as_object_dict
-from app.job_discovery.page_extract import job_page_dict_for_agent
-from app.job_discovery.tool_observed_urls import (
+from app.job_discovery.url_utils import (
+    normalize_job_search_query,
+    normalize_result_url,
+)
+from job_url_heuristics import (  # pyright: ignore[reportImplicitRelativeImport]
+    looks_like_job_posting_url,
+)
+from page_extract import (  # pyright: ignore[reportImplicitRelativeImport]
+    job_page_dict_for_agent,
+)
+from spike_config import (  # pyright: ignore[reportImplicitRelativeImport]
+    SEARCH_SCRAPE_MAX,
+    VISIT_MAX_OUTPUT_LENGTH,
+)
+from tool_observed_urls import (  # pyright: ignore[reportImplicitRelativeImport]
     ToolObservedUrlRegistry,
     extract_urls_from_tool_output,
-)
-from app.job_discovery.url_utils import (
-    looks_like_job_posting_url,
-    normalize_job_search_query,
-    prepare_scrape_url,
 )
 
 logger = logging.getLogger(__name__)
@@ -139,7 +147,7 @@ def _is_ats_url(url: str) -> bool:
 
 def _is_individual_posting_url(url: str) -> bool:
     """True for a single ATS/job posting URL (not a board index or SERP list)."""
-    prepared, error = prepare_scrape_url(url)
+    prepared, error = normalize_result_url(url)
     if error or not prepared:
         return False
     lower = prepared.lower()
@@ -164,7 +172,7 @@ def _is_unusable_serp_row(href: str, _title: str) -> bool:
     """Drop only empty/invalid URLs (spike keeps list pages for follow-up extract)."""
     if not href.strip():
         return True
-    prepared, error = prepare_scrape_url(href)
+    prepared, error = normalize_result_url(href)
     if error or not prepared:
         return True
     return False
@@ -308,7 +316,7 @@ def _title_from_markdown(raw_text: str) -> str:
 
 
 def _company_from_ats_url(url: str) -> str:
-    prepared, error = prepare_scrape_url(url)
+    prepared, error = normalize_result_url(url)
     if error or not prepared:
         return ""
     host = _host(prepared)
@@ -344,7 +352,7 @@ def _scrape_job_page(
     visit_tool: VisitWebpageTool,
     url: str,
 ) -> tuple[dict[str, str], str]:
-    normalized, error = prepare_scrape_url(url)
+    normalized, error = normalize_result_url(url)
     if error or not normalized:
         message = error or "Invalid URL."
         raw = f"Error fetching the webpage: {message}"
@@ -431,9 +439,9 @@ def search_job_postings(
 ) -> JsonObject:
     """Search + scrape for one query on one DDGS backend. Returns jobs payload dict."""
     registry = observed_urls if observed_urls is not None else ToolObservedUrlRegistry()
-    jd = config.llm.job_discovery
-    visit_tool = VisitWebpageTool(max_output_length=jd.visit_max_output_length)
+    visit_tool = VisitWebpageTool(max_output_length=VISIT_MAX_OUTPUT_LENGTH)
     ddgs = _ddgs_client()
+    jd = config.llm.job_discovery
 
     search_query = normalize_job_search_query(query)
     _ = _enforce_rate_limit(
@@ -490,12 +498,12 @@ def search_job_postings(
     pending = list(candidates)
     seen_scrape: set[str] = set()
     family_counts: dict[str, int] = defaultdict(int)
-    max_per_family = _max_jobs_per_ats_family(jd.search_scrape_max)
+    max_per_family = _max_jobs_per_ats_family(SEARCH_SCRAPE_MAX)
 
     def _family_has_room(url: str) -> bool:
         return family_counts[_ats_family(url)] < max_per_family
 
-    while pending and len(jobs) < jd.search_scrape_max:
+    while pending and len(jobs) < SEARCH_SCRAPE_MAX:
         row = pending.pop(0)
         url = row["url"]
         if url in seen_scrape:

@@ -19,7 +19,7 @@ import sys
 from pathlib import Path
 from typing import Annotated, NotRequired, TypedDict
 
-# Notebook/cwd may be lg_spike/; ensure backend/ and this spike dir are importable.
+# Notebook/cwd may be notebooks/; ensure backend/ and this spike dir are importable.
 _SPIKE_DIR = Path(__file__).resolve().parent
 _BACKEND_ROOT = _SPIKE_DIR.parent
 for _path in (_BACKEND_ROOT, _SPIKE_DIR):
@@ -41,11 +41,11 @@ from app.job_discovery import (
     rank_and_filter_found_jobs,
     synthesize_job_discovery_results,
 )
-from app.job_discovery.tool_observed_urls import (
+from search import search_queries_on_backend  # pyright: ignore[reportImplicitRelativeImport]
+from tool_observed_urls import (  # pyright: ignore[reportImplicitRelativeImport]
     ToolObservedUrlRegistry,
     filter_results_to_tool_observed_urls,
 )
-from search import search_queries_on_backend  # pyright: ignore[reportImplicitRelativeImport]
 
 # Spike-local DDGS engines only (production Stage 3 uses Tavily; not in config).
 _SPIKE_SEARCH_BACKENDS = ("brave", "yahoo", "yandex")
@@ -152,7 +152,7 @@ def reduce_filter_fit(
     on_progress: ProgressCallback | None = None,
 ) -> Stage3StateUpdate:
     # Spike: do not run production filter_found_jobs (it drops list/search URLs
-    # that lg_spike/search.py intentionally keeps and scrapes).
+    # that notebooks/search.py intentionally keeps and scrapes).
     found_jobs = _dedupe_jobs_by_url(list(state.get("partial_jobs") or []))
     if found_jobs:
         emit_progress("Ranking by aptitude work-pattern fit…", on_progress=on_progress)

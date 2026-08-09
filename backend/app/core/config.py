@@ -1,6 +1,8 @@
 import sys
 import tomllib
 from pathlib import Path
+from typing import Literal
+
 from pydantic import BaseModel, Field, ValidationError, ValidationInfo, field_validator
 
 _CONFIG_PATH = Path(__file__).resolve().parents[2] / "config.toml"
@@ -43,11 +45,16 @@ class AptitudeLlmConfig(BaseModel):
         return value
 
 
+_TavilySearchDepth = Literal["basic", "advanced", "fast", "ultra-fast"]
+
+
 class JobDiscoveryConfig(BaseModel):
     url_filters_file: str
     discovery_query_max: int
     tavily_api_key: str
     result_top_k: int = 25
+    search_depth: _TavilySearchDepth = "basic"
+    search_min_score: float = 0.0
 
     @field_validator("url_filters_file")
     @classmethod
@@ -85,6 +92,14 @@ class JobDiscoveryConfig(BaseModel):
         if value < 1:
             field = info.field_name or "field"
             raise ValueError(f"job_discovery.{field} must be at least 1")
+        return value
+
+    @field_validator("search_min_score")
+    @classmethod
+    def search_min_score_in_range(cls, value: float, info: ValidationInfo) -> float:
+        if value < 0.0 or value > 1.0:
+            field = info.field_name or "field"
+            raise ValueError(f"job_discovery.{field} must be between 0 and 1")
         return value
 
 
@@ -151,10 +166,6 @@ class JobDiscoveryLlmConfig(BaseModel):
     search_max_results: int
     search_snippet_max_chars: int
     search_rate_limit: float | None
-    # Spike (`lg_spike/`) / page_extract only — unused by production search.
-    visit_max_output_length: int = 8000
-    search_scrape_max: int = 3
-    page_snippet_max_chars: int = 400
 
     @field_validator("model_key", "model")
     @classmethod
@@ -173,13 +184,7 @@ class JobDiscoveryLlmConfig(BaseModel):
             raise ValueError(f"llm.job_discovery.{field} must be at least 256")
         return value
 
-    @field_validator(
-        "search_max_results",
-        "search_snippet_max_chars",
-        "visit_max_output_length",
-        "search_scrape_max",
-        "page_snippet_max_chars",
-    )
+    @field_validator("search_max_results", "search_snippet_max_chars")
     @classmethod
     def positive_int(cls, value: int, info: ValidationInfo) -> int:
         if value < 1:

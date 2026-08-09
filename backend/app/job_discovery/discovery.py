@@ -15,7 +15,8 @@ from app.job_discovery.tools import search_job_postings
 
 logger = logging.getLogger(__name__)
 
-# Seniority modifiers only — never assume an occupational family (e.g. "software engineer").
+# Only used for skill-fallback queries (core/secondary skills). Role-family /
+# adjacent_roles / domains queries ignore this — those terms are already role-shaped.
 _SENIORITY_MODIFIER = {
     "entry": "junior",
     "mid": "",
@@ -62,7 +63,7 @@ def _discovery_search_terms_from_plan(
     *,
     max_queries: int,
 ) -> list[tuple[str, str]]:
-    """Round-robin search_terms across role families."""
+    """Pick search terms evenly from each role family (1st from each, then 2nd, …)."""
     families_raw = as_object_list(role_family_plan.get("recommended_role_families"))
     if families_raw is None:
         return []

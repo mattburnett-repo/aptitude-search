@@ -1,4 +1,4 @@
-# Spike (`lg_spike/`) still uses ddgs until ported to Tavily; production tools use tavily-python.
+# Spike (`notebooks/`) still uses ddgs until ported to Tavily; production tools use tavily-python.
 ddgs>=9.0.0
 # Pinned spaCy model for Presidio (input_safety.py); install at build — no runtime download.
 en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl

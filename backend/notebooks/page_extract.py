@@ -1,12 +1,16 @@
-"""Compact job posting pages for discovery context (full fetch, small return)."""
+"""Notebook/spike helper: compact scraped job pages for discovery context."""
 
 from __future__ import annotations
 
 import re
 from urllib.parse import urlparse
 
-from app.core.config import config
-from app.job_discovery.url_utils import looks_like_job_posting_url
+from job_url_heuristics import (  # pyright: ignore[reportImplicitRelativeImport]
+    looks_like_job_posting_url,
+)
+from spike_config import (  # pyright: ignore[reportImplicitRelativeImport]
+    PAGE_SNIPPET_MAX_CHARS,
+)
 
 _GENERIC_HOST_LABELS = frozenset(
     {"www", "jobs", "careers", "job", "boards", "apply", "wd5"}
@@ -65,7 +69,7 @@ def job_page_dict_for_agent(url: str, page_text: str) -> dict[str, str]:
         "title": title,
         "company": company,
         "location": _meta_field(meta_lines, "location", "office", "remote"),
-        "snippet": _truncate(snippet, config.llm.job_discovery.page_snippet_max_chars),
+        "snippet": _truncate(snippet, PAGE_SNIPPET_MAX_CHARS),
         "error": "",
     }
 
@@ -145,9 +149,9 @@ def _body_snippet(
             continue
         chunks.append(stripped)
         total += len(stripped)
-        if total >= config.llm.job_discovery.page_snippet_max_chars:
+        if total >= PAGE_SNIPPET_MAX_CHARS:
             break
-    return _truncate(" ".join(chunks), config.llm.job_discovery.page_snippet_max_chars)
+    return _truncate(" ".join(chunks), PAGE_SNIPPET_MAX_CHARS)
 
 
 def _truncate(text: str, max_chars: int) -> str:

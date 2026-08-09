@@ -3,6 +3,7 @@
 #
 # skip_domains: exact hostname match (after stripping www.), e.g. medium.com blocks www.medium.com only.
 # skip_domain_suffixes: hostname equals entry or ends with ".entry" (optional; may be empty).
+# include_domains: optional Tavily allowlist; empty = no include filter (search the open web).
 
 skip_domains = [
   "baeldung.com",
@@ -30,6 +31,8 @@ skip_domains = [
   "wikipedia.org",
   "youtube.com",
 ]
+
+include_domains = []
 
 skip_domain_suffixes = []
 

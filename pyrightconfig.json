@@ -9,7 +9,7 @@
     "backend/app",
     "backend/scripts",
     "backend/tests",
-    "backend/lg_spike",
+    "backend/notebooks",
     "data/embed",
     "data/smoke_onet_postgres.py"
   ],
@@ -23,7 +23,7 @@
       "pythonVersion": "3.12"
     },
     {
-      "root": "backend/lg_spike",
+      "root": "backend/notebooks",
       "extraPaths": ["backend"],
       "pythonVersion": "3.12"
     },
