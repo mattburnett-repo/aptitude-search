@@ -2,18 +2,16 @@
 
 from __future__ import annotations
 
-import json
 import logging
-from typing import cast
 
 from langsmith import traceable  # pyright: ignore[reportUnknownVariableType]
 
 from app.core.config import config
-from app.core.json_types import FoundJob, JsonObject, JsonValue, as_object_dict, as_object_list
+from app.core.json_types import FoundJob, JsonObject, as_object_dict, as_object_list
 from app.core.models import Constraints
 from app.core.profile_text import profile_labels
 from app.core.progress import ProgressCallback, emit_progress
-from app.job_discovery.tools import build_job_discovery_tools
+from app.job_discovery.tools import search_job_postings
 
 logger = logging.getLogger(__name__)
 
@@ -218,25 +216,6 @@ def _merge_jobs(
     return added
 
 
-def _parse_tool_payload(raw: str) -> JsonObject:
-    payload = cast(JsonValue, json.loads(raw))
-    if not isinstance(payload, dict):
-        return {}
-    return payload
-
-
-def _jobs_from_payload(payload: JsonObject) -> list[FoundJob]:
-    jobs_raw = as_object_list(payload.get("jobs"))
-    if jobs_raw is None:
-        return []
-    jobs: list[FoundJob] = []
-    for job in jobs_raw:
-        job_dict = as_object_dict(job)
-        if job_dict is not None:
-            jobs.append(job_dict)
-    return jobs
-
-
 @traceable(run_type="chain", name="job_discovery")
 def run_job_discovery(
     aptitude_profile: JsonObject,
@@ -246,8 +225,6 @@ def run_job_discovery(
     on_progress: ProgressCallback | None = None,
 ) -> list[FoundJob]:
     """Run profile-driven searches via search_job_postings; returns found_jobs."""
-    tool = build_job_discovery_tools()[0]
-
     queries = build_discovery_queries(
         aptitude_profile,
         constraints,
@@ -266,16 +243,12 @@ def run_job_discovery(
             f"Searching the web ({index}/{total}): {query}…",
             on_progress=on_progress,
         )
-        payload = _parse_tool_payload(tool.run_search_job_postings(query))
-        typed_jobs = _jobs_from_payload(payload)
-        added = _merge_jobs(found_jobs, seen_urls, typed_jobs)
-        message = payload.get("message")
+        added = _merge_jobs(found_jobs, seen_urls, search_job_postings(query))
         logger.info(
-            "job_discovery query=%r jobs_added=%s total=%s message=%r",
+            "job_discovery query=%r jobs_added=%s total=%s",
             query,
             added,
             len(found_jobs),
-            message,
         )
 
     logger.info("job_discovery found_jobs count=%s", len(found_jobs))

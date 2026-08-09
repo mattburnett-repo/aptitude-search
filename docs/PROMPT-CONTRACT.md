@@ -3,7 +3,7 @@
 ## Product model (canonical)
 
 - **`POST /v1/pipeline`** runs Stage 1 (resume → aptitude profile), Stage 2 (profile → role family plan), then Stage 3 (plan-driven discovery → aptitude fit ranking → synthesis), with no manual step between stages.
-- **Stage 3 is job search.** The API runs role-family-driven web discovery, ranks scraped postings by work-pattern fit, then a synthesis LLM call, and returns currently open postings in **`verified_matches`**.
+- **Stage 3 is job search.** The API runs role-family-driven web discovery, ranks found postings by work-pattern fit, then a synthesis LLM call, and returns currently open postings in **`verified_matches`**.
 - **Primary path:** API + UI (or Swagger). Prompt text lives under `prompts/` (see Stages table); filenames are wired in `backend/config.toml`.
 - **Testing:** Swagger UI at `/docs` on the running API (see [backend/README.md](../backend/README.md)).
 - **Implementation (not user-facing):** Stage 3 is three phases: (1) **discovery** — Python builds search queries from the **role family plan** `search_terms` (fallback: `adjacent_roles`, `domains`, skills), plus constraints, then runs `search_job_postings`; (2) **aptitude fit** — rank/`top_k` filter on `found_jobs`; (3) **synthesis** — chat completion maps ranked `found_jobs` into schema-strict JSON with match explanations. The API jsonschema-validates `verified_matches` against `job-discovery-results.schema.json`.

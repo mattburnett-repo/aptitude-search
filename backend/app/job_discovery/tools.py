@@ -1,187 +1,99 @@
-"""Stage 3 discovery: Tavily search → light junk filter → SERP job rows."""
+"""Stage 3 discovery: Tavily search → junk filter → SERP job rows."""
 
 from __future__ import annotations
 
-import json
 import time
-from typing import Protocol, cast
+from collections.abc import Callable, Mapping, Sequence
+from typing import cast
 
 from langsmith import traceable  # pyright: ignore[reportUnknownVariableType]
+from tavily import TavilyClient  # pyright: ignore[reportMissingTypeStubs]
 
 from app.core.config import config
-from app.core.json_types import JsonObject, as_object_dict, as_object_list
+from app.core.json_types import FoundJob, JsonObject, as_object_dict, as_object_list
 from app.job_discovery.url_utils import (
     normalize_job_search_query,
     prepare_scrape_url,
     should_skip_search_result,
 )
 
+# Fake search callable for tests (query, max_results) -> SERP rows. Not used at runtime.
+SearchFn = Callable[[str, int], Sequence[Mapping[str, object]]]
 
-class TavilySearchClient(Protocol):
-    """Search surface used by SearchJobPostings (swap-friendly)."""
-
-    def search(self, query: str, *, max_results: int) -> list[dict[str, object]]: ...
-
-
-class _TavilyHttpClient(Protocol):
-    """Subset of ``tavily.TavilyClient`` used by the adapter."""
-
-    def search(self, query: str, *, max_results: int) -> object: ...
+_last_request_time = 0.0
 
 
-class TavilySdkClient:
-    """Adapter around ``tavily.TavilyClient`` (search only)."""
-
-    _client: _TavilyHttpClient
-
-    def __init__(self, api_key: str) -> None:
-        try:
-            from tavily import TavilyClient  # pyright: ignore[reportMissingTypeStubs]
-        except ImportError as exc:
-            raise ImportError(
-                "You must install package `tavily-python` to run this tool: "
-                + "for instance run `pip install tavily-python`."
-            ) from exc
-        self._client = cast(_TavilyHttpClient, cast(object, TavilyClient(api_key=api_key)))
-
-    def search(self, query: str, *, max_results: int) -> list[dict[str, object]]:
-        response = cast(JsonObject, self._client.search(query=query, max_results=max_results))
-        rows: list[dict[str, object]] = []
-        for item in as_object_list(response.get("results")) or []:
-            item_dict = as_object_dict(item)
-            if item_dict is None:
-                continue
-            rows.append(
-                {
-                    "title": str(item_dict.get("title") or ""),
-                    "href": str(item_dict.get("url") or ""),
-                    "body": str(item_dict.get("content") or ""),
-                }
-            )
-        return rows
-
-
-def _enforce_rate_limit(
-    *,
-    rate_limit: float | None,
-    last_request_time: float,
-) -> float:
+def _enforce_rate_limit() -> None:
+    global _last_request_time
+    rate_limit = config.llm.job_discovery.search_rate_limit
     if not rate_limit:
-        return last_request_time
+        return
     min_interval = 1.0 / rate_limit
     now = time.time()
-    elapsed = now - last_request_time
+    elapsed = now - _last_request_time
     if elapsed < min_interval:
         time.sleep(min_interval - elapsed)
-    return time.time()
+    _last_request_time = time.time()
 
 
-def _filter_search_rows(
-    raw_results: list[dict[str, object]],
-) -> tuple[list[dict[str, str]], int]:
-    snippet_max = config.llm.job_discovery.search_snippet_max_chars
-    rows: list[dict[str, str]] = []
-    skipped = 0
-    for result in raw_results:
-        href = str(result.get("href") or "")
-        title = str(result.get("title") or "")
-        if should_skip_search_result(href, title=title):
-            skipped += 1
+def _tavily_search(query: str, max_results: int) -> list[dict[str, object]]:
+    client = TavilyClient(api_key=config.job_discovery.tavily_api_key)
+    response = cast(
+        JsonObject,
+        client.search(query=query, max_results=max_results),  # pyright: ignore[reportUnknownMemberType]
+    )
+    rows: list[dict[str, object]] = []
+    for item in as_object_list(response.get("results")) or []:
+        item_dict = as_object_dict(item)
+        if item_dict is None:
             continue
         rows.append(
             {
-                "title": title,
-                "url": href,
-                "snippet": str(result.get("body") or "")[:snippet_max],
+                "title": str(item_dict.get("title") or ""),
+                "url": str(item_dict.get("url") or ""),
+                "content": str(item_dict.get("content") or ""),
             }
         )
-    return rows, skipped
+    return rows
 
 
-def _job_row_from_serp(row: dict[str, str]) -> dict[str, str] | None:
-    """Build a found_jobs row from a filtered SERP hit (no page scrape)."""
-    prepared, error = prepare_scrape_url(row["url"])
+def _job_from_serp(title: str, url: str) -> FoundJob | None:
+    prepared, error = prepare_scrape_url(url)
     if error or not prepared:
         return None
-    title = (row.get("title") or "").strip()
-    if not title:
+    cleaned = title.strip()
+    if not cleaned:
         return None
     return {
-        "title": title,
+        "title": cleaned,
         "company": "",
         "url": prepared,
         "location": "",
     }
 
 
-class SearchJobPostings:
-    """Search the web and return job-like SERP rows as JSON."""
+@traceable(run_type="tool", name="search_job_postings")
+def search_job_postings(
+    query: str,
+    *,
+    search: SearchFn | None = None,  # optional: pass a fake in tests; leave unset to call Tavily
+) -> list[FoundJob]:
+    """Run one Tavily search and return job-like SERP rows."""
+    search_query = normalize_job_search_query(query)
+    max_results = config.llm.job_discovery.search_max_results
+    if search is None:
+        _enforce_rate_limit()
+        raw_results = _tavily_search(search_query, max_results)
+    else:
+        raw_results = search(search_query, max_results)
 
-    max_results: int
-    rate_limit: float | None
-    _last_request_time: float
-    tavily: TavilySearchClient
-
-    def __init__(
-        self,
-        max_results: int,
-        rate_limit: float | None,
-        tavily: TavilySearchClient | None = None,
-    ) -> None:
-        self.max_results = max_results
-        self.rate_limit = rate_limit
-        self._last_request_time = 0.0
-        self.tavily = tavily or TavilySdkClient(config.job_discovery.tavily_api_key)
-
-    @traceable(run_type="tool", name="search_job_postings")
-    def run_search_job_postings(self, query: str) -> str:
-        search_query = normalize_job_search_query(query)
-        self._last_request_time = _enforce_rate_limit(
-            rate_limit=self.rate_limit,
-            last_request_time=self._last_request_time,
-        )
-        raw_results = self.tavily.search(
-            search_query,
-            max_results=self.max_results,
-        )
-        if not raw_results:
-            return json.dumps(
-                {
-                    "jobs": [],
-                    "skipped": 0,
-                    "message": (
-                        f"No results for {query!r}. "
-                        "Use 3–6 keywords (role + skill + location); drop quotes."
-                    ),
-                }
-            )
-
-        rows, skipped = _filter_search_rows(raw_results)
-        jobs: list[dict[str, str]] = []
-        for row in rows:
-            job = _job_row_from_serp(row)
-            if job is None:
-                skipped += 1
-                continue
+    jobs: list[FoundJob] = []
+    for result in raw_results:
+        title = str(result.get("title") or "")
+        url = str(result.get("url") or result.get("href") or "")
+        if should_skip_search_result(url, title=title):
+            continue
+        job = _job_from_serp(title, url)
+        if job is not None:
             jobs.append(job)
-
-        message = ""
-        if skipped:
-            message = f"Omitted {skipped} junk or invalid result(s)."
-        if not jobs:
-            suffix = " No search results passed the junk filter."
-            message = (message + suffix).strip()
-
-        return json.dumps({"jobs": jobs, "skipped": skipped, "message": message})
-
-
-SearchJobPostingsTool = SearchJobPostings
-
-
-def build_job_discovery_tools() -> list[SearchJobPostings]:
-    return [
-        SearchJobPostings(
-            max_results=config.llm.job_discovery.search_max_results,
-            rate_limit=config.llm.job_discovery.search_rate_limit,
-        ),
-    ]
+    return jobs
