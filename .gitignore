@@ -26,6 +26,9 @@ config.toml
 profile_default/
 ipython_config.py
 
+# Cursor local MCP config (may contain secrets)
+.cursor/mcp.json
+
 # Other
 output/*
 data/**/*.zip
