@@ -13,6 +13,7 @@ def test_health_returns_ok(client: TestClient):
     body = cast(dict[str, object], response.json())
     assert body["ok"] is True
     assert body["service"] == "aptitude-search-api"
+    assert body["version"] == "0.0.0"
 
 
 def test_pipeline_requires_resume(client: TestClient):

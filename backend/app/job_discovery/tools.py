@@ -56,27 +56,18 @@ def _tavily_search(query: str, max_results: int) -> list[dict[str, object]]:
     filters = load_url_filters()
     exclude_domains = sorted(filters.skip_domains)
     include_domains = sorted(filters.include_domains)
+    search_kwargs: dict[str, object] = {
+        "query": query,
+        "max_results": max_results,
+        "search_depth": config.job_discovery.search_depth,
+        "exclude_domains": exclude_domains,
+    }
     if include_domains:
-        response = cast(
-            JsonObject,
-            client.search(  # pyright: ignore[reportUnknownMemberType]
-                query=query,
-                max_results=max_results,
-                search_depth=config.job_discovery.search_depth,
-                exclude_domains=exclude_domains,
-                include_domains=include_domains,
-            ),
-        )
-    else:
-        response = cast(
-            JsonObject,
-            client.search(  # pyright: ignore[reportUnknownMemberType]
-                query=query,
-                max_results=max_results,
-                search_depth=config.job_discovery.search_depth,
-                exclude_domains=exclude_domains,
-            ),
-        )
+        search_kwargs["include_domains"] = include_domains
+    response = cast(
+        JsonObject,
+        client.search(**search_kwargs),  # pyright: ignore[reportUnknownMemberType, reportArgumentType]
+    )
     rows: list[dict[str, object]] = []
     for item in as_object_list(response.get("results")) or []:
         item_dict = as_object_dict(item)

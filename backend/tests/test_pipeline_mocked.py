@@ -7,8 +7,7 @@ from app.core.json_types import JsonObject
 
 from app.core.models import Constraints
 from app.core.validate import validate_stage
-from app.pipeline import run_pipeline, run_stage3
-from app.role_family_plan import Stage2Result
+from app.pipeline import Stage2Result, run_pipeline, run_stage3
 
 
 @pytest.fixture
@@ -23,20 +22,22 @@ def found_jobs() -> list[dict[str, object]]:
 
 
 @patch("app.pipeline.synthesize_job_discovery_results")
+@patch("app.pipeline.rank_and_filter_found_jobs", side_effect=lambda jobs, *_a, **_k: jobs)
 @patch("app.pipeline.run_job_discovery")
 @patch("app.pipeline.run_stage2")
-@patch("app.pipeline.complete_chat_json")
+@patch("app.pipeline.aptitude_llm_call")
 def test_run_pipeline_wires_stages_and_validates_output(
-    mock_complete_chat_json: MagicMock,
+    mock_aptitude_llm_call: MagicMock,
     mock_run_stage2: MagicMock,
     mock_run_job_discovery: MagicMock,
+    _mock_rank: MagicMock,
     mock_synthesize: MagicMock,
     stage1_fixture: dict[str, object],
     role_family_plan_fixture: dict[str, object],
     verified_matches_fixture: dict[str, object],
     found_jobs: list[dict[str, object]],
 ) -> None:
-    mock_complete_chat_json.return_value = stage1_fixture
+    mock_aptitude_llm_call.return_value = stage1_fixture
     mock_run_stage2.return_value = Stage2Result(
         role_family_plan=role_family_plan_fixture,
     )

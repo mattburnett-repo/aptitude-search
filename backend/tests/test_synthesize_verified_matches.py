@@ -83,7 +83,7 @@ def test_synthesize_calls_llm_and_validates(
         "notes": ["Synthesized from found_jobs."],
     }
     with patch(
-        "app.job_discovery.synthesize_verified_matches.complete_job_discovery_chat_json",
+        "app.job_discovery.synthesize_verified_matches.job_discovery_llm_call",
         return_value=llm_payload,
     ) as mock_llm:
         result = synthesize_job_discovery_results(

@@ -76,10 +76,11 @@ def test_stream_pipeline_emits_error_event(
             if line.strip()
         ]
 
-    assert len(events) == 1
-    assert events[0]["type"] == "error"
-    assert "Pipeline failed" in cast(str, events[0]["detail"])
-    assert events[0]["request_id"]
+    assert any(event["type"] == "progress" for event in events)
+    errors = [event for event in events if event["type"] == "error"]
+    assert len(errors) == 1
+    assert "Pipeline failed" in cast(str, errors[0]["detail"])
+    assert errors[0]["request_id"]
 
 
 def test_stream_pipeline_rejects_injection_blocklist(client: TestClient) -> None:

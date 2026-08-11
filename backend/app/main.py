@@ -1,56 +1,19 @@
-import logging
-import os
-import sys
-from typing import cast
-
-import sentry_sdk
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.exceptions import RequestValidationError
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from opentelemetry import trace
-from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
-from starlette.types import ExceptionHandler
 
 from app.core.config import config
+from app.core.exception_handlers import register_exception_handlers
+from app.core.logging_setup import configure_logging
 from app.core.models import PipelineRequest, Stage1Request, Stage2Request, Stage3Request
-from app.core.request_context import (
-    error_response_headers,
-    RequestContextMiddleware,
-    RequestIdFilter,
-)
-from app.core.resume_io import parse_pipeline_body
-from app.core.input_safety import prepare_resume
+from app.core.observability import init_observability
+from app.core.request_context import RequestContextMiddleware
+from app.core.resume_io import ingest_resume, prepare_pipeline_inputs
 from app.core.stream_pipeline import stream_pipeline_response
+from app.pipeline import run_pipeline, run_stage1, run_stage2, run_stage3
 from app.onet.match import matches_to_json
-from app.pipeline import run_pipeline, run_stage1, run_stage3
-from app.role_family_plan import run_stage2
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(levelname)s request_id=%(request_id)s %(name)s %(message)s",
-    stream=sys.stdout,
-)
-_request_id_filter = RequestIdFilter()
-for _handler in logging.root.handlers:
-    _handler.addFilter(_request_id_filter)
-logging.root.addFilter(_request_id_filter)
-logger = logging.getLogger(__name__)
-
-_sentry_dsn = os.environ.get("SENTRY_DSN", "").strip()
-if _sentry_dsn:
-    _ = sentry_sdk.init(
-        dsn=_sentry_dsn,
-        environment=os.environ.get("SENTRY_ENVIRONMENT", "development"),
-        traces_sample_rate=0.0,
-        send_default_pii=False,
-    )
-
-provider = TracerProvider()
-provider.add_span_processor(BatchSpanProcessor(OTLPSpanExporter()))
-trace.set_tracer_provider(provider)
+configure_logging()
+init_observability()
 
 app = FastAPI(
     title=config.app.title,
@@ -71,77 +34,35 @@ app.add_middleware(
 )
 app.add_middleware(RequestContextMiddleware)
 
-
-def _request_id(request: Request) -> str:
-    return getattr(request.state, "request_id", "")
-
-
-async def http_exception_handler(
-    request: Request, exc: HTTPException
-) -> JSONResponse:
-    logger.warning("HTTP %s: %s", exc.status_code, exc.detail)
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={"detail": exc.detail, "request_id": _request_id(request)},
-        headers=error_response_headers(request),
-    )
-
-
-async def validation_exception_handler(
-    request: Request, exc: RequestValidationError
-) -> JSONResponse:
-    logger.warning("Request validation failed: %s", exc.errors())
-    return JSONResponse(
-        status_code=422,
-        content={"detail": exc.errors(), "request_id": _request_id(request)},
-        headers=error_response_headers(request),
-    )
-
-
-async def unhandled_exception_handler(
-    request: Request, exc: Exception
-) -> JSONResponse:
-    logger.exception("Request failed: %s", exc)
-    _ = sentry_sdk.capture_exception(exc)
-    return JSONResponse(
-        status_code=500,
-        content={"detail": str(exc), "request_id": _request_id(request)},
-        headers=error_response_headers(request),
-    )
-
-
-app.add_exception_handler(HTTPException, cast(ExceptionHandler, http_exception_handler))
-app.add_exception_handler(
-    RequestValidationError, cast(ExceptionHandler, validation_exception_handler)
-)
-app.add_exception_handler(Exception, unhandled_exception_handler)
-
+register_exception_handlers(app)
 
 @app.get("/health", tags=["Health"])
 def health():
-    return {"ok": True, "service": config.app.service}
+    return {
+        "ok": True,
+        "service": config.app.service,
+        "version": config.app.version,
+    }
 
 
 @app.post("/v1/pipeline", tags=["Pipeline"])
 async def pipeline(body: PipelineRequest, stream: bool = False):
-    # resume may be pasted text or text extracted from resume_pdf_base64
-    if not body.resume.strip() and not body.resume_pdf_base64:
-        raise HTTPException(status_code=400, detail="resume is required")
+    """Run Stages 1→2→3: resume → aptitude profile → role family plan → job search."""
     if stream:
         return await stream_pipeline_response(body)
-    resume, constraints = parse_pipeline_body(body)
+    resume, constraints = prepare_pipeline_inputs(body)
     return run_pipeline(resume, constraints)
 
 
 @app.post("/v1/stages/1", tags=["Pipeline Stages"])
 def stage1(body: Stage1Request):
-    if not body.resume.strip():
-        raise HTTPException(status_code=400, detail="resume is required")
-    return {"aptitude_profile": run_stage1(prepare_resume(body.resume))}
+    """Stage 1: sanitize resume text and extract a schema-strict aptitude profile."""
+    return {"aptitude_profile": run_stage1(ingest_resume(body.resume))}
 
 
 @app.post("/v1/stages/2", tags=["Pipeline Stages"])
 def stage2(body: Stage2Request):
+    """Stage 2: map aptitude profile to a role family plan (plus O*NET matches)."""
     result = run_stage2(body.aptitude_profile)
     return {
         "role_family_plan": result.role_family_plan,
@@ -151,6 +72,7 @@ def stage2(body: Stage2Request):
 
 @app.post("/v1/stages/3", tags=["Pipeline Stages"])
 def stage3(body: Stage3Request):
+    """Stage 3: discover, rank, and synthesize verified job matches from the profile."""
     return {
         "verified_matches": run_stage3(
             body.aptitude_profile,

@@ -7,23 +7,23 @@ import pytest
 from fastapi import HTTPException
 
 from app.core.models import PipelineRequest
-from app.core.resume_io import parse_pipeline_body
 from app.core.resume_io import (
     _extract_pdf_text,  # pyright: ignore[reportPrivateUsage]
+    extract_resume_text,
+    ingest_resume,
+    prepare_pipeline_inputs,
 )
 
 
-def test_parse_pipeline_body_returns_plain_resume_text():
+def test_extract_resume_text_returns_plain_resume_text():
     body = PipelineRequest(resume="Jane Doe\nEngineer")
-    resume, constraints = parse_pipeline_body(body)
-    assert resume == "Jane Doe\nEngineer"
-    assert constraints is None
+    assert extract_resume_text(body) == "Jane Doe\nEngineer"
 
 
-def test_parse_pipeline_body_rejects_invalid_pdf_base64():
+def test_extract_resume_text_rejects_invalid_pdf_base64():
     body = PipelineRequest(resume="", resume_pdf_base64="not-valid-base64!!")
     with pytest.raises(HTTPException) as exc:
-        _ = parse_pipeline_body(body)
+        _ = extract_resume_text(body)
     assert exc.value.status_code == 400
     assert "Invalid PDF upload encoding" in str(exc.value.detail)
 
@@ -48,9 +48,30 @@ def test_extract_pdf_text_returns_joined_page_text(mock_reader: MagicMock):
 
 
 @patch("app.core.resume_io._extract_pdf_text", return_value="Extracted resume text")
-def test_parse_pipeline_body_decodes_pdf_base64(mock_extract: MagicMock):
+def test_extract_resume_text_decodes_pdf_base64(mock_extract: MagicMock):
     encoded = base64.b64encode(b"%PDF-fake").decode()
     body = PipelineRequest(resume="", resume_pdf_base64=encoded)
-    resume, _ = parse_pipeline_body(body)
-    assert resume == "Extracted resume text"
+    assert extract_resume_text(body) == "Extracted resume text"
     mock_extract.assert_called_once()
+
+
+def test_ingest_resume_rejects_empty():
+    with pytest.raises(HTTPException) as exc:
+        _ = ingest_resume("   ")
+    assert exc.value.status_code == 400
+    assert exc.value.detail == "resume is required"
+
+
+@patch("app.core.resume_io.prepare_resume", return_value="safe resume")
+def test_ingest_resume_calls_prepare(mock_prepare: MagicMock):
+    assert ingest_resume("Jane Doe\nEngineer") == "safe resume"
+    mock_prepare.assert_called_once()
+
+
+@patch("app.core.resume_io.prepare_resume", return_value="safe resume")
+def test_prepare_pipeline_inputs_returns_constraints(mock_prepare: MagicMock):
+    body = PipelineRequest(resume="Jane Doe", constraints=None)
+    resume, constraints = prepare_pipeline_inputs(body)
+    assert resume == "safe resume"
+    assert constraints is None
+    mock_prepare.assert_called_once()

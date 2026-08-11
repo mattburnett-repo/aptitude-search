@@ -15,8 +15,9 @@ from langsmith import traceable  # pyright: ignore[reportUnknownVariableType]
 
 from app.core import prompt_loader
 from app.core.config import config
-from app.job_discovery.context import labeled_names, build_stage3_synthesis_user_message
-from app.core.llm import complete_job_discovery_chat_json
+from app.core.profile_text import labeled_names
+from app.job_discovery.context import build_stage3_synthesis_user_message
+from app.core.llm import job_discovery_llm_call
 from app.core.json_types import FoundJob, JsonObject, as_object_dict, as_object_list
 from app.core.models import Constraints
 from app.core.validate import normalize_job_discovery_results
@@ -83,10 +84,6 @@ def _build_empty_search_plan(
     industries = [i.strip() for i in constraints.industries_include if i.strip()]
     if industries:
         plan.append(f"Filtered to industries: {', '.join(industries)}.")
-
-    adjacent = labeled_names(profile.get("adjacent_roles"))
-    if adjacent:
-        plan.append(f"Explored adjacent role families: {adjacent}.")
 
     if constraints.salary_min is not None:
         plan.append(f"Applied minimum salary constraint: ${int(constraints.salary_min):,}.")
@@ -205,7 +202,7 @@ def synthesize_job_discovery_results(
         role_family_plan=role_family_plan,
     )
     result = normalize_job_discovery_results(
-        complete_job_discovery_chat_json(
+        job_discovery_llm_call(
             prompt_loader.system_prompt_stage3_synthesis(),
             user,
             temperature=config.llm.job_discovery.temperature,

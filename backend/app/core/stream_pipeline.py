@@ -13,7 +13,7 @@ from fastapi.responses import StreamingResponse
 
 from app.core.models import PipelineRequest
 from app.core.request_context import get_request_id
-from app.core.resume_io import parse_pipeline_body
+from app.core.resume_io import prepare_pipeline_inputs
 from app.pipeline import PipelineResult, run_pipeline
 
 logger = logging.getLogger(__name__)
@@ -53,9 +53,9 @@ async def stream_pipeline_response(body: PipelineRequest) -> StreamingResponse:
 
     def run_sync() -> None:
         try:
-            resume, constraints = parse_pipeline_body(body, on_progress=on_progress)
-            if not resume.strip():
-                raise ValueError("resume is required")
+            resume, constraints = prepare_pipeline_inputs(
+                body, on_progress=on_progress
+            )
             result = run_pipeline(resume, constraints, on_progress=on_progress)
             _ = loop.call_soon_threadsafe(
                 put_event,

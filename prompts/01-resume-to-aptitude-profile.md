@@ -177,11 +177,3 @@ When you include evidence_from_resume on a skill:
 
 ## FINAL CONSTRAINT
 Schema defines structure. This prompt defines interpretation rules.
-
----
-
-## INPUT TEMPLATE
-
-<resume>
-{{RESUME_TEXT}}
-</resume>

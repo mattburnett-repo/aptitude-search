@@ -41,7 +41,7 @@ Any step in the injection chain that flags input → **400** with the shared use
 
 - Model: `meta-llama/Llama-Prompt-Guard-2-22M` (English resumes; use 86M if multilingual is required later).
 - **512-token context window** — chunk resume into segments (~400 tokens each); fail if **any** chunk is `malicious`.
-- Integration via **text-classification** (HF inference or local `transformers` pipeline), **not** the existing `complete_chat_json` chat path used by aptitude and job discovery.
+- Integration via **text-classification** (HF inference or local `transformers` pipeline), **not** the existing `aptitude_llm_call` / `job_discovery_llm_call` chat path used by aptitude and job discovery.
 - Regex and blocklist run first to reduce classifier calls and cost.
 
 ### Also (not ingress gates)
@@ -137,7 +137,7 @@ Mocked tests prove wiring and schema; live Prompt Guard accuracy is a separate s
 
 - `backend/app/core/resume_io.py` — extract text; run safety pipeline.
 - `backend/app/core/input_safety.py` (or similar) — injection cascade + Presidio PII deletion; `INPUT_REJECTED_MESSAGE` constant; raise `HTTPException(400, …)` on block.
-- `backend/app/core/llm.py` — new classification helper for Prompt Guard (not `complete_chat_json`).
+- `backend/app/core/llm.py` — new classification helper for Prompt Guard (not `aptitude_llm_call`).
 - `backend/app/core/config.py` — `LlmInputGuardSettings`; optional Presidio entity/threshold config.
 - `backend/app/pipeline.py` — call guard before `run_stage1`.
 - `backend/requirements.txt` — `presidio-analyzer`, `presidio-anonymizer`, and spaCy model dep for NER.

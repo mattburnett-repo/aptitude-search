@@ -225,7 +225,13 @@ def run_job_discovery(
     role_family_plan: JsonObject | None = None,
     on_progress: ProgressCallback | None = None,
 ) -> list[FoundJob]:
-    """Run profile-driven searches via search_job_postings; returns found_jobs."""
+    """Stage 3 discovery: web search for open postings (no LLM).
+
+    - Build hiring-shaped queries from role family ``search_terms`` when
+      present (else profile adjacent_roles / domains / skills).
+    - Run ``search_job_postings`` for each query (this is the actual web search).
+    - Return URL-deduped ``found_jobs`` for aptitude-fit ranking and synthesis.
+    """
     queries = build_discovery_queries(
         aptitude_profile,
         constraints,
@@ -244,6 +250,7 @@ def run_job_discovery(
             f"Searching the web ({index}/{total}): {query}…",
             on_progress=on_progress,
         )
+        # Web search for this query; append new URLs only (dedupe via seen_urls).
         added = _merge_jobs(found_jobs, seen_urls, search_job_postings(query))
         logger.info(
             "job_discovery query=%r jobs_added=%s total=%s",

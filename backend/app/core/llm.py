@@ -1,3 +1,12 @@
+"""Hugging Face chat helpers for schema-strict JSON stage outputs.
+
+Shared call/parse logic lives in ``_llm_call``. The two public wrappers bind
+config + LangSmith spans so callers never pass credentials:
+
+- ``aptitude_llm_call`` → ``[llm.aptitude]`` (Stages 1 and 2)
+- ``job_discovery_llm_call`` → ``[llm.job_discovery]`` (Stage 3 synthesis)
+"""
+
 from huggingface_hub import InferenceClient
 from huggingface_hub.inference._generated.types.chat_completion import (
     ChatCompletionInputResponseFormatJSONObject,
@@ -8,10 +17,6 @@ from langsmith import traceable  # pyright: ignore[reportUnknownVariableType]
 from app.core.config import config
 from app.core.json_types import JsonValue
 from app.core.validate import parse_json_response
-
-
-def _inference_client(api_key: str) -> InferenceClient:
-    return InferenceClient(api_key=api_key)
 
 
 def _chat_completion(
@@ -28,36 +33,17 @@ def _chat_completion(
         if json_object
         else None
     )
-    if max_tokens is not None and response_format is not None:
-        return client.chat_completion(  # pyright: ignore[reportUnknownMemberType]
-            messages=messages,
-            model=model,
-            temperature=temperature,
-            max_tokens=max_tokens,
-            response_format=response_format,
-        )
-    if max_tokens is not None:
-        return client.chat_completion(  # pyright: ignore[reportUnknownMemberType]
-            messages=messages,
-            model=model,
-            temperature=temperature,
-            max_tokens=max_tokens,
-        )
-    if response_format is not None:
-        return client.chat_completion(  # pyright: ignore[reportUnknownMemberType]
-            messages=messages,
-            model=model,
-            temperature=temperature,
-            response_format=response_format,
-        )
     return client.chat_completion(  # pyright: ignore[reportUnknownMemberType]
         messages=messages,
         model=model,
         temperature=temperature,
+        max_tokens=max_tokens,
+        response_format=response_format,
+        stream=False,
     )
 
 
-def _complete_chat_json(
+def _llm_call(
     *,
     client: InferenceClient,
     model: str,
@@ -95,7 +81,7 @@ def _complete_chat_json(
 
 
 @traceable(run_type="llm", name="stage1_aptitude_profile")
-def complete_chat_json(
+def aptitude_llm_call(
     system_prompt: str,
     user_message: str,
     *,
@@ -103,9 +89,9 @@ def complete_chat_json(
     max_tokens: int | None = None,
     json_object: bool = False,
 ) -> JsonValue:
-    """Hugging Face chat completion for Stage 1/2; returns parsed JSON."""
-    return _complete_chat_json(
-        client=_inference_client(config.llm.aptitude.model_key),
+    """Stages 1/2: ``[llm.aptitude]`` model/key → parsed JSON."""
+    return _llm_call(
+        client=InferenceClient(api_key=config.llm.aptitude.model_key),
         model=config.llm.aptitude.model,
         system_prompt=system_prompt,
         user_message=user_message,
@@ -117,7 +103,7 @@ def complete_chat_json(
 
 
 @traceable(run_type="llm", name="stage3_job_discovery_synthesis")
-def complete_job_discovery_chat_json(
+def job_discovery_llm_call(
     system_prompt: str,
     user_message: str,
     *,
@@ -125,9 +111,9 @@ def complete_job_discovery_chat_json(
     max_tokens: int | None = None,
     json_object: bool = False,
 ) -> JsonValue:
-    """Hugging Face chat completion for Stage 3 synthesis; returns parsed JSON."""
-    return _complete_chat_json(
-        client=_inference_client(config.llm.job_discovery.model_key),
+    """Stage 3 synthesis: ``[llm.job_discovery]`` model/key → parsed JSON."""
+    return _llm_call(
+        client=InferenceClient(api_key=config.llm.job_discovery.model_key),
         model=config.llm.job_discovery.model,
         system_prompt=system_prompt,
         user_message=user_message,

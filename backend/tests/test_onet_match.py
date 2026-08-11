@@ -67,14 +67,14 @@ def test_match_aptitude_to_occupations_returns_ranked_matches(
     cursor.execute.assert_called_once()
 
 
-@patch("app.role_family_plan.match_aptitude_to_occupations")
-@patch("app.role_family_plan.complete_chat_json")
+@patch("app.pipeline.match_aptitude_to_occupations")
+@patch("app.pipeline.aptitude_llm_call")
 def test_run_stage2_includes_onet_matches_in_prompt(
-    mock_complete_chat_json: MagicMock,
+    mock_aptitude_llm_call: MagicMock,
     mock_match: MagicMock,
     role_family_plan_fixture: dict[str, object],
 ) -> None:
-    from app.role_family_plan import run_stage2
+    from app.pipeline import run_stage2
 
     mock_match.return_value = [
         OccupationMatch(
@@ -84,12 +84,12 @@ def test_run_stage2_includes_onet_matches_in_prompt(
             occupation_profile="Title: Software Developers\nDescription: Develop software.",
         )
     ]
-    mock_complete_chat_json.return_value = role_family_plan_fixture
+    mock_aptitude_llm_call.return_value = role_family_plan_fixture
 
     result = run_stage2({"aptitude_summary": "Engineer"})
 
     assert result.role_family_plan == role_family_plan_fixture
     assert len(result.occupation_matches) == 1
-    user_prompt = mock_complete_chat_json.call_args.args[1]
+    user_prompt = mock_aptitude_llm_call.call_args.args[1]
     assert "<onet_occupation_matches>" in user_prompt
     assert "Software Developers" in user_prompt

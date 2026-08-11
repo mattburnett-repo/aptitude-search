@@ -82,14 +82,18 @@ def prepare_resume(
     *,
     on_progress: ProgressCallback | None = None,
 ) -> str:
-    """Run injection checks on original text, then delete PII for downstream stages."""
+    """Length check, injection gate, then PII redaction.
+
+    Expects non-empty text (``ingest_resume`` enforces that first).
+    """
     stripped = text.strip()
-    if not stripped:
-        return stripped
     if len(stripped) > config.input_safety.max_resume_chars:
         raise HTTPException(
             status_code=400,
-            detail=f"Resume exceeds maximum length ({config.input_safety.max_resume_chars} characters).",
+            detail=(
+                "Resume exceeds maximum length "
+                f"({config.input_safety.max_resume_chars} characters)."
+            ),
         )
     emit_progress("Checking resume safety…", on_progress=on_progress)
     _check_injection(stripped)
@@ -103,6 +107,12 @@ def _reject_injection(reason: str) -> None:
 
 
 def _check_injection(text: str) -> None:
+    """Reject prompt-injection attempts in resume text.
+
+    Runs three gates in order: regex patterns, phrase blocklist, then
+    Hugging Face Prompt Guard. Raises HTTP 400 on the first hit; returns
+    None when the text passes all gates.
+    """
     for pattern in _INJECTION_REGEXES:
         if pattern.search(text):
             _reject_injection("regex")

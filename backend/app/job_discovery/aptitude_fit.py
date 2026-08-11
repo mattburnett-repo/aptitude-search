@@ -63,64 +63,35 @@ def _phrase_hits(text: str, phrase: str) -> bool:
     return hits >= min(2, len(tokens))
 
 
-def _collect_avoid_terms(role_family_plan: JsonObject | None) -> list[str]:
+def _family_string_list(
+    role_family_plan: JsonObject | None,
+    key: str,
+    *,
+    lowercase: bool = False,
+) -> list[str]:
+    """Collect string list fields from each recommended_role_families entry."""
     if role_family_plan is None:
         return []
     families = as_object_list(role_family_plan.get("recommended_role_families"))
     if families is None:
         return []
-    terms: list[str] = []
+    values: list[str] = []
     for family in families:
         family_dict = as_object_dict(family)
         if family_dict is None:
             continue
-        avoid_raw = as_object_list(family_dict.get("avoid_terms"))
-        if avoid_raw is None:
+        raw = as_object_list(family_dict.get(key))
+        if raw is None:
             continue
-        for term in avoid_raw:
-            if term:
-                terms.append(str(term).strip().lower())
-    return terms
-
-
-def _collect_search_terms(role_family_plan: JsonObject | None) -> list[str]:
-    terms: list[str] = []
-    if role_family_plan is None:
-        return terms
-    families = as_object_list(role_family_plan.get("recommended_role_families"))
-    if families is None:
-        return terms
-    for family in families:
-        family_dict = as_object_dict(family)
-        if family_dict is None:
-            continue
-        search_raw = as_object_list(family_dict.get("search_terms"))
-        if search_raw is None:
-            continue
-        for term in search_raw:
-            if term:
-                terms.append(str(term).strip().lower())
-    return terms
-
-
-def _collect_work_modes(role_family_plan: JsonObject | None) -> list[str]:
-    modes: list[str] = []
-    if role_family_plan is None:
-        return modes
-    families = as_object_list(role_family_plan.get("recommended_role_families"))
-    if families is None:
-        return modes
-    for family in families:
-        family_dict = as_object_dict(family)
-        if family_dict is None:
-            continue
-        mode_raw = as_object_list(family_dict.get("work_modes"))
-        if mode_raw is None:
-            continue
-        for mode in mode_raw:
-            if mode:
-                modes.append(str(mode).strip())
-    return modes
+        for item in raw:
+            if not item:
+                continue
+            text = str(item).strip()
+            if lowercase:
+                text = text.lower()
+            if text:
+                values.append(text)
+    return values
 
 
 def _job_text(job: FoundJob) -> str:
@@ -144,7 +115,7 @@ def score_job_aptitude_fit(
     if not text.strip():
         return (-999, ["empty_job_text"])
 
-    for avoid in _collect_avoid_terms(role_family_plan):
+    for avoid in _family_string_list(role_family_plan, "avoid_terms", lowercase=True):
         if avoid and avoid in text:
             return (-999, [f"avoid:{avoid}"])
 
@@ -166,21 +137,26 @@ def score_job_aptitude_fit(
             score += 4
             signals.append(f"adjacent_role:{label}")
 
-    for term in _collect_search_terms(role_family_plan):
+    search_terms = _family_string_list(
+        role_family_plan, "search_terms", lowercase=True
+    )
+    for term in search_terms:
         if term in text:
             score += 2
             signals.append(f"role_family_search:{term}")
 
-    for mode in _collect_work_modes(role_family_plan):
+    for mode in _family_string_list(role_family_plan, "work_modes"):
         if _phrase_hits(text, mode):
             score += 2
             signals.append(f"work_mode:{mode}")
 
-    search_terms = _collect_search_terms(role_family_plan)
-    if score == 0 and search_terms and not any(
-        term in text or _phrase_hits(text, term) for term in search_terms
+    if (
+        score == 0
+        and search_terms
+        and not any(term in text or _phrase_hits(text, term) for term in search_terms)
     ):
-        signals.append("penalty:no_role_family_alignment")
+        # Hard-reject: role family plan had search terms but none aligned.
+        return (-1, ["penalty:no_role_family_alignment"])
 
     return score, signals
 
