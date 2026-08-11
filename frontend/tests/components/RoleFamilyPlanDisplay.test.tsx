@@ -11,19 +11,34 @@ vi.mock("../../src/lib/exportRoleFamilyPlanPdf", () => ({
 import { openRoleFamilyPlanPdf } from "../../src/lib/exportRoleFamilyPlanPdf";
 
 describe("RoleFamilyPlanDisplay", () => {
-  it("renders role families from the stage 2 fixture", () => {
+  it("renders collapsed role families from the stage 2 fixture", () => {
     render(<RoleFamilyPlanDisplay plan={roleFamilyPlan} />);
 
-    expect(
-      screen.getByRole("heading", { name: "Role: Solutions / Integration Engineering" })
-    ).toBeInTheDocument();
+    const summary = screen.getByText("Role: Solutions / Integration Engineering");
+    const details = summary.closest("details");
+    expect(details).toBeInstanceOf(HTMLDetailsElement);
+    expect(details).not.toHaveAttribute("open");
+    expect(document.querySelector(".aptitude-rationale")).toHaveTextContent(
+      /Profile emphasizes integration/
+    );
+  });
+
+  it("expands a role to show its details", async () => {
+    const user = userEvent.setup();
+    render(<RoleFamilyPlanDisplay plan={roleFamilyPlan} />);
+
+    await user.click(
+      screen.getByText("Role: Solutions / Integration Engineering")
+    );
+
+    const details = screen
+      .getByText("Role: Solutions / Integration Engineering")
+      .closest("details");
+    expect(details).toHaveAttribute("open");
     expect(document.querySelector(".role-family-fit-reason")).toHaveTextContent(
       /Repeated API integrations/
     );
     expect(screen.getByText("solutions engineer")).toBeInTheDocument();
-    expect(document.querySelector(".aptitude-rationale")).toHaveTextContent(
-      /Profile emphasizes integration/
-    );
   });
 
   it("falls back to raw JSON for unknown shapes", () => {

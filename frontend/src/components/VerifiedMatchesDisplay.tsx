@@ -53,47 +53,52 @@ function JobCard({ job }: { job: JobPosting }) {
   ].filter(Boolean);
 
   return (
-    <article
+    <details
       className={[
+        "collapsible-section",
         "job-card",
         job.confidence === "high" ? "job-card-high-confidence" : "",
       ]
         .filter(Boolean)
         .join(" ")}
     >
-      <header className="job-card-header">
-        <div>
-          <h4 className="job-card-role">{job.role}</h4>
-          <p className="job-card-company">{job.company}</p>
+      <summary className="job-card-summary">
+        <div className="job-card-header">
+          <div>
+            <span className="job-card-role">{job.role}</span>
+            <p className="job-card-company">{job.company}</p>
+          </div>
+          {job.confidence && isConfidence(job.confidence) && (
+            <ConfidenceBadge level={job.confidence} />
+          )}
         </div>
-        {job.confidence && isConfidence(job.confidence) && (
-          <ConfidenceBadge level={job.confidence} />
+      </summary>
+
+      <div className="collapsible-section-body job-card-body">
+        {meta.length > 0 && (
+          <p className="job-card-meta">{meta.join(" · ")}</p>
         )}
-      </header>
 
-      {meta.length > 0 && (
-        <p className="job-card-meta">{meta.join(" · ")}</p>
-      )}
+        <p className="job-card-match">{job.match_description}</p>
 
-      <p className="job-card-match">{job.match_description}</p>
+        {job.match_signals && job.match_signals.length > 0 && (
+          <ul className="job-card-signals">
+            {job.match_signals.map((signal) => (
+              <li key={signal}>{signal}</li>
+            ))}
+          </ul>
+        )}
 
-      {job.match_signals && job.match_signals.length > 0 && (
-        <ul className="job-card-signals">
-          {job.match_signals.map((signal) => (
-            <li key={signal}>{signal}</li>
-          ))}
-        </ul>
-      )}
-
-      <a
-        className="job-card-link"
-        href={job.url}
-        target="_blank"
-        rel="noreferrer noopener"
-      >
-        View posting
-      </a>
-    </article>
+        <a
+          className="job-card-link"
+          href={job.url}
+          target="_blank"
+          rel="noreferrer noopener"
+        >
+          View posting
+        </a>
+      </div>
+    </details>
   );
 }
 

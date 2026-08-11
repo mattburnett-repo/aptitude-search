@@ -16,20 +16,40 @@ describe("VerifiedMatchesDisplay", () => {
     vi.resetModules();
   });
 
-  it("renders search plan, results, and notes", () => {
+  it("renders search plan, collapsed results, and notes", () => {
     render(<VerifiedMatchesDisplay matches={verifiedMatches} />);
 
     expect(screen.getByText("What we looked for")).toBeInTheDocument();
     expect(screen.getByText("Django modernization roles")).toBeInTheDocument();
-    expect(screen.getByText("Senior Software Engineer")).toBeInTheDocument();
+
+    const role = screen.getByText("Senior Software Engineer");
+    const details = role.closest("details");
+    expect(details).toBeInstanceOf(HTMLDetailsElement);
+    expect(details).not.toHaveAttribute("open");
     expect(screen.getByText("Riverbend Logistics")).toBeInTheDocument();
-    expect(
-      screen.getByRole("link", { name: "View posting" })
-    ).toHaveAttribute("href", "https://example.com/jobs/senior-software-engineer");
+
     expect(screen.getByRole("heading", { name: "Notes" })).toBeInTheDocument();
     expect(
       screen.getAllByText(/Sample fixture for frontend display tests/).length
     ).toBeGreaterThan(0);
+  });
+
+  it("expands a job posting to show its details", async () => {
+    const user = userEvent.setup();
+    render(<VerifiedMatchesDisplay matches={verifiedMatches} />);
+
+    await user.click(screen.getByText("Senior Software Engineer"));
+
+    const details = screen
+      .getByText("Senior Software Engineer")
+      .closest("details");
+    expect(details).toHaveAttribute("open");
+    expect(
+      screen.getByRole("link", { name: "View posting" })
+    ).toHaveAttribute("href", "https://example.com/jobs/senior-software-engineer");
+    expect(
+      screen.getByText(/Matches Python, Django, and legacy modernization/)
+    ).toBeInTheDocument();
   });
 
   it("falls back to raw JSON for unknown match shapes", () => {

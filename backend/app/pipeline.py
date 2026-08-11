@@ -98,7 +98,7 @@ def run_stage2(
         )
 
     emit_progress("Stage 2: Building role family plan…", on_progress=on_progress)
-    task = prompt_loader.user_task_role_family_plan()
+    task = prompt_loader.user_task_stage2()
     profile_json = json.dumps(aptitude_profile, indent=2)
     onet_block = ""
     if occupation_matches:
@@ -114,7 +114,7 @@ def run_stage2(
     )
     result = normalize_role_family_plan(
         aptitude_llm_call(
-            prompt_loader.system_prompt_role_family_plan(),
+            prompt_loader.system_prompt_stage2(),
             user,
             temperature=config.llm.aptitude.temperature,
             max_tokens=config.llm.aptitude.max_tokens,

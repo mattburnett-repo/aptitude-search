@@ -1377,11 +1377,12 @@ button.theme-toggle:hover {
   gap: 1rem;
 }
 
-.role-family-card {
-  padding: 0.85rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  background: var(--color-surface);
+.role-family-plan > .role-family-card {
+  margin-bottom: 0;
+}
+
+.role-family-card > .collapsible-section-body {
+  padding: 0.85rem 1rem 1rem;
 }
 
 .role-family-fit-reason {
@@ -1661,11 +1662,11 @@ button.theme-toggle:hover {
   gap: 0.75rem;
 }
 
+.job-card-list > .job-card {
+  margin-bottom: 0;
+}
+
 .job-card {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 0.85rem 1rem;
-  background: var(--color-surface);
   transition:
     border-color 0.15s ease,
     transform 0.15s ease;
@@ -1686,6 +1687,15 @@ button.theme-toggle:hover {
   }
 }
 
+.job-card-summary {
+  width: 100%;
+}
+
+.job-card-summary .job-card-header {
+  flex: 1;
+  min-width: 0;
+}
+
 .job-card-header {
   display: flex;
   align-items: flex-start;
@@ -1703,6 +1713,15 @@ button.theme-toggle:hover {
   margin: 0.15rem 0 0;
   font-size: 0.9rem;
   color: var(--color-muted);
+  font-weight: 400;
+}
+
+.job-card-body {
+  padding: 0.85rem 1rem 1rem;
+}
+
+.job-card-body .job-card-meta {
+  margin-top: 0;
 }
 
 .job-card-meta {
@@ -1762,6 +1781,7 @@ button.theme-toggle:hover {
 }
 
 .verified-matches.verified-matches--pdf-export .job-card-role,
+.verified-matches.verified-matches--pdf-export .job-card > summary,
 .verified-matches.verified-matches--pdf-export .job-card-match,
 .verified-matches.verified-matches--pdf-export .verified-search-plan,
 .verified-matches.verified-matches--pdf-export .verified-notes {
@@ -1808,6 +1828,7 @@ button.theme-toggle:hover {
   background: #ffffff;
 }
 
+.role-family-plan.role-family-plan--pdf-export .role-family-card > summary,
 .role-family-plan.role-family-plan--pdf-export .aptitude-section-title,
 .role-family-plan.role-family-plan--pdf-export .role-family-tags-label {
   color: #3c4043;

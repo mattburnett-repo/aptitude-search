@@ -6,6 +6,11 @@ import {
 
 function prepareVerifiedMatchesCloneForExport(_doc: Document, clone: HTMLElement) {
   clone.classList.add("verified-matches", "verified-matches--pdf-export");
+  for (const node of clone.querySelectorAll("details")) {
+    if (node instanceof HTMLDetailsElement) {
+      node.open = true;
+    }
+  }
 }
 
 type MeasuredCard = {

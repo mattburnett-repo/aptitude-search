@@ -6,6 +6,11 @@ import {
 
 function prepareRoleFamilyPlanCloneForExport(_doc: Document, clone: HTMLElement) {
   clone.classList.add("role-family-plan", "role-family-plan--pdf-export");
+  for (const node of clone.querySelectorAll("details")) {
+    if (node instanceof HTMLDetailsElement) {
+      node.open = true;
+    }
+  }
 }
 
 type MeasuredCard = {

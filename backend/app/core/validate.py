@@ -166,10 +166,6 @@ def _prune_dict(item: JsonObject, allowed: frozenset[str]) -> None:
             del item[key]
 
 
-_SKILL_ITEM_KEYS = frozenset({"name", "confidence", "evidence_from_resume"})
-_LABELED_ITEM_KEYS = frozenset({"label", "confidence", "evidence_from_resume"})
-
-
 def _normalize_seniority_band(value: object) -> str:
     if not isinstance(value, str):
         return "unknown"
@@ -193,22 +189,25 @@ def _normalize_profile_list_items(
             _prune_dict(entry, allowed)
             entry["confidence"] = _normalize_confidence(entry.get("confidence"))
 
+_SKILL_ITEM_KEYS = frozenset({"name", "confidence", "evidence_from_resume"})
+_LABELED_ITEM_KEYS = frozenset({"label", "confidence", "evidence_from_resume"})
 
 def normalize_aptitude_profile(data: object) -> JsonObject:
     """Light cleanup before schema validation. Shape must come from the Stage 1 prompt."""
-    profile = as_object_dict(data)
-    if profile is None:
+    if (profile := as_object_dict(data)) is None:
         return {}
 
     profile["seniority_band"] = _normalize_seniority_band(profile.get("seniority_band"))
-    _normalize_profile_list_items(
-        profile, ("core_skills", "secondary_skills"), _SKILL_ITEM_KEYS
-    )
-    _normalize_profile_list_items(
-        profile,
-        ("domains", "strengths", "adjacent_roles", "working_style_signals"),
-        _LABELED_ITEM_KEYS,
-    )
+
+    for keys, allowed in (
+        (("core_skills", "secondary_skills"), _SKILL_ITEM_KEYS),
+        (
+            ("domains", "strengths", "adjacent_roles", "working_style_signals"),
+            _LABELED_ITEM_KEYS,
+        ),
+    ):
+        _normalize_profile_list_items(profile, keys, allowed)
+
     profile["confidence_map"] = _normalize_confidence_map(profile.get("confidence_map"))
     return profile
 

@@ -117,20 +117,28 @@ export function RoleFamilyPlanDisplay({
       <div className="collapsible-section-body">
         <div ref={planRef} className="role-family-plan">
           <p className="stage2-lead role-family-lead">
-            Each role shows why we recommend it, keywords to use when searching,
-            preferred work setup, details from your resume that support the fit,
-            and keywords to skip.
+            Select a role to see why we recommend it, keywords to use when
+            searching, preferred work setup, details from your resume that
+            support the fit, and keywords to skip.
           </p>
           {plan.recommended_role_families.map((family) => (
-            <section key={family.role_family} className="aptitude-section role-family-card">
-              <h3 className="aptitude-section-title">Role: {family.role_family}</h3>
-              <p className="role-family-tags-label">Why it fits</p>
-              <p className="role-family-fit-reason">{family.fit_reason}</p>
-              <TagList label="Job search keywords" items={family.search_terms} />
-              <TagList label="Work setup" items={family.work_modes} />
-              <TagList label="From your resume" items={family.supporting_signals} />
-              <TagList label="Skip these keywords" items={family.avoid_terms} />
-            </section>
+            <details
+              key={family.role_family}
+              className="collapsible-section role-family-card"
+            >
+              <summary>Role: {family.role_family}</summary>
+              <div className="collapsible-section-body">
+                <p className="role-family-tags-label">Why it fits</p>
+                <p className="role-family-fit-reason">{family.fit_reason}</p>
+                <TagList label="Job search keywords" items={family.search_terms} />
+                <TagList label="Work setup" items={family.work_modes} />
+                <TagList
+                  label="From your resume"
+                  items={family.supporting_signals}
+                />
+                <TagList label="Skip these keywords" items={family.avoid_terms} />
+              </div>
+            </details>
           ))}
 
           {plan.rationale.length > 0 && (

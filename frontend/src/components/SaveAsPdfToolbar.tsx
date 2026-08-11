@@ -79,8 +79,13 @@ export function SaveAsPdfToolbar({
               Start over
             </button>
           ) : (
-            <button type="button" disabled={navDisabled} onClick={stageNav.onNext}>
-              Next
+            <button
+              type="button"
+              className="primary-cta"
+              disabled={navDisabled}
+              onClick={stageNav.onNext}
+            >
+              Next →
             </button>
           )}
         </div>
