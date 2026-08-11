@@ -83,3 +83,4 @@ def test_url_filters_allow_empty_optional_lists():
     filters = load_url_filters()
     assert filters.skip_domain_suffixes == ()
     assert filters.skip_listing_path_markers == ()
+
