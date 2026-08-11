@@ -38,15 +38,36 @@ def test_normalize_aptitude_profile_maps_seniority_aliases():
     assert result["seniority_band"] == "mid"
 
 
-def test_normalize_aptitude_profile_coerces_inverted_confidence_map():
+def test_normalize_aptitude_profile_confidence_map_entry_shape():
+    data: JsonObject = {
+        "seniority_band": "senior",
+        "confidence_map": {
+            "seniority_band": "medium",
+            "adjacent_roles": {
+                "confidence": "high",
+                "reason": "Strong skill overlap.",
+            },
+        },
+    }
+    result = normalize_aptitude_profile(data)
+    confidence_map = cast(dict[str, dict[str, str]], result["confidence_map"])
+    assert confidence_map["seniority_band"] == {
+        "confidence": "medium",
+        "reason": "",
+    }
+    assert confidence_map["adjacent_roles"]["confidence"] == "high"
+
+
+def test_normalize_aptitude_profile_does_not_rewrite_inverted_confidence_map():
+    """Inverted maps are prompt failures; normalizer no longer rebuilds them."""
     data: JsonObject = {
         "seniority_band": "senior",
         "confidence_map": {"high": ["core_skills"], "medium": ["adjacent_roles"]},
     }
     result = normalize_aptitude_profile(data)
     confidence_map = cast(dict[str, dict[str, str]], result["confidence_map"])
-    assert confidence_map["core_skills"]["confidence"] == "high"
-    assert confidence_map["adjacent_roles"]["confidence"] == "medium"
+    assert "core_skills" not in confidence_map
+    assert confidence_map["high"]["confidence"] == "low"
 
 
 def test_normalize_job_discovery_results_builds_match_description():

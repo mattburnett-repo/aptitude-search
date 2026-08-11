@@ -7,7 +7,7 @@ import re
 
 from app.core.config import config
 from app.core.json_types import FoundJob, JsonObject, as_object_dict, as_object_list
-from app.core.profile_text import profile_labels
+from app.core.profile_text import profile_labels, string_list
 
 logger = logging.getLogger(__name__)
 
@@ -80,17 +80,7 @@ def _family_string_list(
         family_dict = as_object_dict(family)
         if family_dict is None:
             continue
-        raw = as_object_list(family_dict.get(key))
-        if raw is None:
-            continue
-        for item in raw:
-            if not item:
-                continue
-            text = str(item).strip()
-            if lowercase:
-                text = text.lower()
-            if text:
-                values.append(text)
+        values.extend(string_list(family_dict.get(key), lowercase=lowercase))
     return values
 
 

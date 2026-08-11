@@ -18,7 +18,9 @@ Resume ingress: `resume_io.py` (`extract_resume_text` → `ingest_resume` → `p
 
 ---
 
-## Done (this pass)
+## Part A — Code simplification — done
+
+### Wiring / structure (earlier in this pass)
 
 - Extracted `exception_handlers`, `logging_setup`, `observability` from `main.py`.
 - Unified resume ingress (`ingest_resume` / `prepare_pipeline_inputs`); pipeline no longer double-runs safety.
@@ -26,37 +28,40 @@ Resume ingress: `resume_io.py` (`extract_resume_text` → `ingest_resume` → `p
 - Simplified `llm.py` chat call; renamed wrappers to `aptitude_llm_call` / `job_discovery_llm_call`.
 - Added stage payload aliases (`AptitudeProfile`, `RoleFamilyPlan`, `VerifiedMatches`, …).
 - Docstrings/comments on stages, discovery, LLM wrappers; `/health` returns `version`.
-- **Part A.1 dead paths:** removed duplicate empty-plan `adjacent_roles` line; aptitude-fit “no role family alignment” now hard-rejects (`score = -1`); dropped unused Stage 1 `INPUT TEMPLATE`; corrected stale `aptitude_fit_min_*` docs to `result_top_k`.
-- **Part A.2 repeated structure:** `_family_string_list` in `aptitude_fit.py`; single Tavily `search` kwargs path; `labeled_names` imported from `profile_text` in synthesis.
 
----
+### A.1 Clear bugs / dead paths
 
-## Part A — Remaining code simplification
+- Removed duplicate empty-plan `adjacent_roles` line.
+- Aptitude-fit “no role family alignment” hard-rejects (`score = -1`).
+- Dropped unused Stage 1 `INPUT TEMPLATE`.
+- Corrected stale `aptitude_fit_min_*` docs → `result_top_k`.
 
-### 1. Clear bugs / dead paths
+### A.2 Repeated structure
 
-_Done — see above._
+- `_family_string_list` in `aptitude_fit.py`.
+- Single Tavily `search` kwargs path.
+- `labeled_names` from `profile_text` in synthesis.
 
-### 2. Repeated structure worth collapsing
+### A.3 Stage 1 shape (prompt + thinner normalizer)
 
-_Done — see above._
+**Prompt / user task** (`prompts/01-resume-to-aptitude-profile.md`, `prompts/stage1-agent-user-task.txt`):
 
-### 3. Complexity that exists because Stage 1 is sloppy
+- Matches schema minimums: `core_skills` / `strengths` / `rationale` non-empty; other lists may be `[]`.
+- Exact `seniority_band` enum (no aliases in the prompt).
+- Correct vs wrong `confidence_map` examples (field → `{confidence, reason}`).
 
-`normalize_aptitude_profile` in `validate.py` is a large compatibility layer:
+**`normalize_aptitude_profile`** (`backend/app/core/validate.py`):
 
-- `name` ↔ `label` swaps
-- inverted `confidence_map` (`{high: [...]}` vs `{field: {confidence, reason}}`)
-- seniority aliases
+- No `name`↔`label` swaps (wrong key → schema failure).
+- No inverted `{high: [fields]}` rewrite.
+- Remaining light cleanup: prune extras, coerce item confidence, string→`{confidence,reason}` entries, `mid-level`→`mid` alias.
 
-Simplify this **after** (or together with) prompt/schema tightening. Until then, deleting normalizers will just raise validation failures.
+### A.4 Smaller cleanups
 
-### 4. Smaller cleanups (optional)
+- `main.py` OpenAPI tags use `"description"`.
+- `profile_text.py`: `profile_labels` / `labeled_names` for skill/labeled objects; `string_list` / `joined_strings` for plan plain-string arrays (`search_terms`, `work_modes`, `avoid_terms`). Call sites: discovery, synthesis context, `_family_string_list`.
 
-- `main.py` OpenAPI tags look malformed (`"Health check"` / `"Full pipeline"` as keys instead of `"description"`).
-- `profile_labels` used on plain-string `search_terms` works via the string branch; a dedicated helper would be clearer.
-
-**Not worth “simplifying” right now:** input_safety (Presidio), streaming queue, URL filters — they earn their size.
+**Left alone on purpose:** input_safety (Presidio), streaming queue, URL filters.
 
 ---
 
@@ -79,30 +84,27 @@ From product direction (`docs/v0.2.0/aptitude_refinement/`) and code:
 
 So the prompt still spends a lot of weight on **skills taxonomy**, while matching/search care most about **work patterns + adjacent roles + summary**.
 
-### Prompt problems to revisit
+### Prompt problems still open
 
-1. **Schema vs prompt conflict**  
-   Prompt: empty arrays / `"unknown"` when uncertain.  
-   Schema: `core_skills` and `strengths` `minItems: 1`, `rationale` `minItems: 1`, `aptitude_summary` `minLength: 20`.  
-   Model is told it may empty fields that validation will reject.
-
-2. **“SHARED VOCABULARY (USED BY BOTH PROMPTS)”**  
+1. **“SHARED VOCABULARY (USED BY BOTH PROMPTS)”**  
    Full defs live only in Prompt 1. Prompt 2 has none. Prompt 3 has a short locked subset. Either share one vocabulary block or drop the “both prompts” claim.
 
-3. **`name` vs `label`**  
-   Repeated in system prompt + user task; still needs a normalizer. Options: unify schema to one key, or keep split but make the prompt shorter and rely on schema examples.
+2. **`name` vs `label`**  
+   Prompt + user task still teach the split; normalizer no longer swaps. Options: unify schema to one key, or shorten the teaching text and rely on schema.
 
-4. **Evidence rules are uneven**  
+3. **Evidence rules are uneven**  
    Detailed `evidence_from_resume` rules are skills-only; schema allows evidence on labeled items too. Decide: evidence everywhere, or skills-only and say so in schema/`$defs`.
 
-5. **Tension: non-obvious adjacent roles vs no invention**  
-   “Include at least one non-obvious but justified role” vs “No aspirational.” That’s the product heart of Stage 1 — worth rewriting as a crisp rule (e.g. must cite skill overlap / progression / known path in `evidence_from_resume`).
+4. **Tension: non-obvious adjacent roles vs no invention**  
+   “Include at least one non-obvious but justified role” vs “No aspirational.” Worth a crisp rule (e.g. must cite skill overlap / progression / known path in `evidence_from_resume`).
 
-6. **Redundancy / dead text**  
-   JSON-only rules repeated; unused `INPUT TEMPLATE`; “v4” title with no contract versioning; processing steps overlap vocabulary.
+5. **Redundancy / dead text**  
+   JSON-only rules repeated; “v4” title with no contract versioning; processing steps overlap vocabulary. (`INPUT TEMPLATE` already removed in A.1.)
 
-7. **`confidence_map` under-specified relative to failure modes**  
-   Normalizer handles inverted maps and string values → prompt examples should match schema exactly so that code can shrink.
+### Fixed earlier (A.3) — keep for context
+
+- Schema vs prompt empty-array conflict.
+- Underspecified `confidence_map` (inverted-map failure mode).
 
 ### Prompt redesign direction (recommendation, not implementation)
 
@@ -113,12 +115,11 @@ Prioritize quality of fields that drive the rest of the pipeline:
 3. `aptitude_summary` (embed + UI)
 4. Then skills/domains as supporting, not primary
 
-Align empty-vs-required with the schema. Cut dead template. Make vocabulary once and reference it. Tighten adjacent-role justification so “non-obvious” doesn’t become invention.
+Cut redundant prompt text. Make vocabulary once and reference it. Tighten adjacent-role justification so “non-obvious” doesn’t become invention.
 
 ---
 
 ## Suggested order for remaining work
 
-1. **Stage 1 prompt + schema alignment** (biggest leverage on profile quality *and* later code shrink)
-2. **Optional small cleanups** (OpenAPI tag keys, `profile_labels` for plain search_terms)
-3. **Only then** thin `normalize_aptitude_profile` once the model reliably emits shape
+1. **Stage 1 prompt quality (Part B)** — vocabulary claim, evidence rules, adjacent-role tension, prioritize strengths / working_style / adjacent_roles / summary
+2. Drop remaining `mid-level` seniority alias once live Stage 1 outputs are clean

@@ -5,7 +5,7 @@ import json
 from app.core import prompt_loader
 from app.core.json_types import FoundJob, JsonObject, as_object_dict, as_object_list
 from app.core.models import Constraints
-from app.core.profile_text import labeled_names
+from app.core.profile_text import joined_strings, labeled_names
 
 
 def compact_aptitude_profile_summary(profile: JsonObject) -> str:
@@ -51,8 +51,8 @@ def compact_role_family_plan_summary(plan: JsonObject) -> str:
             continue
         role_family = family_dict.get("role_family")
         fit_reason = family_dict.get("fit_reason")
-        work_modes = labeled_names(family_dict.get("work_modes"), limit=5)
-        search_terms = labeled_names(family_dict.get("search_terms"), limit=4)
+        work_modes = joined_strings(family_dict.get("work_modes"), limit=5)
+        search_terms = joined_strings(family_dict.get("search_terms"), limit=4)
         if role_family:
             lines.append(f"- {role_family}")
         if isinstance(fit_reason, str) and fit_reason.strip():

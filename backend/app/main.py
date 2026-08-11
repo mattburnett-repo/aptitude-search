@@ -19,9 +19,12 @@ app = FastAPI(
     title=config.app.title,
     version=config.app.version,
     openapi_tags=[
-        {"name": "Health", "Health check": "Liveness checks"},
-        {"name": "Pipeline", "Full pipeline": "Full resume → aptitude → job search run"},
-        {"name": "Pipeline Stages", "Stages for pipeline": "Individual pipeline stages (1, 2, and 3)"},
+        {"name": "Health", "description": "Liveness checks"},
+        {"name": "Pipeline", "description": "Full resume → aptitude → job search run"},
+        {
+            "name": "Pipeline Stages",
+            "description": "Individual pipeline stages (1, 2, and 3)",
+        },
     ],
 )
 

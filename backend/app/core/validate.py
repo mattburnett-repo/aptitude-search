@@ -131,55 +131,29 @@ def _normalize_confidence(value: object) -> str:
 
 
 def _normalize_confidence_map_entry(item: object) -> dict[str, str]:
-    """Coerce LLM confidence_map values into {confidence, reason}."""
+    """Coerce a confidence_map value into {confidence, reason}."""
     if isinstance(item, str):
         return {"confidence": _normalize_confidence(item), "reason": ""}
     entry = as_object_dict(item)
     if entry is None:
         return {"confidence": "low", "reason": ""}
-
     confidence = entry.get("confidence")
     reason = entry.get("reason")
-    if isinstance(confidence, str) and confidence in _VALID_CONFIDENCE:
-        return {
-            "confidence": confidence,
-            "reason": reason.strip() if isinstance(reason, str) else "",
-        }
-
-    for level in ("high", "medium", "low"):
-        level_val = entry.get(level)
-        if isinstance(level_val, str) and level_val.strip():
-            return {"confidence": level, "reason": level_val.strip()}
-        if level_val is True:
-            return {"confidence": level, "reason": ""}
-
-    if isinstance(reason, str) and reason.strip():
-        return {"confidence": "low", "reason": reason.strip()}
-
-    return {"confidence": "low", "reason": ""}
+    return {
+        "confidence": (
+            confidence
+            if isinstance(confidence, str) and confidence in _VALID_CONFIDENCE
+            else "low"
+        ),
+        "reason": reason.strip() if isinstance(reason, str) else "",
+    }
 
 
 def _normalize_confidence_map(confidence_map: object) -> dict[str, dict[str, str]]:
+    """Expect field → {confidence, reason}. Do not rewrite inverted {high: [fields]} maps."""
     mapping = as_object_dict(confidence_map)
     if mapping is None:
         return {}
-
-    if mapping and all(str(key) in _VALID_CONFIDENCE for key in mapping):
-        rebuilt: dict[str, dict[str, str]] = {}
-        for level, fields in mapping.items():
-            field_names: list[str] = []
-            field_list = as_object_list(fields)
-            if field_list is not None:
-                field_names = [str(field) for field in field_list if field]
-            elif isinstance(fields, str) and fields.strip():
-                field_names = [fields.strip()]
-            for field in field_names:
-                rebuilt[field] = {
-                    "confidence": _normalize_confidence(str(level)),
-                    "reason": "",
-                }
-        return rebuilt
-
     return {
         str(key): _normalize_confidence_map_entry(item)
         for key, item in mapping.items()
@@ -205,51 +179,36 @@ def _normalize_seniority_band(value: object) -> str:
     return _SENIORITY_ALIASES.get(key, "unknown")
 
 
-def _normalize_skill_item(item: JsonObject) -> None:
-    name = item.get("name")
-    label = item.get("label")
-    if not isinstance(name, str) or not name.strip():
-        if isinstance(label, str) and label.strip():
-            item["name"] = label.strip()
-    _prune_dict(item, _SKILL_ITEM_KEYS)
-    item["confidence"] = _normalize_confidence(item.get("confidence"))
-
-
-def _normalize_labeled_item(item: JsonObject) -> None:
-    label = item.get("label")
-    name = item.get("name")
-    if not isinstance(label, str) or not label.strip():
-        if isinstance(name, str) and name.strip():
-            item["label"] = name.strip()
-    _prune_dict(item, _LABELED_ITEM_KEYS)
-    item["confidence"] = _normalize_confidence(item.get("confidence"))
+def _normalize_profile_list_items(
+    profile: JsonObject, keys: tuple[str, ...], allowed: frozenset[str]
+) -> None:
+    for key in keys:
+        items = as_object_list(profile.get(key))
+        if items is None:
+            continue
+        for item in items:
+            entry = as_object_dict(item)
+            if entry is None:
+                continue
+            _prune_dict(entry, allowed)
+            entry["confidence"] = _normalize_confidence(entry.get("confidence"))
 
 
 def normalize_aptitude_profile(data: object) -> JsonObject:
+    """Light cleanup before schema validation. Shape must come from the Stage 1 prompt."""
     profile = as_object_dict(data)
     if profile is None:
         return {}
 
     profile["seniority_band"] = _normalize_seniority_band(profile.get("seniority_band"))
-
-    for key in ("core_skills", "secondary_skills"):
-        items = as_object_list(profile.get(key))
-        if items is None:
-            continue
-        for item in items:
-            skill_item = as_object_dict(item)
-            if skill_item is not None:
-                _normalize_skill_item(skill_item)
-
-    for key in ("domains", "strengths", "adjacent_roles", "working_style_signals"):
-        items = as_object_list(profile.get(key))
-        if items is None:
-            continue
-        for item in items:
-            labeled_item = as_object_dict(item)
-            if labeled_item is not None:
-                _normalize_labeled_item(labeled_item)
-
+    _normalize_profile_list_items(
+        profile, ("core_skills", "secondary_skills"), _SKILL_ITEM_KEYS
+    )
+    _normalize_profile_list_items(
+        profile,
+        ("domains", "strengths", "adjacent_roles", "working_style_signals"),
+        _LABELED_ITEM_KEYS,
+    )
     profile["confidence_map"] = _normalize_confidence_map(profile.get("confidence_map"))
     return profile
 

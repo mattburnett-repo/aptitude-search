@@ -9,7 +9,7 @@ from langsmith import traceable  # pyright: ignore[reportUnknownVariableType]
 from app.core.config import config
 from app.core.json_types import FoundJob, JsonObject, as_object_dict, as_object_list
 from app.core.models import Constraints
-from app.core.profile_text import profile_labels
+from app.core.profile_text import profile_labels, string_list
 from app.core.progress import ProgressCallback, emit_progress
 from app.job_discovery.tools import search_job_postings
 
@@ -73,7 +73,7 @@ def _discovery_search_terms_from_plan(
         family_dict = as_object_dict(family)
         if family_dict is None:
             continue
-        terms = profile_labels(family_dict.get("search_terms"), limit=max_queries)
+        terms = string_list(family_dict.get("search_terms"), limit=max_queries)
         if terms:
             per_family.append(terms)
 

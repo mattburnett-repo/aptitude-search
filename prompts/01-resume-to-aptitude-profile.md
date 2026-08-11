@@ -130,38 +130,59 @@ Include at least one non-obvious but justified role.
 
 ## OUTPUT RULES
 
-- Output ONLY valid JSON
-- Must conform exactly to AptitudeProfile schema
+- Output ONLY valid JSON matching the AptitudeProfile schema
 - No commentary or markdown
 
 ## REQUIRED TOP-LEVEL KEYS (MANDATORY)
-Return all of these keys in every response, even when evidence is weak:
-core_skills, secondary_skills, domains, strengths, adjacent_roles, seniority_band, working_style_signals, aptitude_summary, confidence_map, rationale.
 
-If uncertain, use:
-- empty arrays for list fields
-- "unknown" for seniority_band
-- {} for confidence_map
-Never omit a required key.
+Return every key every time:
+`core_skills`, `secondary_skills`, `domains`, `strengths`, `adjacent_roles`, `seniority_band`, `working_style_signals`, `aptitude_summary`, `confidence_map`, `rationale`.
+
+Schema minimums (do not empty these):
+- `core_skills`: at least 1 item
+- `strengths`: at least 1 item
+- `rationale`: at least 1 string
+- `aptitude_summary`: at least 20 characters
+
+When evidence is weak for other list fields (`secondary_skills`, `domains`, `adjacent_roles`, `working_style_signals`), use `[]`.
+When seniority is unclear: `"seniority_band": "unknown"`.
+When overall confidence notes are unnecessary: `"confidence_map": {}`.
 
 ## TYPE-SHAPE REQUIREMENTS (MANDATORY)
 
-Use the correct identifier field for each array. Do not swap them.
+Use the correct identifier field. Do not swap `name` and `label`.
 
 | Array | Object shape |
 |-------|--------------|
-| core_skills, secondary_skills | `{"name": string, "confidence": "high"\|"medium"\|"low", "evidence_from_resume"?: string}` |
-| domains, strengths, adjacent_roles, working_style_signals | `{"label": string, "confidence": "high"\|"medium"\|"low", "evidence_from_resume"?: string}` |
+| `core_skills`, `secondary_skills` | `{"name": string, "confidence": "high"\|"medium"\|"low", "evidence_from_resume"?: string}` |
+| `domains`, `strengths`, `adjacent_roles`, `working_style_signals` | `{"label": string, "confidence": "high"\|"medium"\|"low", "evidence_from_resume"?: string}` |
 
-- Skill arrays use **`name`**. Never use `label` in core_skills or secondary_skills.
-- Domain/strength/role arrays use **`label`**. Never use `name` in those arrays.
+- Skills use **`name` only**. Never put `label` on skill items.
+- Domains / strengths / roles / working style use **`label` only**. Never put `name` on those items.
 
-confidence_map: keys are profile fields (e.g. seniority_band, core_skills). Each value is `{"confidence": "high"|"medium"|"low", "reason": string}`. Never use high/medium/low as keys inside confidence_map.
+`seniority_band` must be exactly one of:
+`entry` | `mid` | `senior` | `staff` | `principal` | `executive` | `unknown`
+Do not use aliases (`mid-level`, `sr`, etc.).
 
-rationale: array of strings, never a single string.
-Example: "rationale": ["reason 1", "reason 2"]
+`confidence` on every item must be exactly `high`, `medium`, or `low` — never `unknown`.
 
-Never use "unknown" for confidence. Confidence must be exactly one of: high, medium, low.
+`confidence_map` maps **profile field names** → `{confidence, reason}`. Never invert it.
+
+Correct:
+```json
+"confidence_map": {
+  "seniority_band": {"confidence": "medium", "reason": "Title is Software Engineer; 8 years experience."},
+  "adjacent_roles": {"confidence": "medium", "reason": "Grounded in skill overlap from resume."}
+}
+```
+
+Wrong (do not emit):
+```json
+"confidence_map": {"high": ["core_skills"], "medium": ["adjacent_roles"]}
+```
+
+`rationale` is always an array of strings, never a single string:
+`"rationale": ["reason 1", "reason 2"]`
 
 ---
 
