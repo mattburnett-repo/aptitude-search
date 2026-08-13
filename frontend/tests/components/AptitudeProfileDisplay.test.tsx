@@ -11,6 +11,13 @@ vi.mock("../../src/lib/exportAptitudeProfilePdf", () => ({
 import { openAptitudeProfilePdf } from "../../src/lib/exportAptitudeProfilePdf";
 
 describe("AptitudeProfileDisplay", () => {
+  it("matches markup snapshot", () => {
+    const { container } = render(
+      <AptitudeProfileDisplay profile={stage1Profile} />
+    );
+    expect(container.querySelector(".aptitude-profile")).toMatchSnapshot();
+  });
+
   it("renders structured profile content from the stage 1 fixture", () => {
     render(<AptitudeProfileDisplay profile={stage1Profile} />);
 

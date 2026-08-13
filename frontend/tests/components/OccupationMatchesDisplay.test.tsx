@@ -11,6 +11,13 @@ vi.mock("../../src/lib/exportOccupationMatchesPdf", () => ({
 import { openOccupationMatchesPdf } from "../../src/lib/exportOccupationMatchesPdf";
 
 describe("OccupationMatchesDisplay", () => {
+  it("matches markup snapshot", () => {
+    const { container } = render(
+      <OccupationMatchesDisplay matches={occupationMatches} />
+    );
+    expect(container.querySelector(".occupation-matches")).toMatchSnapshot();
+  });
+
   it("renders O*NET occupation matches from fixture", () => {
     render(<OccupationMatchesDisplay matches={occupationMatches} />);
 

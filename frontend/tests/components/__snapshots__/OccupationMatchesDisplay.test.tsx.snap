@@ -1,0 +1,57 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`OccupationMatchesDisplay > matches markup snapshot 1`] = `
+<div
+  class="occupation-matches"
+>
+  <section
+    class="aptitude-section"
+  >
+    <p
+      class="stage2-lead"
+    >
+      Careers ranked by how well they match your resume.
+    </p>
+    <ol
+      class="occupation-match-list"
+    >
+      <li
+        class="occupation-match-item"
+      >
+        <div
+          class="occupation-match-header"
+        >
+          <span
+            class="occupation-match-title"
+          >
+            Web Developers
+          </span>
+          <span
+            class="confidence-badge confidence-medium"
+          >
+            medium
+          </span>
+        </div>
+      </li>
+      <li
+        class="occupation-match-item"
+      >
+        <div
+          class="occupation-match-header"
+        >
+          <span
+            class="occupation-match-title"
+          >
+            Software Developers
+          </span>
+          <span
+            class="confidence-badge confidence-medium"
+          >
+            medium
+          </span>
+        </div>
+      </li>
+    </ol>
+  </section>
+</div>
+`;

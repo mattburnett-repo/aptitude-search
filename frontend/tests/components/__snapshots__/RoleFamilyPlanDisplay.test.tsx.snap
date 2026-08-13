@@ -1,0 +1,353 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`RoleFamilyPlanDisplay > matches markup snapshot 1`] = `
+<div
+  class="role-family-plan"
+>
+  <p
+    class="stage2-lead role-family-lead"
+  >
+    Select a role to see why we recommend it, keywords to use when searching, preferred work setup, details from your resume that support the fit, and keywords to skip.
+  </p>
+  <details
+    class="collapsible-section role-family-card"
+  >
+    <summary>
+      Role: 
+      Solutions / Integration Engineering
+    </summary>
+    <div
+      class="collapsible-section-body"
+    >
+      <p
+        class="role-family-tags-label"
+      >
+        Why it fits
+      </p>
+      <p
+        class="role-family-fit-reason"
+      >
+        Repeated API integrations, warehouse systems, and client-facing portal delivery at Riverbend Logistics.
+      </p>
+      <div
+        class="role-family-tags"
+      >
+        <span
+          class="role-family-tags-label"
+        >
+          Job search keywords
+        </span>
+        <ul
+          class="role-family-tag-list"
+        >
+          <li>
+            solutions engineer
+          </li>
+          <li>
+            integration engineer
+          </li>
+          <li>
+            implementation engineer
+          </li>
+        </ul>
+      </div>
+      <div
+        class="role-family-tags"
+      >
+        <span
+          class="role-family-tags-label"
+        >
+          Work setup
+        </span>
+        <ul
+          class="role-family-tag-list"
+        >
+          <li>
+            customer integrations
+          </li>
+          <li>
+            technical discovery
+          </li>
+          <li>
+            API design
+          </li>
+        </ul>
+      </div>
+      <div
+        class="role-family-tags"
+      >
+        <span
+          class="role-family-tags-label"
+        >
+          From your resume
+        </span>
+        <ul
+          class="role-family-tag-list"
+        >
+          <li>
+            Solutions Engineer (integration-heavy products)
+          </li>
+          <li>
+            Thrives in transitional technical environments
+          </li>
+          <li>
+            Logistics / supply chain software
+          </li>
+        </ul>
+      </div>
+      <div
+        class="role-family-tags"
+      >
+        <span
+          class="role-family-tags-label"
+        >
+          Skip these keywords
+        </span>
+        <ul
+          class="role-family-tag-list"
+        >
+          <li>
+            quota
+          </li>
+          <li>
+            cold calling
+          </li>
+          <li>
+            account executive
+          </li>
+        </ul>
+      </div>
+    </div>
+  </details>
+  <details
+    class="collapsible-section role-family-card"
+  >
+    <summary>
+      Role: 
+      Platform / Internal Developer Experience
+    </summary>
+    <div
+      class="collapsible-section-body"
+    >
+      <p
+        class="role-family-tags-label"
+      >
+        Why it fits
+      </p>
+      <p
+        class="role-family-fit-reason"
+      >
+        CI/CD introduction, internal APIs, and mentoring indicate platform and internal-tools work.
+      </p>
+      <div
+        class="role-family-tags"
+      >
+        <span
+          class="role-family-tags-label"
+        >
+          Job search keywords
+        </span>
+        <ul
+          class="role-family-tag-list"
+        >
+          <li>
+            platform engineer
+          </li>
+          <li>
+            developer experience engineer
+          </li>
+          <li>
+            internal tools engineer
+          </li>
+        </ul>
+      </div>
+      <div
+        class="role-family-tags"
+      >
+        <span
+          class="role-family-tags-label"
+        >
+          Work setup
+        </span>
+        <ul
+          class="role-family-tag-list"
+        >
+          <li>
+            developer experience
+          </li>
+          <li>
+            internal tooling
+          </li>
+          <li>
+            platform infrastructure
+          </li>
+        </ul>
+      </div>
+      <div
+        class="role-family-tags"
+      >
+        <span
+          class="role-family-tags-label"
+        >
+          From your resume
+        </span>
+        <ul
+          class="role-family-tag-list"
+        >
+          <li>
+            Platform Engineer (internal tools / developer experience)
+          </li>
+          <li>
+            Pragmatic builder over specialist researcher
+          </li>
+        </ul>
+      </div>
+      <div
+        class="role-family-tags"
+      >
+        <span
+          class="role-family-tags-label"
+        >
+          Skip these keywords
+        </span>
+        <ul
+          class="role-family-tag-list"
+        >
+          <li>
+            machine learning researcher
+          </li>
+          <li>
+            phd required
+          </li>
+        </ul>
+      </div>
+    </div>
+  </details>
+  <details
+    class="collapsible-section role-family-card"
+  >
+    <summary>
+      Role: 
+      Modernization / Technical Program Delivery
+    </summary>
+    <div
+      class="collapsible-section-body"
+    >
+      <p
+        class="role-family-tags-label"
+      >
+        Why it fits
+      </p>
+      <p
+        class="role-family-fit-reason"
+      >
+        Led ColdFusion-to-Django migration and greenfield initiatives under shifting nonprofit requirements.
+      </p>
+      <div
+        class="role-family-tags"
+      >
+        <span
+          class="role-family-tags-label"
+        >
+          Job search keywords
+        </span>
+        <ul
+          class="role-family-tag-list"
+        >
+          <li>
+            technical program manager modernization
+          </li>
+          <li>
+            application modernization engineer
+          </li>
+        </ul>
+      </div>
+      <div
+        class="role-family-tags"
+      >
+        <span
+          class="role-family-tags-label"
+        >
+          Work setup
+        </span>
+        <ul
+          class="role-family-tag-list"
+        >
+          <li>
+            legacy migration
+          </li>
+          <li>
+            program delivery
+          </li>
+          <li>
+            stakeholder coordination
+          </li>
+        </ul>
+      </div>
+      <div
+        class="role-family-tags"
+      >
+        <span
+          class="role-family-tags-label"
+        >
+          From your resume
+        </span>
+        <ul
+          class="role-family-tag-list"
+        >
+          <li>
+            Technical Program Manager (modernization programs)
+          </li>
+          <li>
+            End-to-end ownership under ambiguity
+          </li>
+          <li>
+            High tolerance for ambiguity
+          </li>
+        </ul>
+      </div>
+      <div
+        class="role-family-tags"
+      >
+        <span
+          class="role-family-tags-label"
+        >
+          Skip these keywords
+        </span>
+        <ul
+          class="role-family-tag-list"
+        >
+          <li>
+            pure sales
+          </li>
+          <li>
+            tier 1 support
+          </li>
+        </ul>
+      </div>
+    </div>
+  </details>
+  <section
+    class="aptitude-section aptitude-rationale-section"
+  >
+    <h3
+      class="aptitude-section-title"
+    >
+      Why these roles
+    </h3>
+    <ul
+      class="aptitude-rationale"
+    >
+      <li>
+        Profile emphasizes integration and modernization over narrow stack specialization.
+      </li>
+      <li>
+        Logistics and nonprofit domains support integration-heavy, resource-constrained work modes.
+      </li>
+      <li>
+        Adjacent roles from Stage 1 align with solutions, platform, and TPM-style modernization paths.
+      </li>
+    </ul>
+  </section>
+</div>
+`;

@@ -1,0 +1,34 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`BuyMeACoffeeButton > matches markup snapshot 1`] = `
+<a
+  class="bmc-btn"
+  href="https://buymeacoffee.com/aptitude.search"
+  rel="noopener noreferrer"
+  style="background-color: rgb(64, 220, 165); color: rgb(0, 0, 0);"
+  target="_blank"
+>
+  <svg
+    aria-hidden="true"
+    class="bmc-btn-icon"
+    viewBox="0 0 32 32"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      class="logo-outline"
+      d="M8 11h15v11c0 2.2-1.8 4-4 4H10c-2.2 0-4-1.8-4-4V11zm17 3h2.5a3.5 3.5 0 0 1 0 7H25"
+      fill="#000000"
+    />
+    <path
+      class="logo-coffee"
+      d="M10 13h13v9c0 1.1-.9 2-2 2H12c-1.1 0-2-.9-2-2v-9z"
+      fill="#FFDD00"
+    />
+  </svg>
+  <span
+    class="bmc-btn-text"
+  >
+    Buy me a coffee
+  </span>
+</a>
+`;

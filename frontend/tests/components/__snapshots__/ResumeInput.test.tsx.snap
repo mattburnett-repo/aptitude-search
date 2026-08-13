@@ -1,0 +1,29 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ResumeInput > matches markup snapshot 1`] = `
+<section>
+  <div
+    class="resume-toolbar"
+  >
+    <input
+      accept=".txt,.md,.text,.pdf,text/plain,application/pdf"
+      aria-label="Resume file"
+      class="resume-file-input"
+      id="resume-file"
+      type="file"
+    />
+    <button
+      class="secondary resume-file-button"
+      type="button"
+    >
+      Choose resume file
+    </button>
+    <button
+      class="secondary resume-file-button"
+      type="button"
+    >
+      Paste resume
+    </button>
+  </div>
+</section>
+`;

@@ -1,0 +1,17 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`SiteChrome support links > matches footer markup snapshot 1`] = `
+<footer
+  class="site-footer"
+>
+  <div
+    class="site-footer-inner"
+  >
+    <p
+      class="site-footer-copy"
+    >
+      Aptitude Search — beyond the obvious job search.
+    </p>
+  </div>
+</footer>
+`;

@@ -16,6 +16,13 @@ describe("VerifiedMatchesDisplay", () => {
     vi.resetModules();
   });
 
+  it("matches markup snapshot", () => {
+    const { container } = render(
+      <VerifiedMatchesDisplay matches={verifiedMatches} />
+    );
+    expect(container.querySelector(".verified-matches")).toMatchSnapshot();
+  });
+
   it("renders search plan, collapsed results, and notes", () => {
     render(<VerifiedMatchesDisplay matches={verifiedMatches} />);
 

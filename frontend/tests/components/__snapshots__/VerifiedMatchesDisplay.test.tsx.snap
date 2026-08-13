@@ -1,0 +1,125 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`VerifiedMatchesDisplay > matches markup snapshot 1`] = `
+<div
+  class="verified-matches"
+>
+  <section
+    class="verified-section"
+  >
+    <h3
+      class="verified-section-title"
+    >
+      What we looked for
+    </h3>
+    <ol
+      class="verified-search-plan"
+    >
+      <li>
+        Logistics software companies
+      </li>
+      <li>
+        Django modernization roles
+      </li>
+      <li>
+        Integration-heavy SaaS teams
+      </li>
+    </ol>
+  </section>
+  <section
+    class="verified-section"
+  >
+    <h3
+      class="verified-section-title"
+    >
+      Results (
+      1
+      )
+    </h3>
+    <div
+      class="job-card-list"
+    >
+      <details
+        class="collapsible-section job-card job-card-high-confidence"
+      >
+        <summary
+          class="job-card-summary"
+        >
+          <div
+            class="job-card-header"
+          >
+            <div>
+              <span
+                class="job-card-role"
+              >
+                Senior Software Engineer
+              </span>
+              <p
+                class="job-card-company"
+              >
+                Riverbend Logistics
+              </p>
+            </div>
+            <span
+              class="confidence-badge confidence-high"
+            >
+              high
+            </span>
+          </div>
+        </summary>
+        <div
+          class="collapsible-section-body job-card-body"
+        >
+          <p
+            class="job-card-meta"
+          >
+            Portland, OR · Full-time · senior
+          </p>
+          <p
+            class="job-card-match"
+          >
+            Matches Python, Django, and legacy modernization experience from the aptitude profile.
+          </p>
+          <ul
+            class="job-card-signals"
+          >
+            <li>
+              Python
+            </li>
+            <li>
+              Django
+            </li>
+            <li>
+              Legacy modernization
+            </li>
+          </ul>
+          <a
+            class="job-card-link"
+            href="https://example.com/jobs/senior-software-engineer"
+            rel="noreferrer noopener"
+            target="_blank"
+          >
+            View posting
+          </a>
+        </div>
+      </details>
+    </div>
+  </section>
+  <section
+    class="verified-section"
+  >
+    <h3
+      class="verified-section-title"
+    >
+      Notes
+    </h3>
+    <ul
+      class="verified-notes"
+    >
+      <li>
+        Sample fixture for frontend display tests; not a live search result.
+      </li>
+    </ul>
+  </section>
+</div>
+`;

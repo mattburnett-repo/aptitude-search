@@ -29,6 +29,17 @@ describe("hasResumeInput", () => {
 });
 
 describe("ResumeInput", () => {
+  it("matches markup snapshot", () => {
+    const { container } = render(
+      <ResumeInput
+        value={defaultResumeInput}
+        onChange={() => {}}
+        onError={() => {}}
+      />
+    );
+    expect(container.querySelector("section")).toMatchSnapshot();
+  });
+
   it("shows an error for unsupported file types", () => {
     const onError = vi.fn();
     const onChange = vi.fn();

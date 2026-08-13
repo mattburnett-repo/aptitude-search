@@ -11,6 +11,14 @@ describe("SiteChrome support links", () => {
     vi.resetModules();
   });
 
+  it("matches footer markup snapshot", async () => {
+    vi.stubEnv("VITE_SUPPORT_URL", "");
+    const { SiteFooter } = await loadSiteChrome();
+
+    const { container } = render(<SiteFooter />);
+    expect(container.querySelector(".site-footer")).toMatchSnapshot();
+  });
+
   it("links donations and renders the BMC button when VITE_SUPPORT_URL is set", async () => {
     vi.stubEnv("VITE_SUPPORT_URL", "https://buymeacoffee.com/aptitude.search");
     const { InputTrustNotes, SiteFooter } = await loadSiteChrome();

@@ -1,0 +1,14 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`PipelineActions > matches markup snapshot 1`] = `
+<div
+  class="actions actions-primary"
+>
+  <button
+    class="primary-cta"
+    type="button"
+  >
+    Go →
+  </button>
+</div>
+`;

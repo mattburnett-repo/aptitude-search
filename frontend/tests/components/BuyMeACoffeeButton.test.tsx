@@ -11,6 +11,14 @@ describe("BuyMeACoffeeButton", () => {
     vi.resetModules();
   });
 
+  it("matches markup snapshot", async () => {
+    vi.stubEnv("VITE_SUPPORT_URL", "https://buymeacoffee.com/aptitude.search");
+    const { BuyMeACoffeeButton } = await loadBuyMeACoffeeButton();
+
+    const { container } = render(<BuyMeACoffeeButton />);
+    expect(container.querySelector(".bmc-btn")).toMatchSnapshot();
+  });
+
   it("renders a static support link styled like the BMC button", async () => {
     vi.stubEnv("VITE_SUPPORT_URL", "https://buymeacoffee.com/aptitude.search");
     const { BuyMeACoffeeButton } = await loadBuyMeACoffeeButton();

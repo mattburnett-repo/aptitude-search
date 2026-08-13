@@ -3,6 +3,13 @@ import { describe, expect, it } from "vitest";
 import { PipelineActions } from "../../src/components/PipelineActions";
 
 describe("PipelineActions", () => {
+  it("matches markup snapshot", () => {
+    const { container } = render(
+      <PipelineActions loading={false} canRun={true} onRun={() => {}} />
+    );
+    expect(container.querySelector(".actions")).toMatchSnapshot();
+  });
+
   it("disables Go while loading or when resume input is missing", () => {
     const { rerender } = render(
       <PipelineActions loading={false} canRun={false} onRun={() => {}} />

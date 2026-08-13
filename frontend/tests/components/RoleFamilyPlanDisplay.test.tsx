@@ -11,6 +11,13 @@ vi.mock("../../src/lib/exportRoleFamilyPlanPdf", () => ({
 import { openRoleFamilyPlanPdf } from "../../src/lib/exportRoleFamilyPlanPdf";
 
 describe("RoleFamilyPlanDisplay", () => {
+  it("matches markup snapshot", () => {
+    const { container } = render(
+      <RoleFamilyPlanDisplay plan={roleFamilyPlan} />
+    );
+    expect(container.querySelector(".role-family-plan")).toMatchSnapshot();
+  });
+
   it("renders collapsed role families from the stage 2 fixture", () => {
     render(<RoleFamilyPlanDisplay plan={roleFamilyPlan} />);
 

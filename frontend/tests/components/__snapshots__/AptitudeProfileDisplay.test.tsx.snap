@@ -1,0 +1,604 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`AptitudeProfileDisplay > matches markup snapshot 1`] = `
+<div
+  class="aptitude-profile"
+>
+  <div
+    class="aptitude-pdf-page"
+    data-pdf-page="true"
+  >
+    <p
+      class="aptitude-summary"
+    >
+      Adaptable full-stack engineer who repeatedly succeeds where systems are being replaced or formalized for the first time. Unusual value in modernization, integration-heavy teams, and resource-constrained organizations—not in narrow algorithmic specialization.
+    </p>
+    <p
+      class="aptitude-seniority"
+    >
+      Seniority band:
+       
+      <span
+        class="seniority-badge"
+      >
+        senior
+      </span>
+    </p>
+    <div
+      class="aptitude-grid"
+    >
+      <section
+        class="aptitude-section"
+      >
+        <h3
+          class="aptitude-section-title"
+        >
+          Core skills
+        </h3>
+        <ul
+          class="aptitude-item-list"
+        >
+          <li
+            class="aptitude-item"
+          >
+            <div
+              class="aptitude-item-header"
+            >
+              <span
+                class="aptitude-item-label"
+              >
+                Python
+              </span>
+              <span
+                class="confidence-badge confidence-high"
+              >
+                high
+              </span>
+            </div>
+            <p
+              class="aptitude-evidence"
+            >
+              Django stack at Riverbend; Python on internal tools at Pine State
+            </p>
+          </li>
+          <li
+            class="aptitude-item"
+          >
+            <div
+              class="aptitude-item-header"
+            >
+              <span
+                class="aptitude-item-label"
+              >
+                Django
+              </span>
+              <span
+                class="confidence-badge confidence-high"
+              >
+                high
+              </span>
+            </div>
+            <p
+              class="aptitude-evidence"
+            >
+              ColdFusion to Django migration at Riverbend Logistics
+            </p>
+          </li>
+          <li
+            class="aptitude-item"
+          >
+            <div
+              class="aptitude-item-header"
+            >
+              <span
+                class="aptitude-item-label"
+              >
+                Vue
+              </span>
+              <span
+                class="confidence-badge confidence-high"
+              >
+                high
+              </span>
+            </div>
+            <p
+              class="aptitude-evidence"
+            >
+              Django + Vue portal migration
+            </p>
+          </li>
+          <li
+            class="aptitude-item"
+          >
+            <div
+              class="aptitude-item-header"
+            >
+              <span
+                class="aptitude-item-label"
+              >
+                Legacy modernization
+              </span>
+              <span
+                class="confidence-badge confidence-high"
+              >
+                high
+              </span>
+            </div>
+            <p
+              class="aptitude-evidence"
+            >
+              ColdFusion to Django migration; CI/CD introduction at CivicWorks
+            </p>
+          </li>
+        </ul>
+      </section>
+      <section
+        class="aptitude-section"
+      >
+        <h3
+          class="aptitude-section-title"
+        >
+          Secondary skills
+        </h3>
+        <ul
+          class="aptitude-item-list"
+        >
+          <li
+            class="aptitude-item"
+          >
+            <div
+              class="aptitude-item-header"
+            >
+              <span
+                class="aptitude-item-label"
+              >
+                PostgreSQL
+              </span>
+              <span
+                class="confidence-badge confidence-high"
+              >
+                high
+              </span>
+            </div>
+            <p
+              class="aptitude-evidence"
+            >
+              Warehouse scanner APIs with PostgreSQL backends
+            </p>
+          </li>
+          <li
+            class="aptitude-item"
+          >
+            <div
+              class="aptitude-item-header"
+            >
+              <span
+                class="aptitude-item-label"
+              >
+                Mentoring
+              </span>
+              <span
+                class="confidence-badge confidence-medium"
+              >
+                medium
+              </span>
+            </div>
+            <p
+              class="aptitude-evidence"
+            >
+              Mentored two junior developers at Riverbend
+            </p>
+          </li>
+          <li
+            class="aptitude-item"
+          >
+            <div
+              class="aptitude-item-header"
+            >
+              <span
+                class="aptitude-item-label"
+              >
+                ColdFusion
+              </span>
+              <span
+                class="confidence-badge confidence-high"
+              >
+                high
+              </span>
+            </div>
+            <p
+              class="aptitude-evidence"
+            >
+              Listed in skills; migration source at Riverbend
+            </p>
+          </li>
+        </ul>
+      </section>
+    </div>
+  </div>
+  <div
+    class="aptitude-pdf-page aptitude-profile-section-divider"
+    data-pdf-page="true"
+  >
+    <div
+      class="aptitude-grid"
+    >
+      <section
+        class="aptitude-section"
+      >
+        <h3
+          class="aptitude-section-title"
+        >
+          Industry experience
+        </h3>
+        <ul
+          class="aptitude-item-list"
+        >
+          <li
+            class="aptitude-item"
+          >
+            <div
+              class="aptitude-item-header"
+            >
+              <span
+                class="aptitude-item-label"
+              >
+                Logistics / supply chain software
+              </span>
+              <span
+                class="confidence-badge confidence-high"
+              >
+                high
+              </span>
+            </div>
+            <p
+              class="aptitude-evidence"
+            >
+              Riverbend Logistics customer portal and warehouse integrations
+            </p>
+          </li>
+          <li
+            class="aptitude-item"
+          >
+            <div
+              class="aptitude-item-header"
+            >
+              <span
+                class="aptitude-item-label"
+              >
+                Nonprofit / mission-driven organizations
+              </span>
+              <span
+                class="confidence-badge confidence-high"
+              >
+                high
+              </span>
+            </div>
+            <p
+              class="aptitude-evidence"
+            >
+              CivicWorks Nonprofit 2017–2021
+            </p>
+          </li>
+        </ul>
+      </section>
+      <section
+        class="aptitude-section"
+      >
+        <h3
+          class="aptitude-section-title"
+        >
+          Strengths
+        </h3>
+        <ul
+          class="aptitude-item-list"
+        >
+          <li
+            class="aptitude-item"
+          >
+            <div
+              class="aptitude-item-header"
+            >
+              <span
+                class="aptitude-item-label"
+              >
+                Thrives in transitional technical environments
+              </span>
+              <span
+                class="confidence-badge confidence-high"
+              >
+                high
+              </span>
+            </div>
+            <p
+              class="aptitude-evidence"
+            >
+              Legacy migration, CI/CD from scratch, shifting nonprofit requirements
+            </p>
+          </li>
+          <li
+            class="aptitude-item"
+          >
+            <div
+              class="aptitude-item-header"
+            >
+              <span
+                class="aptitude-item-label"
+              >
+                End-to-end ownership under ambiguity
+              </span>
+              <span
+                class="confidence-badge confidence-medium"
+              >
+                medium
+              </span>
+            </div>
+            <p
+              class="aptitude-evidence"
+            >
+              Summary claims ambiguous problems; multiple greenfield-ish initiatives
+            </p>
+          </li>
+          <li
+            class="aptitude-item"
+          >
+            <div
+              class="aptitude-item-header"
+            >
+              <span
+                class="aptitude-item-label"
+              >
+                Cross-functional communication
+              </span>
+              <span
+                class="confidence-badge confidence-medium"
+              >
+                medium
+              </span>
+            </div>
+            <p
+              class="aptitude-evidence"
+            >
+              Listed in skills; nonprofit and logistics contexts imply stakeholder variety
+            </p>
+          </li>
+        </ul>
+      </section>
+    </div>
+  </div>
+  <div
+    class="aptitude-pdf-page aptitude-profile-section-divider"
+    data-pdf-page="true"
+  >
+    <div
+      class="aptitude-grid"
+    >
+      <section
+        class="aptitude-section"
+      >
+        <h3
+          class="aptitude-section-title"
+        >
+          Adjacent roles
+        </h3>
+        <ul
+          class="aptitude-item-list"
+        >
+          <li
+            class="aptitude-item"
+          >
+            <div
+              class="aptitude-item-header"
+            >
+              <span
+                class="aptitude-item-label"
+              >
+                Solutions Engineer (integration-heavy products)
+              </span>
+              <span
+                class="confidence-badge confidence-medium"
+              >
+                medium
+              </span>
+            </div>
+            <p
+              class="aptitude-evidence"
+            >
+              API integrations, warehouse systems, client-facing portal work
+            </p>
+          </li>
+          <li
+            class="aptitude-item"
+          >
+            <div
+              class="aptitude-item-header"
+            >
+              <span
+                class="aptitude-item-label"
+              >
+                Technical Program Manager (modernization programs)
+              </span>
+              <span
+                class="confidence-badge confidence-low"
+              >
+                low
+              </span>
+            </div>
+            <p
+              class="aptitude-evidence"
+            >
+              Inferred from migration leadership and mentoring; not explicit TPM title
+            </p>
+          </li>
+          <li
+            class="aptitude-item"
+          >
+            <div
+              class="aptitude-item-header"
+            >
+              <span
+                class="aptitude-item-label"
+              >
+                Platform Engineer (internal tools / developer experience)
+              </span>
+              <span
+                class="confidence-badge confidence-medium"
+              >
+                medium
+              </span>
+            </div>
+            <p
+              class="aptitude-evidence"
+            >
+              CI/CD introduction, internal APIs, mentoring
+            </p>
+          </li>
+        </ul>
+      </section>
+      <section
+        class="aptitude-section"
+      >
+        <h3
+          class="aptitude-section-title"
+        >
+          Working style signals
+        </h3>
+        <ul
+          class="aptitude-item-list"
+        >
+          <li
+            class="aptitude-item"
+          >
+            <div
+              class="aptitude-item-header"
+            >
+              <span
+                class="aptitude-item-label"
+              >
+                High tolerance for ambiguity
+              </span>
+              <span
+                class="confidence-badge confidence-medium"
+              >
+                medium
+              </span>
+            </div>
+            <p
+              class="aptitude-evidence"
+            >
+              Nonprofit shifting requirements; modernization projects
+            </p>
+          </li>
+          <li
+            class="aptitude-item"
+          >
+            <div
+              class="aptitude-item-header"
+            >
+              <span
+                class="aptitude-item-label"
+              >
+                Pragmatic builder over specialist researcher
+              </span>
+              <span
+                class="confidence-badge confidence-medium"
+              >
+                medium
+              </span>
+            </div>
+            <p
+              class="aptitude-evidence"
+            >
+              Breadth across stacks and ops basics vs deep specialization
+            </p>
+          </li>
+        </ul>
+      </section>
+      <section
+        class="aptitude-section"
+      >
+        <h3
+          class="aptitude-section-title"
+        >
+          Culture preferences
+        </h3>
+        <ul
+          class="aptitude-item-list"
+        >
+          <li
+            class="aptitude-item"
+          >
+            <div
+              class="aptitude-item-header"
+            >
+              <span
+                class="aptitude-item-label"
+              >
+                Mission-driven / nonprofit environments
+              </span>
+              <span
+                class="confidence-badge confidence-high"
+              >
+                high
+              </span>
+            </div>
+            <p
+              class="aptitude-evidence"
+            >
+              CivicWorks Nonprofit 2017–2021
+            </p>
+          </li>
+          <li
+            class="aptitude-item"
+          >
+            <div
+              class="aptitude-item-header"
+            >
+              <span
+                class="aptitude-item-label"
+              >
+                Resource-constrained / lean organizations
+              </span>
+              <span
+                class="confidence-badge confidence-medium"
+              >
+                medium
+              </span>
+            </div>
+            <p
+              class="aptitude-evidence"
+            >
+              Tight budgets and shifting requirements at CivicWorks
+            </p>
+          </li>
+        </ul>
+      </section>
+    </div>
+    <section
+      class="aptitude-section aptitude-rationale-section"
+    >
+      <h3
+        class="aptitude-section-title"
+      >
+        Rationale
+      </h3>
+      <ul
+        class="aptitude-rationale"
+      >
+        <li>
+          Core stack is explicitly Python/Django/Vue with a flagship legacy migration.
+        </li>
+        <li>
+          Domain experience skews logistics and nonprofit rather than generic SaaS.
+        </li>
+        <li>
+          Adjacent roles emphasize integration and modernization, not only 'Senior Full Stack Engineer'.
+        </li>
+        <li>
+          Seniority inferred from 8 years experience and mentoring; title on resume is Software Engineer.
+        </li>
+      </ul>
+    </section>
+  </div>
+</div>
+`;
