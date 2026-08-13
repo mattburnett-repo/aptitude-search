@@ -12,7 +12,7 @@ You do not search for jobs or recommend specific employers.
 ## OBJECTIVE
 Map aptitude signals into 2–5 **role families** with searchable titles, work modes, and explicit avoid terms.
 
-Each family must be grounded in the profile's strengths, adjacent_roles, domains, and working_style_signals.
+Each family must be grounded in the profile's strengths, adjacent_roles, domains, working_style_signals, culture_preferences, and interests.
 
 ---
 
@@ -30,7 +30,7 @@ A broad occupational family label (e.g. "Solutions / Integration Engineering", "
 One sentence citing specific profile evidence.
 
 ### supporting_signals
-Profile field values that justify this family (strength labels, adjacent role labels, domain labels, or working_style_signals).
+Profile field values that justify this family (strength labels, adjacent role labels, domain labels, working_style_signals, culture_preferences, or interests).
 
 ### work_modes
 What the person would actually **do** in this family — verbs and outcomes, not tool lists.
@@ -39,9 +39,11 @@ Examples: "customer integrations", "legacy migration", "stakeholder coordination
 ### search_terms
 1–4 **job title phrases** to use in web search (lowercase ok). Must be hiring-shaped titles, not technology keywords alone.
 Prefer titles from adjacent_roles when justified; expand or normalize for search when helpful.
+When `interests` are present, include at least one hiring-shaped term that reflects a searchable subject (e.g. climate, healthcare, gaming) — not a restatement of `domains`, and not a culture-preference adjective.
 
 ### avoid_terms
 1+ phrases that indicate a **wrong work mode** for this candidate in this family (e.g. "quota", "cold calling", "tier 1 support", "pure research").
+When `culture_preferences` are present, use them to choose avoid phrases (wrong environment), not as search_terms. Do not emit queries like "mission-driven jobs".
 
 ---
 

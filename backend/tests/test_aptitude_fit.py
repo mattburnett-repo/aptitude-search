@@ -94,3 +94,17 @@ def test_rank_and_filter_found_jobs_orders_by_fit(
     assert titles[0] == "Platform Engineer - Internal Tools"
     assert ranked[0].get("aptitude_fit_signals")
     assert len(ranked) >= 1
+
+
+def test_score_job_aptitude_fit_rewards_culture_preferences(
+    stage1_fixture: dict[str, object],
+) -> None:
+    job = {
+        "title": "Software Engineer",
+        "company": "CivicWorks",
+        "url": "https://example.com/jobs/nonprofit-engineer",
+        "snippet": "Mission-driven nonprofit; lean team, tight budgets",
+    }
+    score, signals = score_job_aptitude_fit(job, stage1_fixture)
+    assert score > 0
+    assert any(signal.startswith("culture_preference:") for signal in signals)

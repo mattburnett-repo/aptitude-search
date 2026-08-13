@@ -107,7 +107,7 @@ const STAGE_HERO: Partial<
   },
   stage1: {
     title: "Your aptitude profile",
-    lead: "Skills, strengths, and working-style signals from your resume.",
+    lead: "Skills, strengths, working style, culture preferences, and interests from your resume.",
   },
   stage2: {
     title: "How sure we are",

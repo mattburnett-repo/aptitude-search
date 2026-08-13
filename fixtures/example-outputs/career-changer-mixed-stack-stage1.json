@@ -97,6 +97,19 @@
       "evidence_from_resume": "Breadth across stacks and ops basics vs deep specialization"
     }
   ],
+  "culture_preferences": [
+    {
+      "label": "Mission-driven / nonprofit environments",
+      "confidence": "high",
+      "evidence_from_resume": "CivicWorks Nonprofit 2017–2021"
+    },
+    {
+      "label": "Resource-constrained / lean organizations",
+      "confidence": "medium",
+      "evidence_from_resume": "Tight budgets and shifting requirements at CivicWorks"
+    }
+  ],
+  "interests": [],
   "aptitude_summary": "Adaptable full-stack engineer who repeatedly succeeds where systems are being replaced or formalized for the first time. Unusual value in modernization, integration-heavy teams, and resource-constrained organizations—not in narrow algorithmic specialization.",
   "confidence_map": {
     "seniority_band": {

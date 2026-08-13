@@ -9,7 +9,7 @@ Run the stack and call the pipeline — Stages 1, 2, and 3 run automatically wit
 
 Example bodies:
 
-- [`fixtures/pipeline-request-example.json`](../fixtures/pipeline-request-example.json) — mid-career software engineer, Toronto remote
+- [`fixtures/pipeline-request-example.json`](../fixtures/pipeline-request-example.json) — civic/climate product engineer (preference/interest-rich), Toronto remote; resume text: [`civic-climate-product-engineer.txt`](../fixtures/sample-resumes/civic-climate-product-engineer.txt)
 - [`fixtures/pipeline-request-pre-college.json`](../fixtures/pipeline-request-pre-college.json) — entry-level retail/service, Kirksville MO
 - [`fixtures/pipeline-request-injection-test.json`](../fixtures/pipeline-request-injection-test.json) — should return **400** (input safety)
 

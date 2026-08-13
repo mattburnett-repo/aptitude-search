@@ -11,6 +11,8 @@
     "adjacent_roles",
     "seniority_band",
     "working_style_signals",
+    "culture_preferences",
+    "interests",
     "aptitude_summary",
     "confidence_map",
     "rationale"
@@ -44,6 +46,14 @@
       "enum": ["entry", "mid", "senior", "staff", "principal", "executive", "unknown"]
     },
     "working_style_signals": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/labeledItem" }
+    },
+    "culture_preferences": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/labeledItem" }
+    },
+    "interests": {
       "type": "array",
       "items": { "$ref": "#/$defs/labeledItem" }
     },

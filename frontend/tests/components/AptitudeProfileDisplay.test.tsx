@@ -52,6 +52,7 @@ describe("AptitudeProfileDisplay", () => {
     expect(pages[1]).toHaveTextContent("Strengths");
     expect(pages[2]).toHaveTextContent("Adjacent roles");
     expect(pages[2]).toHaveTextContent("Working style signals");
+    expect(pages[2]).toHaveTextContent("Culture preferences");
     expect(pages[2]).not.toHaveTextContent("Inference confidence");
   });
 });

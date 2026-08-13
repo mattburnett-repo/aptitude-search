@@ -16,7 +16,8 @@ from app.job_discovery.tools import search_job_postings
 logger = logging.getLogger(__name__)
 
 # Only used for skill-fallback queries (core/secondary skills). Role-family /
-# adjacent_roles / domains queries ignore this — those terms are already role-shaped.
+# adjacent_roles / domains / interests queries ignore this — those terms are
+# already role- or subject-shaped.
 _SENIORITY_MODIFIER = {
     "entry": "junior",
     "mid": "",
@@ -135,6 +136,13 @@ def _discovery_search_terms(
         ):
             add("domains", label)
 
+    if len(terms) < max_queries:
+        for label in profile_labels(
+            aptitude_profile.get("interests"),
+            limit=max_queries - len(terms),
+        ):
+            add("interests", label)
+
     if not terms:
         for label in profile_labels(
             aptitude_profile.get("core_skills"),
@@ -160,7 +168,7 @@ def _query_parts(
 ) -> list[str]:
     """Assemble a hiring-shaped query without hardcoding an occupational family."""
     normalized = _normalize_search_term(term)
-    if source in {"role_family", "adjacent_roles", "domains"}:
+    if source in {"role_family", "adjacent_roles", "domains", "interests"}:
         return [normalized, *loc_tokens, "jobs"]
     if seniority_modifier:
         return [seniority_modifier, normalized, *loc_tokens, "jobs"]
@@ -228,7 +236,7 @@ def run_job_discovery(
     """Stage 3 discovery: web search for open postings (no LLM).
 
     - Build hiring-shaped queries from role family ``search_terms`` when
-      present (else profile adjacent_roles / domains / skills).
+      present (else profile adjacent_roles / domains / interests / skills).
     - Run ``search_job_postings`` for each query (this is the actual web search).
     - Return URL-deduped ``found_jobs`` for aptitude-fit ranking and synthesis.
     """

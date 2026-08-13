@@ -33,6 +33,12 @@ def compact_aptitude_profile_summary(profile: JsonObject) -> str:
     working_style = labeled_names(profile.get("working_style_signals"), limit=6)
     if working_style:
         lines.append(f"working_style_signals: {working_style}")
+    culture = labeled_names(profile.get("culture_preferences"), limit=6)
+    if culture:
+        lines.append(f"culture_preferences: {culture}")
+    interests = labeled_names(profile.get("interests"), limit=6)
+    if interests:
+        lines.append(f"interests: {interests}")
     if summary:
         lines.append(f"summary: {summary}")
     return "\n".join(lines)

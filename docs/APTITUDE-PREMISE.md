@@ -97,10 +97,48 @@ Keep **preference** and **interest** as two labeled lists, not one blob, and not
 
 **Do not duplicate user constraints:** location, remote, salary, industries include/exclude stay on `constraints`. Resume inference is extra signal, not a second constraints object.
 
-**Incorporate in layers (smallest first):**
+**Decision:** preference and interest are **job-search inputs**, same as other profile signals used to find or keep openings. Do not extract them onto the profile if search does not use them. Extract-and-display-only is out.
 
-1. **Capture + display** — `culture_preferences` + `interests` (labeled items, `[]` ok): schema, Stage 1 prompt, normalizer keys, fixture, profile UI.
-2. **Stage 2 (next)** — interests may justify a non-obvious family or `avoid_terms`; preferences may shape `work_modes` / avoid (e.g. quota sales, heavy process). Still not search keywords.
-3. **Stage 3 fit (later)** — phrase-match posting text like `strengths`. Skip as Tavily query terms: “mission-driven jobs” is a bad query. Interest as a single domain token is optional, same as today’s `domains` fallback.
+(Wording fix: “change job search” was unclear. They are not an extra side effect on search — they are part of how search is supposed to work.)
 
-**Not in this pass:** personality field; Stage 1 `fit`; wiring into discovery queries.
+Same unit of work: schema + Stage 1 prompt **and** wiring into discovery/rank (Stage 2 `search_terms`/`avoid_terms` and/or Stage 3 fit). UI can come along; it is not the point.
+
+| Signal | How it hits search | Why not raw Tavily adjectives |
+|--------|--------------------|-------------------------------|
+| **Interest** | Query token when hiring-shaped (`climate`, `healthcare`, `gaming`); also Stage 2 `search_terms` / family choice | Subject words appear in SERPs |
+| **Preference** | Stage 2 families / `avoid_terms`; Stage 3 fit keep/boost | “mission-driven jobs” is a bad query |
+
+**Superseded:** earlier “step 1 = capture + display, search later.”
+
+### Scope of work (this thread)
+
+**Goal:** add `culture_preferences` and `interests` as labeled profile fields **and** use them as job-search inputs. Personality out. Fit stays Stage 3 ranking, not a Stage 1 field. Constraints (remote/salary/location/industries) unchanged.
+
+**In**
+
+1. **Stage 1 extract** — schema + prompt vocab + normalizer + fixture.
+2. **Stage 2** — prompt uses both when mapping families / `search_terms` / `avoid_terms`.
+3. **Stage 3 discovery** — `interests` as query tokens when hiring-shaped (same pattern as `domains` fallback). Do not query on preference adjectives.
+4. **Stage 3 fit** — score/boost `culture_preferences` against posting text (same pattern as `strengths` / `working_style_signals`).
+5. **Synthesis compact + UI** — so matches can cite them; profile panel shows the lists.
+
+**Out:** personality field; Stage 1 `fit`; duplicating remote/salary into the profile; rewriting what “aptitude” means in the schema; embeddings (optional later); prompt-only capture without search wiring.
+
+**Files (expected)**
+
+| Area | Touch |
+|------|--------|
+| Schema | `schemas/aptitude-profile.schema.json` |
+| Prompts | `01-resume-to-aptitude-profile.md`, `stage1-agent-user-task.txt`, `02-role-family-plan.md`, `role-family-plan-user-task.txt`; light cite in Stage 3 synthesis prompt/user-task |
+| Normalize | `backend/app/core/validate.py` labeled-key list |
+| Search | `discovery.py` (`interests`); `aptitude_fit.py` (`culture_preferences`) |
+| Context / UI | `job_discovery/context.py`; `AptitudeProfileDisplay.tsx` |
+| Fixtures / tests | Stage 1 fixture; `test_query_planner.py`, `test_discovery.py` / fit tests; frontend profile test if needed |
+
+`run_stage1` / pipeline orchestration: no structural change.
+
+### Implementation (checkpoint)
+
+Shipped as one unit: schema + Stage 1 extract **and** Stage 2/3 search/rank. Personality still out. Embeddings not wired.
+
+- Thin Swagger example resume lacked preference/interest evidence. Added `fixtures/sample-resumes/civic-climate-product-engineer.txt` (employer types, volunteer, side projects, stated passions) and made it the default `POST /v1/pipeline` Try It Out body via `pipeline-request-example.json`.

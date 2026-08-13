@@ -32,22 +32,9 @@ Steps: **[prompts/README.md](prompts/README.md)**
 2. Open **Swagger UI:** [http://localhost:3001/docs](http://localhost:3001/docs).
 3. Call **`POST /v1/pipeline`** — use the pre-filled example request body, or paste from [`fixtures/pipeline-request-example.json`](fixtures/pipeline-request-example.json).
 
-Example body (resume + Toronto remote SaaS/FinTech constraints):
+Swagger Try It Out uses [`fixtures/pipeline-request-example.json`](fixtures/pipeline-request-example.json) (resume: [`civic-climate-product-engineer.txt`](fixtures/sample-resumes/civic-climate-product-engineer.txt); Toronto remote SaaS/FinTech constraints).
 
-```json
-{
-  "resume": "Product-minded software engineer with 7 years of experience building web applications. Strong in TypeScript, React, Node.js, and PostgreSQL. Built customer-facing SaaS features, improved performance, and partnered with design and product teams. Comfortable owning projects end-to-end, mentoring teammates, and working in agile environments.",
-  "constraints": {
-    "location": "Toronto, ON",
-    "remote_preference": "remote",
-    "salary_min": 110000,
-    "industries_include": ["SaaS", "FinTech"],
-    "industries_exclude": ["Gambling"]
-  }
-}
-```
-
-Or from the repo root (with the API running):
+From the repo root (with the API running):
 
 ```bash
 curl -s -X POST http://localhost:3001/v1/pipeline \

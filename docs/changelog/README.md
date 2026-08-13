@@ -2,6 +2,10 @@
 
 Release notes for **aptitude-search**, newest first. Each entry links to the full changelog for that version.
 
+- **[0.8.3.md](0.8.3.md)** — culture preferences / interests as search inputs; backend cleanup
+- **[0.8.2.md](0.8.2.md)** — SERP-only Tavily; notebooks relocation
+- **[0.8.1.md](0.8.1.md)** — Stage 3 recall: search → fit top-k → synthesize
+- **[0.8.0.md](0.8.0.md)** — Tavily search migration
 - **[0.7.1.md](0.7.1.md)** — configurable search backends; omit Mojeek from Stage 3 discovery
 - **[0.7.0.md](0.7.0.md)** — optional Sentry backend error monitoring
 - **[0.6.2.md](0.6.2.md)** — marketing copy refresh (hero, footer, meta description)

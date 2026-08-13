@@ -1,10 +1,15 @@
 {
-  "resume": "Product-minded software engineer with 7 years of experience building web applications. Strong in TypeScript, React, Node.js, and PostgreSQL. Built customer-facing SaaS features, improved performance, and partnered with design and product teams. Comfortable owning projects end-to-end, mentoring teammates, and working in agile environments.",
+  "resume": "Jordan Hale\nToronto, ON | jordan.hale@email.example | github.com/jordanhale\n\nSUMMARY\nProduct-minded software engineer with 8 years building customer-facing web tools. Happiest in lean teams shipping for non-technical users. Drawn to climate and civic-tech problems — volunteer and side-project work is where that shows up, not only day jobs.\n\nEXPERIENCE\n\nSoftware Engineer — Northwind Climate (Series B climate-tech startup) (2021–Present)\n- Shipped carbon-accounting features for small manufacturers (TypeScript, React, Node.js, PostgreSQL)\n- First year had no dedicated PM; owned discovery through deployment in a 6-person engineering team\n- Partnered with climate scientists and customer success on what operators would actually use\n\nSoftware Engineer — CivicWorks Digital, nonprofit civic-tech (2018–2021)\n- Built donation and volunteer-scheduling tools for municipal programs under tight budgets\n- Worked directly with city staff who were not engineers; requirements shifted with grant cycles\n- Introduced basic CI and error alerting where none existed\n\nJunior Developer — Harbor Ledger (B2B SaaS, ~200 employees) (2016–2018)\n- Maintained billing dashboards in a process-heavy product org with dedicated PMs and QA\n- Learned TypeScript and React on the customer portal team\n\nVOLUNTEER\n\nCode for Toronto — civic hack nights (2019–Present)\n- Built a neighborhood air-quality map used by two residents’ associations\n- Mentored newcomers on React and public-data APIs\n\nSIDE PROJECTS\n\nCommunity solar estimator (open source, nights/weekends)\n- Web app that turns public irradiance data into a household-readable cost estimate\n- “I care about making energy data usable for people who are not analysts.”\n\nEDUCATION\nB.Sc. Computer Science — University of Toronto (2016)\n\nSKILLS\nTypeScript, React, Node.js, PostgreSQL, REST APIs, civic open data, stakeholder interviews, end-to-end ownership\n",
   "constraints": {
     "location": "Toronto, ON",
     "remote_preference": "remote",
     "salary_min": 110000,
-    "industries_include": ["SaaS", "FinTech"],
-    "industries_exclude": ["Gambling"]
+    "industries_include": [
+      "SaaS",
+      "FinTech"
+    ],
+    "industries_exclude": [
+      "Gambling"
+    ]
   }
 }

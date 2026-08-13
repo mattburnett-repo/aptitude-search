@@ -6,13 +6,18 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from app.core.json_types import JsonObject
 
-_PIPELINE_EXAMPLE_PATH = (
-    Path(__file__).resolve().parents[3] / "fixtures" / "pipeline-request-example.json"
+_FIXTURES_DIR = Path(__file__).resolve().parents[3] / "fixtures"
+_PIPELINE_EXAMPLE_PATH = _FIXTURES_DIR / "pipeline-request-example.json"
+_PIPELINE_EXAMPLE_RESUME_PATH = (
+    _FIXTURES_DIR / "sample-resumes" / "civic-climate-product-engineer.txt"
 )
 
 
 def _load_pipeline_request_example() -> JsonObject:
-    return cast(JsonObject, json.loads(_PIPELINE_EXAMPLE_PATH.read_text(encoding="utf-8")))
+    """Swagger Try It Out body: constraints from JSON, resume from the sample txt."""
+    example = cast(JsonObject, json.loads(_PIPELINE_EXAMPLE_PATH.read_text(encoding="utf-8")))
+    example["resume"] = _PIPELINE_EXAMPLE_RESUME_PATH.read_text(encoding="utf-8")
+    return example
 
 
 class Constraints(BaseModel):

@@ -1,0 +1,39 @@
+Jordan Hale
+Toronto, ON | jordan.hale@email.example | github.com/jordanhale
+
+SUMMARY
+Product-minded software engineer with 8 years building customer-facing web tools. Happiest in lean teams shipping for non-technical users. Drawn to climate and civic-tech problems — volunteer and side-project work is where that shows up, not only day jobs.
+
+EXPERIENCE
+
+Software Engineer — Northwind Climate (Series B climate-tech startup) (2021–Present)
+- Shipped carbon-accounting features for small manufacturers (TypeScript, React, Node.js, PostgreSQL)
+- First year had no dedicated PM; owned discovery through deployment in a 6-person engineering team
+- Partnered with climate scientists and customer success on what operators would actually use
+
+Software Engineer — CivicWorks Digital, nonprofit civic-tech (2018–2021)
+- Built donation and volunteer-scheduling tools for municipal programs under tight budgets
+- Worked directly with city staff who were not engineers; requirements shifted with grant cycles
+- Introduced basic CI and error alerting where none existed
+
+Junior Developer — Harbor Ledger (B2B SaaS, ~200 employees) (2016–2018)
+- Maintained billing dashboards in a process-heavy product org with dedicated PMs and QA
+- Learned TypeScript and React on the customer portal team
+
+VOLUNTEER
+
+Code for Toronto — civic hack nights (2019–Present)
+- Built a neighborhood air-quality map used by two residents’ associations
+- Mentored newcomers on React and public-data APIs
+
+SIDE PROJECTS
+
+Community solar estimator (open source, nights/weekends)
+- Web app that turns public irradiance data into a household-readable cost estimate
+- “I care about making energy data usable for people who are not analysts.”
+
+EDUCATION
+B.Sc. Computer Science — University of Toronto (2016)
+
+SKILLS
+TypeScript, React, Node.js, PostgreSQL, REST APIs, civic open data, stakeholder interviews, end-to-end ownership

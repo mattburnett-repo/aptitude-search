@@ -21,6 +21,7 @@ def test_build_discovery_queries_uses_adjacent_roles_and_constraints(
     assert not any("Python" in q for q in queries)
     assert not any("Django" in q for q in queries)
     assert not any(_SOFTWARE_ENGINEER in q.lower() for q in queries)
+    assert not any("mission-driven" in q.lower() for q in queries)
 
 
 def test_build_discovery_queries_respects_max_queries(
@@ -135,3 +136,19 @@ def test_build_discovery_queries_non_swe_profile_uses_plan_not_software_engineer
     assert any("marketing operations" in q.lower() for q in queries)
     assert not any(_SOFTWARE_ENGINEER in q.lower() for q in queries)
     assert not any("HubSpot" in q for q in queries)
+
+
+def test_build_discovery_queries_uses_interests_when_no_roles_or_domains() -> None:
+    profile: dict[str, object] = {
+        "seniority_band": "mid",
+        "adjacent_roles": [],
+        "domains": [],
+        "interests": [{"label": "climate", "confidence": "medium"}],
+        "core_skills": [{"name": "Python", "confidence": "high"}],
+        "secondary_skills": [],
+    }
+    queries = build_discovery_queries(profile, Constraints(), max_queries=2)
+
+    assert any("climate" in q.lower() for q in queries)
+    assert not any("Python" in q for q in queries)
+    assert not any("mission-driven" in q.lower() for q in queries)

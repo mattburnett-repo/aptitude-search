@@ -202,7 +202,14 @@ def normalize_aptitude_profile(data: object) -> JsonObject:
     for keys, allowed in (
         (("core_skills", "secondary_skills"), _SKILL_ITEM_KEYS),
         (
-            ("domains", "strengths", "adjacent_roles", "working_style_signals"),
+            (
+                "domains",
+                "strengths",
+                "adjacent_roles",
+                "working_style_signals",
+                "culture_preferences",
+                "interests",
+            ),
             _LABELED_ITEM_KEYS,
         ),
     ):

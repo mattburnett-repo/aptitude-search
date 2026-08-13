@@ -28,6 +28,8 @@ export type AptitudeProfile = {
   adjacent_roles: LabeledItem[];
   seniority_band: string;
   working_style_signals: LabeledItem[];
+  culture_preferences: LabeledItem[];
+  interests: LabeledItem[];
   aptitude_summary: string;
   confidence_map: Record<string, ConfidenceMapEntry>;
   rationale: string[];
@@ -199,6 +201,11 @@ export function AptitudeProfileDisplay({
                 title="Working style signals"
                 items={profile.working_style_signals}
               />
+              <LabeledList
+                title="Culture preferences"
+                items={profile.culture_preferences ?? []}
+              />
+              <LabeledList title="Interests" items={profile.interests ?? []} />
             </div>
 
             {profile.rationale.length > 0 && (

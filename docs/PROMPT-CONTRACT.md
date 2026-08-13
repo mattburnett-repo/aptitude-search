@@ -6,7 +6,7 @@
 - **Stage 3 is job search.** The API runs role-family-driven web discovery, ranks found postings by work-pattern fit, then a synthesis LLM call, and returns currently open postings in **`verified_matches`**.
 - **Primary path:** API + UI (or Swagger). Prompt text lives under `prompts/` (see Stages table); filenames are wired in `backend/config.toml`.
 - **Testing:** Swagger UI at `/docs` on the running API (see [backend/README.md](../backend/README.md)).
-- **Implementation (not user-facing):** Stage 3 is three phases: (1) **discovery** — Python builds search queries from the **role family plan** `search_terms` (fallback: `adjacent_roles`, `domains`, skills), plus constraints, then runs `search_job_postings`; (2) **aptitude fit** — rank/`top_k` filter on `found_jobs`; (3) **synthesis** — chat completion maps ranked `found_jobs` into schema-strict JSON with match explanations. The API jsonschema-validates `verified_matches` against `job-discovery-results.schema.json`.
+- **Implementation (not user-facing):** Stage 3 is three phases: (1) **discovery** — Python builds search queries from the **role family plan** `search_terms` (fallback: `adjacent_roles`, `domains`, `interests`, skills), plus constraints, then runs `search_job_postings`; (2) **aptitude fit** — rank/`top_k` filter on `found_jobs` (including `culture_preferences`); (3) **synthesis** — chat completion maps ranked `found_jobs` into schema-strict JSON with match explanations. The API jsonschema-validates `verified_matches` against `job-discovery-results.schema.json`.
 
 ---
 
@@ -23,7 +23,7 @@ Stage 1, Stage 2, and Stage 3 synthesis prompts are schema-strict: the markdown 
 
 Cross-cutting:
 
-- **Shared vocabulary** for `core_skills`, `secondary_skills`, `strengths`, `adjacent_roles`, `confidence`
+- **Shared vocabulary** for `core_skills`, `secondary_skills`, `strengths`, `adjacent_roles`, `culture_preferences`, `interests`, `confidence`
 - **Evidence vs inference** — prefer omission over invention
 - **No preamble** — stages 1, 2, and 3 synthesis: JSON only (synthesis parses a single JSON object from the model)
 

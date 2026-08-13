@@ -2,6 +2,6 @@ Build the job discovery results JSON from found_jobs below.
 
 Use only postings listed in found_jobs—do not invent companies or URLs.
 Include every row from found_jobs—one results entry per URL (same count as found_jobs).
-When found_jobs include aptitude_fit_signals, cite strengths and working_style_signals in match_description—not only core_skills.
+When found_jobs include aptitude_fit_signals, cite strengths, working_style_signals, and culture_preferences in match_description—not only core_skills. Mention interests when they align with the posting.
 Do not omit rows for diversification; you may order results by fit.
 Return only one json fenced code block conforming to schemas/job-discovery-results.schema.json.

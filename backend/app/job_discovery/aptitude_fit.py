@@ -122,6 +122,11 @@ def score_job_aptitude_fit(
             score += 3
             signals.append(f"working_style:{label}")
 
+    for label in profile_labels(aptitude_profile.get("culture_preferences")):
+        if _phrase_hits(text, label):
+            score += 3
+            signals.append(f"culture_preference:{label}")
+
     for label in profile_labels(aptitude_profile.get("adjacent_roles")):
         if _phrase_hits(text, label):
             score += 4

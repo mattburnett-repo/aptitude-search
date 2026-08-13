@@ -4,6 +4,7 @@ Plain-text resumes for manual testing and demos. Upload in the UI or pass to `PO
 
 | File | Profile | Use when |
 |------|---------|----------|
+| [`civic-climate-product-engineer.txt`](civic-climate-product-engineer.txt) | Product engineer, climate-tech startup + civic nonprofit, volunteer/side projects | Default Swagger `POST /v1/pipeline` Try It Out body; preference/interest signals (employer types, volunteer, stated passions) |
 | [`career-changer-mixed-stack.txt`](career-changer-mixed-stack.txt) | Full-stack developer, legacy modernization | Pipeline regression, tech-adjacent roles; has golden Stage 1/2 output under [`fixtures/example-outputs/`](../example-outputs/) |
 | [`senior-backend-engineer.txt`](senior-backend-engineer.txt) | Staff/senior backend IC, distributed systems | Senior individual-contributor profiles |
 | [`marketing-operations-lead.txt`](marketing-operations-lead.txt) | Marketing ops director, CRM/analytics | Non-engineering leadership and ops roles |
@@ -13,5 +14,6 @@ Plain-text resumes for manual testing and demos. Upload in the UI or pass to `PO
 
 Pre-built request bodies:
 
+- Default pipeline / Swagger example: [`fixtures/pipeline-request-example.json`](../pipeline-request-example.json) (resume from `civic-climate-product-engineer.txt`)
 - Entry-level profile with constraints: [`fixtures/pipeline-request-pre-college.json`](../pipeline-request-pre-college.json)
 - Injection blocklist smoke test: [`fixtures/pipeline-request-injection-test.json`](../pipeline-request-injection-test.json)

@@ -70,6 +70,35 @@ No aspirational or speculative roles.
 
 ---
 
+### culture_preferences
+Workplace *environment* fit inferred from resume evidence (employer types, org context, repeated setting).
+Examples:
+- mission-driven / nonprofit
+- resource-constrained / lean
+- high-ambiguity product org
+- regulated enterprise
+
+Not:
+- remote / salary / location (those are user constraints, not resume extract)
+- how they work (`working_style_signals`)
+- personality traits
+
+`high` only if stated; pattern → `medium`/`low`; `[]` if none.
+
+---
+
+### interests
+*Subject* that draws them, only when evidenced (stated passion, volunteer, side projects, consistent domain *choice* when they had options).
+Examples: climate, games, healthcare access.
+
+Not:
+- where they happened to be employed (`domains` = knowledge)
+- “worked in logistics” ≠ “interested in logistics”
+
+`high` only if stated; `[]` if none.
+
+---
+
 ### confidence
 - high: directly repeated / explicitly stated
 - medium: clearly supported by evidence
@@ -113,8 +142,10 @@ Only for:
 - strengths
 - adjacent_roles
 - working_style_signals
+- culture_preferences
+- interests
 
-No invention of new capabilities.
+No invention of new capabilities. Prefer `[]` over guessing preference or interest.
 
 ---
 
@@ -136,7 +167,7 @@ Include at least one non-obvious but justified role.
 ## REQUIRED TOP-LEVEL KEYS (MANDATORY)
 
 Return every key every time:
-`core_skills`, `secondary_skills`, `domains`, `strengths`, `adjacent_roles`, `seniority_band`, `working_style_signals`, `aptitude_summary`, `confidence_map`, `rationale`.
+`core_skills`, `secondary_skills`, `domains`, `strengths`, `adjacent_roles`, `seniority_band`, `working_style_signals`, `culture_preferences`, `interests`, `aptitude_summary`, `confidence_map`, `rationale`.
 
 Schema minimums (do not empty these):
 - `core_skills`: at least 1 item
@@ -144,7 +175,7 @@ Schema minimums (do not empty these):
 - `rationale`: at least 1 string
 - `aptitude_summary`: at least 20 characters
 
-When evidence is weak for other list fields (`secondary_skills`, `domains`, `adjacent_roles`, `working_style_signals`), use `[]`.
+When evidence is weak for other list fields (`secondary_skills`, `domains`, `adjacent_roles`, `working_style_signals`, `culture_preferences`, `interests`), use `[]`.
 When seniority is unclear: `"seniority_band": "unknown"`.
 When overall confidence notes are unnecessary: `"confidence_map": {}`.
 
@@ -155,10 +186,10 @@ Use the correct identifier field. Do not swap `name` and `label`.
 | Array | Object shape |
 |-------|--------------|
 | `core_skills`, `secondary_skills` | `{"name": string, "confidence": "high"\|"medium"\|"low", "evidence_from_resume"?: string}` |
-| `domains`, `strengths`, `adjacent_roles`, `working_style_signals` | `{"label": string, "confidence": "high"\|"medium"\|"low", "evidence_from_resume"?: string}` |
+| `domains`, `strengths`, `adjacent_roles`, `working_style_signals`, `culture_preferences`, `interests` | `{"label": string, "confidence": "high"\|"medium"\|"low", "evidence_from_resume"?: string}` |
 
 - Skills use **`name` only**. Never put `label` on skill items.
-- Domains / strengths / roles / working style use **`label` only**. Never put `name` on those items.
+- Domains / strengths / roles / working style / culture preferences / interests use **`label` only**. Never put `name` on those items.
 
 `seniority_band` must be exactly one of:
 `entry` | `mid` | `senior` | `staff` | `principal` | `executive` | `unknown`
