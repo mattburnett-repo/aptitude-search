@@ -117,9 +117,31 @@ Prioritize quality of fields that drive the rest of the pipeline:
 
 Cut redundant prompt text. Make vocabulary once and reference it. Tighten adjacent-role justification so “non-obvious” doesn’t become invention.
 
+### Culture preferences (discussion summary)
+
+**Current state:** Stage 1 does **not** collect workplace/job culture preferences. The prompt extracts resume career signals only. Closest field is `working_style_signals` (“how they have worked”), which is listed but never defined in SHARED VOCABULARY. Remote/hybrid/onsite lives in API `constraints`, not the aptitude profile.
+
+**Product intent:** Stage 1 should be able to **infer** workplace/job culture preferences from resume evidence (employer types, role context, repeated environment patterns) — not require the candidate to state them.
+
+**Recommended shape (not implemented):**
+
+| Field | Meaning |
+|--------|---------|
+| `working_style_signals` | How they work (ambiguity tolerance, ownership, builder vs specialist) |
+| `culture_preferences` (new) | Environment fit signals (startup vs enterprise, lean/resource-constrained, process-heavy, collaborative vs autonomous, mission-driven, etc.) |
+
+**Inference rules to encode in the prompt:**
+
+- Ground in resume evidence only; no invented “wants X.”
+- Prefer fit signals over wishes (e.g. repeated nonprofit modernization → lean / mission-driven — not “prefers nonprofit”).
+- `high` confidence only if stated; pattern-based → `medium`/`low`; allow `[]` when no signal.
+
+**Touchpoints when implementing:** define in `01-resume-to-aptitude-profile.md` + `stage1-agent-user-task.txt`; add to `schemas/aptitude-profile.schema.json`; optionally wire into fit ranking / Stage 2 later (prompt + schema first is enough).
+
 ---
 
 ## Suggested order for remaining work
 
 1. **Stage 1 prompt quality (Part B)** — vocabulary claim, evidence rules, adjacent-role tension, prioritize strengths / working_style / adjacent_roles / summary
-2. Drop remaining `mid-level` seniority alias once live Stage 1 outputs are clean
+2. **Culture preferences** — add `culture_preferences` (prompt vocab + schema); keep separate from `working_style_signals`
+3. Drop remaining `mid-level` seniority alias once live Stage 1 outputs are clean
