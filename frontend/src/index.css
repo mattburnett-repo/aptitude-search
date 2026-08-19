@@ -725,9 +725,31 @@ button.secondary.resume-file-button:active {
   border-color: var(--color-cta-hover);
 }
 
+.resume-file-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
 .resume-file-name {
   font-size: 0.85rem;
   color: var(--color-muted);
+}
+
+.resume-file-meta .field-clear {
+  position: static;
+  transform: none;
+  flex-shrink: 0;
+}
+
+.field-with-clear-active textarea {
+  padding-right: 2.25rem;
+}
+
+.field-with-clear:has(textarea) .field-clear {
+  top: 0.65rem;
+  transform: none;
 }
 
 .resume-pdf-notice {

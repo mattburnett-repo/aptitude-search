@@ -4,6 +4,7 @@ import {
   isSupportedResumeFile,
   isTextResumeFile,
 } from "../lib/resumeUpload";
+import { ClearFieldButton, FieldWithClear } from "./ClearField";
 
 export type ResumeInputValue = {
   resume: string;
@@ -79,9 +80,18 @@ export function ResumeInput({ value, onChange, onError }: ResumeInputProps) {
     });
   }
 
-  function clearFile() {
-    setShowPasteInput(false);
+  const hasFileInfo = Boolean(value.fileName);
+  const showPasteClear = showTextarea && Boolean(value.resume.trim()) && !hasFileInfo;
+
+  function clearResume() {
+    if (hasFileInfo) {
+      setShowPasteInput(false);
+    }
     onChange(defaultResumeInput);
+    onError(null);
+    if (!hasFileInfo) {
+      requestAnimationFrame(() => textareaRef.current?.focus());
+    }
   }
 
   function openPasteInput() {
@@ -113,17 +123,11 @@ export function ResumeInput({ value, onChange, onError }: ResumeInputProps) {
         >
           Choose resume file
         </button>
-        {value.fileName && (
-          <span className="resume-file-name">{value.fileName}</span>
-        )}
-        {value.pdfFile && (
-          <button
-            type="button"
-            className="secondary resume-file-button"
-            onClick={clearFile}
-          >
-            Clear file
-          </button>
+        {hasFileInfo && (
+          <span className="resume-file-meta">
+            <span className="resume-file-name">{value.fileName}</span>
+            <ClearFieldButton ariaLabel="Clear resume" onClick={clearResume} />
+          </span>
         )}
         {!showTextarea && !value.pdfFile && (
           <button
@@ -151,14 +155,20 @@ export function ResumeInput({ value, onChange, onError }: ResumeInputProps) {
         </p>
       )}
       {showTextarea && (
-        <textarea
-          ref={textareaRef}
-          id="resume"
-          value={value.resume}
-          onChange={handleTextChange}
-          placeholder="Paste resume text..."
-          aria-label="Resume text"
-        />
+        <FieldWithClear
+          showClear={showPasteClear}
+          onClear={clearResume}
+          clearLabel="Clear resume"
+        >
+          <textarea
+            ref={textareaRef}
+            id="resume"
+            value={value.resume}
+            onChange={handleTextChange}
+            placeholder="Paste resume text..."
+            aria-label="Resume text"
+          />
+        </FieldWithClear>
       )}
     </section>
   );

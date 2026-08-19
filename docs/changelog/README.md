@@ -2,6 +2,7 @@
 
 Release notes for **aptitude-search**, newest first. Each entry links to the full changelog for that version.
 
+- **[0.8.4.md](0.8.4.md)** — extract evidenced culture/interests; consistent resume clear
 - **[0.8.3.md](0.8.3.md)** — culture preferences / interests as search inputs; backend cleanup
 - **[0.8.2.md](0.8.2.md)** — SERP-only Tavily; notebooks relocation
 - **[0.8.1.md](0.8.1.md)** — Stage 3 recall: search → fit top-k → synthesize

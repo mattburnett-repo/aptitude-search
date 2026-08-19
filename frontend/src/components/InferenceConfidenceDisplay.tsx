@@ -79,7 +79,7 @@ export function InferenceConfidenceDisplay({
   if (!isAptitudeProfile(profile)) {
     return (
       <details className="collapsible-section" open>
-        <summary>Step 2 — How sure we are</summary>
+        <summary>Step 2 — How sure we are and why</summary>
         {stageNav && (
           <InferenceSaveAsPdfToolbar
             contentRef={contentRef}
@@ -103,7 +103,7 @@ export function InferenceConfidenceDisplay({
 
   return (
     <details className="collapsible-section" open>
-      <summary>Step 2 — How sure we are</summary>
+      <summary>Step 2 — How sure we are and why</summary>
       {(confidenceEntries.length > 0 || stageNav) && (
         <InferenceSaveAsPdfToolbar
           contentRef={contentRef}

@@ -115,19 +115,39 @@ describe("ResumeInput", () => {
     ).toBeInTheDocument();
   });
 
-  it("reveals paste textarea when Paste resume is clicked", async () => {
+  it("clears an attached PDF with the same control used for pasted text", async () => {
     const user = userEvent.setup();
+    const onChange = vi.fn();
+    const pdfFile = new File(["pdf"], "resume.pdf", { type: "application/pdf" });
 
     render(
       <ResumeInput
-        value={defaultResumeInput}
-        onChange={() => {}}
+        value={{ resume: "", pdfFile, fileName: "resume.pdf" }}
+        onChange={onChange}
+        onError={() => {}}
+      />
+    );
+
+    await user.click(screen.getByRole("button", { name: "Clear resume" }));
+
+    expect(onChange).toHaveBeenCalledWith(defaultResumeInput);
+  });
+
+  it("clears pasted resume text", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+
+    render(
+      <ResumeInput
+        value={{ resume: "Experience at Acme", pdfFile: null, fileName: null }}
+        onChange={onChange}
         onError={() => {}}
       />
     );
 
     await user.click(screen.getByRole("button", { name: "Paste resume" }));
+    await user.click(screen.getByRole("button", { name: "Clear resume" }));
 
-    expect(screen.getByPlaceholderText("Paste resume text...")).toBeInTheDocument();
+    expect(onChange).toHaveBeenCalledWith(defaultResumeInput);
   });
 });
