@@ -296,19 +296,19 @@ class LlmConfig(BaseModel):
 
 class PromptsConfig(BaseModel):
     stage1_file: str
-    stage2_file: str = "02-role-family-plan.md"
+    stage2_file: str
     stage3_synthesis_file: str
-    stage1_user_task_file: str = "stage1-agent-user-task.txt"
-    stage2_user_task_file: str = "role-family-plan-user-task.txt"
-    stage3_synthesis_user_task_file: str = "stage3-synthesis-user-task.txt"
+    stage1_user_task_file: str
+    stage2_user_task_file: str
+    stage3_synthesis_user_task_file: str
 
 
 class SchemasConfig(BaseModel):
     constraints: str
     aptitude_profile: str
-    role_family_plan: str = "role-family-plan.schema.json"
+    role_family_plan: str
     job_discovery_results: str
-    input_guard: str = "input-guard.schema.json"
+    input_guard: str
 
 
 class PathsConfig(BaseModel):
@@ -323,14 +323,14 @@ class FixtureValidateEntry(BaseModel):
 
 
 class FixturesConfig(BaseModel):
-    files: list[FixtureValidateEntry] = Field(default_factory=list)
+    files: list[FixtureValidateEntry]
 
 
 class Config(BaseModel):
     app: AppConfig
     cors: CorsConfig
     llm: LlmConfig
-    input_safety: InputSafetyConfig = Field(default_factory=InputSafetyConfig)
+    input_safety: InputSafetyConfig
     embedding: EmbeddingConfig
     onet: OnetConfig
     onet_matching: OnetMatchingConfig

@@ -42,7 +42,7 @@ Separately, the backend flow review (Part A) simplified orchestration and tighte
 
 ## Documentation
 
-- `docs/APTITUDE-PREMISE.md` — premise log (aptitude vs supporting signals).
+- `docs/v0.8.4/aptitude-premise.md` — premise (aptitude vs supporting signals); moved from `docs/APTITUDE-PREMISE.md`.
 - `docs/v0.8.3/backend-flow-review.md` — Part A done / Part B notes (already on branch).
 - `docs/video/` — demo pack (already on branch).
 - Changelog: [`docs/changelog/0.8.3.md`](../changelog/0.8.3.md)
