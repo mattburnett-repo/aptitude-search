@@ -19,7 +19,7 @@ max_tokens = 8192
 model_key = "test-key"
 model = "test/input-guard-model"
 chunk_max_chars = 1800
-malicious_score_threshold = 0.5
+malicious_score_threshold = 0.5  # block when malicious score >= this (0–1); higher = fewer blocks, lower = stricter
 
 [input_safety]
 max_resume_chars = 100000

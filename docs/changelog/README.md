@@ -2,6 +2,7 @@
 
 Release notes for **aptitude-search**, newest first. Each entry links to the full changelog for that version.
 
+- **[0.8.5.md](0.8.5.md)** — job types copy; embedding provider; Prompt Guard client reuse
 - **[0.8.4.md](0.8.4.md)** — extract evidenced culture/interests; consistent resume clear
 - **[0.8.3.md](0.8.3.md)** — culture preferences / interests as search inputs; backend cleanup
 - **[0.8.2.md](0.8.2.md)** — SERP-only Tavily; notebooks relocation

@@ -19,7 +19,7 @@ max_tokens = 8192  # Stage 1 JSON output cap; raise if responses truncate
 model_key = ""  # required: Hugging Face key for injection classifier
 model = "meta-llama/Llama-Prompt-Guard-2-22M"
 chunk_max_chars = 1800
-malicious_score_threshold = 0.5
+malicious_score_threshold = 0.5  # block when malicious score >= this (0–1); higher = fewer blocks, lower = stricter
 
 [input_safety]
 max_resume_chars = 100000

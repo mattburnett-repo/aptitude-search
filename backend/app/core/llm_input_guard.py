@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from functools import lru_cache
 
 from huggingface_hub import InferenceClient
 from langsmith import traceable  # pyright: ignore[reportUnknownVariableType]
@@ -27,11 +28,15 @@ def _is_malicious_label(label: str) -> bool:
     return normalized.endswith("1") and "benign" not in normalized
 
 
+@lru_cache(maxsize=1)
+def _input_guard_client() -> InferenceClient:
+    return InferenceClient(api_key=config.llm.input_guard.model_key)
+
+
 @traceable(run_type="llm", name="input_guard_classification")
 def classify_text_malicious(text: str) -> bool:
     """Return True when Prompt Guard labels the chunk malicious."""
-    client = InferenceClient(api_key=config.llm.input_guard.model_key)
-    results = client.text_classification(
+    results = _input_guard_client().text_classification(
         text,
         model=config.llm.input_guard.model,
     )
