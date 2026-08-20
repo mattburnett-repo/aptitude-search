@@ -38,6 +38,7 @@ search_rate_limit = 1.0  # min seconds between searches; omit or set null to dis
 model_key = ""  # required: Hugging Face key for occupation + aptitude vectors
 model = ""  # e.g. BAAI/bge-large-en-v1.5
 dimensions = 1024
+provider = "hf-inference"  # required: must support feature-extraction for the model
 
 [onet]
 host = ""       # e.g. dpg-xxxxx.oregon-postgres.render.com

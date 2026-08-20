@@ -38,6 +38,7 @@ search_rate_limit = 1.0
 model_key = "test-key"
 model = "test/embedding-model"
 dimensions = 1024
+provider = "hf-inference"
 
 [onet]
 host = "localhost"

@@ -333,7 +333,7 @@ exports[`RoleFamilyPlanDisplay > matches markup snapshot 1`] = `
     <h3
       class="aptitude-section-title"
     >
-      Why these roles
+      Why these job types
     </h3>
     <ul
       class="aptitude-rationale"

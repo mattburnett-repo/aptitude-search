@@ -98,7 +98,7 @@ export function RoleFamilyPlanDisplay({
   if (!isRoleFamilyPlan(plan)) {
     return (
       <details className="collapsible-section" open>
-        <summary>Step 4 — Recommended roles</summary>
+        <summary>Step 4 — Job types to try</summary>
         <div className="collapsible-section-body">
           <pre className="aptitude-raw-pre">{JSON.stringify(plan, null, 2)}</pre>
         </div>
@@ -108,7 +108,7 @@ export function RoleFamilyPlanDisplay({
 
   return (
     <details className="collapsible-section" open>
-      <summary>Step 4 — Recommended roles</summary>
+      <summary>Step 4 — Job types to try</summary>
       <RoleFamilySaveAsPdfToolbar
         planRef={planRef}
         stageNav={stageNav}
@@ -143,7 +143,7 @@ export function RoleFamilyPlanDisplay({
 
           {plan.rationale.length > 0 && (
             <section className="aptitude-section aptitude-rationale-section">
-              <h3 className="aptitude-section-title">Why these roles</h3>
+              <h3 className="aptitude-section-title">Why these job types</h3>
               <ul className="aptitude-rationale">
                 {plan.rationale.map((item) => (
                   <li key={item}>{item}</li>

@@ -10,9 +10,9 @@ Resume text → structured aptitude profile JSON. See [prompts/README.md](../pro
 
 ---
 
-## Stage 2 — Role family plan
+## Stage 2 — Job types to try
 
-Aptitude profile → role family plan JSON with `search_terms`, `work_modes`, and `avoid_terms`.
+Aptitude profile → job types to try JSON with `search_terms`, `work_modes`, and `avoid_terms`.
 
 ---
 

@@ -1,16 +1,16 @@
 # Aptitude Search API (Python / FastAPI)
 
-Orchestration for **Stage 1** (aptitude profile), **Stage 2** (O\*NET vector match + role family plan), and **Stage 3** (plan-driven search → aptitude fit ranking → synthesis → `verified_matches` JSON, schema-validated).
+Orchestration for **Stage 1** (aptitude profile), **Stage 2** (O\*NET vector match + job types to try), and **Stage 3** (plan-driven search → aptitude fit ranking → synthesis → `verified_matches` JSON, schema-validated).
 
 **Hugging Face keys** in `config.toml`:
 
 - **Stage 1:** `[llm.aptitude].model_key` + `[llm.aptitude].model` — resume → aptitude profile (chat JSON).
 - **Ingress safety:** `[llm.input_guard]` — Prompt Guard 2 22M text-classification before Stage 1; Presidio PII deletion (`[input_safety]`). See [`docs/v0.5.0/input-safety.md`](../docs/v0.5.0/input-safety.md).
-- **Stage 2:** same model/key — aptitude profile → role family plan (chat JSON).
-- **Stage 3 discovery:** Python builds queries from the role family plan `search_terms` (fallback: profile `adjacent_roles` / `domains` / `interests` / skills) and runs `search_job_postings` (`[job_discovery].discovery_query_max`). No LLM for discovery.
+- **Stage 2:** same model/key — aptitude profile → job types to try (chat JSON).
+- **Stage 3 discovery:** Python builds queries from Stage 2 job types to try `search_terms` (fallback: profile `adjacent_roles` / `domains` / `interests` / skills) and runs `search_job_postings` (`[job_discovery].discovery_query_max`). No LLM for discovery.
 - **Stage 3 fit:** Python ranks found jobs by work-pattern fit and keeps `result_top_k` (`aptitude_fit.py`). No LLM.
 - **Stage 3 synthesis:** `[llm.job_discovery].model_key` + `[llm.job_discovery].model` + `[llm.job_discovery].temperature` — maps ranked `found_jobs` to verified matches JSON.
-- **O\*NET matching (Stage 2):** `[onet_matching]` in `config.toml` (required) — embeds the Stage 1 profile (`[embedding]`), queries `occupation_embeddings` via `[onet]` + pgvector, and grounds the Stage 2 LLM. Requires offline load: [`data/README.md`](../data/README.md).
+- **O\*NET matching (Stage 2):** `[onet_matching]` in `config.toml` (required) — embeds the Stage 1 profile (`[embedding]`: `model_key`, `model`, `dimensions`, `provider` — provider must support `feature-extraction`), queries `occupation_embeddings` via `[onet]` + pgvector, and grounds the Stage 2 LLM. Requires offline load: [`data/README.md`](../data/README.md).
 
 See **[PROMPT-CONTRACT](../docs/PROMPT-CONTRACT.md)** for the full pipeline.
 

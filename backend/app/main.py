@@ -50,7 +50,7 @@ def health():
 
 @app.post("/v1/pipeline", tags=["Pipeline"])
 async def pipeline(body: PipelineRequest, stream: bool = False):
-    """Run Stages 1→2→3: resume → aptitude profile → role family plan → job search."""
+    """Run Stages 1→2→3: resume → aptitude profile → job types to try → job search."""
     if stream:
         return await stream_pipeline_response(body)
     resume, constraints = prepare_pipeline_inputs(body)
@@ -65,7 +65,7 @@ def stage1(body: Stage1Request):
 
 @app.post("/v1/stages/2", tags=["Pipeline Stages"])
 def stage2(body: Stage2Request):
-    """Stage 2: map aptitude profile to a role family plan (plus O*NET matches)."""
+    """Stage 2: map aptitude profile to job types to try (plus O*NET matches)."""
     result = run_stage2(body.aptitude_profile)
     return {
         "role_family_plan": result.role_family_plan,

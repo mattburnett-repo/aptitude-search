@@ -1,11 +1,13 @@
 import sys
 import tomllib
 from pathlib import Path
-from typing import Literal
+from typing import Literal, cast, get_args
 
+from huggingface_hub.inference._providers import PROVIDER_T
 from pydantic import BaseModel, Field, ValidationError, ValidationInfo, field_validator
 
 _CONFIG_PATH = Path(__file__).resolve().parents[2] / "config.toml"
+_EMBEDDING_PROVIDERS = frozenset(get_args(PROVIDER_T))
 
 
 class AppConfig(BaseModel):
@@ -209,6 +211,7 @@ class EmbeddingConfig(BaseModel):
     model_key: str
     model: str
     dimensions: int
+    provider: PROVIDER_T
 
     @field_validator("model_key", "model")
     @classmethod
@@ -218,6 +221,18 @@ class EmbeddingConfig(BaseModel):
             field = info.field_name or "field"
             raise ValueError(f"embedding.{field} must be set in config.toml")
         return stripped
+
+    @field_validator("provider")
+    @classmethod
+    def provider_must_be_supported(cls, value: str) -> PROVIDER_T:
+        stripped = value.strip()
+        if not stripped:
+            raise ValueError("embedding.provider must be set in config.toml")
+        if stripped not in _EMBEDDING_PROVIDERS:
+            raise ValueError(
+                f"embedding.provider must be one of: {', '.join(sorted(_EMBEDDING_PROVIDERS))}"
+            )
+        return cast(PROVIDER_T, stripped)
 
     @field_validator("dimensions")
     @classmethod

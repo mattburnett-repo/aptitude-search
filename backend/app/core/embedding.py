@@ -33,7 +33,10 @@ from app.core.profile_text import labeled_names
 
 
 def _embedding_client() -> InferenceClient:
-    return InferenceClient(api_key=config.embedding.model_key)
+    return InferenceClient(
+        provider=config.embedding.provider,
+        api_key=config.embedding.model_key,
+    )
 
 
 def _coerce_hf_embedding(raw: object) -> object:
@@ -105,10 +108,15 @@ def _parse_embeddings(
     if expected_count == 1:
         return [flatten_embedding(raw, expected_dim=expected_dim)]
 
-    if isinstance(raw, list) and len(raw) == expected_count:
-        return [flatten_embedding(item, expected_dim=expected_dim) for item in raw]
-
-    length: int | str = len(raw) if isinstance(raw, list) else "n/a"
+    if isinstance(raw, list):
+        items = cast(list[object], raw)
+        if len(items) == expected_count:
+            return [
+                flatten_embedding(item, expected_dim=expected_dim) for item in items
+            ]
+        length: int | str = len(items)
+    else:
+        length = "n/a"
     raise ValueError(f"batch embedding response length {length} != {expected_count}")
 
 
@@ -132,10 +140,7 @@ def embed_texts(
     dimensions: int,
 ) -> list[list[float]]:
     """Call HF feature_extraction; used by both embed and embed_aptitude_profile."""
-    raw = cast(
-        object,
-        client.feature_extraction(texts, model=model),  # pyright: ignore[reportUnknownMemberType]
-    )
+    raw = cast(object, client.feature_extraction(texts, model=model))
     vectors = _parse_embeddings(raw, expected_dim=dimensions, expected_count=len(texts))
     return [normalize_embedding(vector) for vector in vectors]
 

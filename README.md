@@ -22,7 +22,7 @@ Keyword-based job search does a poor job of connecting people with roles that fi
 
 ## Product workflow
 
-**Opportunity discovery** in three LLM stages — **[Stage 1](prompts/01-resume-to-aptitude-profile.md)** (profile) → **[Stage 2](prompts/02-role-family-plan.md)** (role families) → **Stage 3** ([discovery + fit ranking](docs/PROMPT-CONTRACT.md) + [synthesis](prompts/03-job-discovery-synthesis.md))
+**Opportunity discovery** in three LLM stages — **[Stage 1](prompts/01-resume-to-aptitude-profile.md)** (profile) → **[Stage 2](prompts/02-role-family-plan.md)** (job types to try) → **Stage 3** ([discovery + fit ranking](docs/PROMPT-CONTRACT.md) + [synthesis](prompts/03-job-discovery-synthesis.md))
 
 Steps: **[prompts/README.md](prompts/README.md)**
 
@@ -47,7 +47,7 @@ Response: `aptitude_profile`, `role_family_plan`, and `verified_matches` (discov
 ## Repository layout
 
 ```
-prompts/          # 01 profile, 02 role families, 03 synthesis
+prompts/          # 01 profile, 02 job types to try, 03 synthesis
 schemas/          # aptitude-profile, role-family-plan, job-discovery-results, constraints
 fixtures/         # sample resumes, pipeline-request-example.json, stage-1 golden output
 docs/             # WORKFLOW, TESTING, PROMPT-CONTRACT

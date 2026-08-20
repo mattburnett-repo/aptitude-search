@@ -118,12 +118,12 @@ const STAGE_HERO: Partial<
     lead: "Careers ranked by fit to your aptitude profile.",
   },
   stage4: {
-    title: "Recommended roles",
-    lead: "Target roles and search terms to guide your job hunt.",
+    title: "Job types to try",
+    lead: "Broad job types that fit how you work — and the titles we’ll search for.",
   },
   stage5: {
     title: "Job search results",
-    lead: "Verified postings discovered from your profile and recommended roles.",
+    lead: "Verified postings discovered from your profile and job types to try.",
   },
 };
 

@@ -97,7 +97,7 @@ def run_stage2(
             on_progress=on_progress,
         )
 
-    emit_progress("Stage 2: Building role family plan…", on_progress=on_progress)
+    emit_progress("Stage 2: Finding job types to try…", on_progress=on_progress)
     task = prompt_loader.user_task_stage2()
     profile_json = json.dumps(aptitude_profile, indent=2)
     onet_block = ""

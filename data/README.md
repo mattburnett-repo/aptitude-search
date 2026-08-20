@@ -8,7 +8,7 @@ Load O\*NET 30.3 into Postgres, build occupation embeddings, and verify the resu
 2. **pgvector** extension available on the server (`CREATE EXTENSION vector`)
 3. **`backend/config.toml`** — copy from `backend/config.example.toml` and set:
    - `[onet]` — Postgres host, database, user, password, `sslmode`
-   - `[embedding]` — Hugging Face `model_key`, `model`, `dimensions`
+   - `[embedding]` — Hugging Face `model_key`, `model`, `dimensions`, `provider` (must support `feature-extraction`)
 4. **Python venv** — `pip install -r backend/requirements.txt` (use `backend/.venv`)
 5. **O\*NET SQL dumps** — not committed; see [download/README.md](download/README.md)
 
