@@ -20,7 +20,7 @@ Aptitude profile → job types to try JSON with `search_terms`, `work_modes`, an
 
 See [prompts/README.md](../prompts/README.md). Input: Stage 1 JSON, Stage 2 JSON, plus optional constraints (`schemas/constraints.schema.json`).
 
-Discovery (Python): profile-driven queries + web search + scrape → aptitude fit ranking → synthesis LLM → `verified_matches`.
+Discovery (Python): profile-driven queries + Exa search + listing gate → aptitude fit ranking → synthesis LLM → `verified_matches`.
 
 ---
 

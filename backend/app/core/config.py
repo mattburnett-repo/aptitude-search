@@ -9,6 +9,17 @@ from pydantic import BaseModel, Field, ValidationError, ValidationInfo, field_va
 _CONFIG_PATH = Path(__file__).resolve().parents[2] / "config.toml"
 _EMBEDDING_PROVIDERS = frozenset(get_args(PROVIDER_T))
 
+ExaSearchType = Literal[
+    "auto",
+    "neural",
+    "fast",
+    "instant",
+    "deep",
+    "deep-lite",
+    "deep-reasoning",
+]
+_EXA_SEARCH_TYPES = frozenset(get_args(ExaSearchType))
+
 
 class AppConfig(BaseModel):
     title: str
@@ -47,16 +58,15 @@ class AptitudeLlmConfig(BaseModel):
         return value
 
 
-_TavilySearchDepth = Literal["basic", "advanced", "fast", "ultra-fast"]
-
-
 class JobDiscoveryConfig(BaseModel):
     url_filters_file: str
     discovery_query_max: int
-    tavily_api_key: str
+    exa_api_key: str
+    search_type: ExaSearchType
+    search_max_age_days: int | None = None
+    url_liveness_check: bool = True
+    url_liveness_timeout_seconds: float = 5.0
     result_top_k: int = 25
-    search_depth: _TavilySearchDepth = "basic"
-    search_min_score: float = 0.0
 
     @field_validator("url_filters_file")
     @classmethod
@@ -79,14 +89,45 @@ class JobDiscoveryConfig(BaseModel):
             raise ValueError(f"job_discovery.{field} must be at least 1")
         return value
 
-    @field_validator("tavily_api_key")
+    @field_validator("exa_api_key")
     @classmethod
-    def tavily_api_key_must_be_set(cls, value: str, info: ValidationInfo) -> str:
+    def exa_api_key_must_be_set(cls, value: str, info: ValidationInfo) -> str:
         stripped = value.strip()
         if not stripped:
             field = info.field_name or "field"
             raise ValueError(f"job_discovery.{field} must be set in config.toml")
         return stripped
+
+    @field_validator("search_type")
+    @classmethod
+    def search_type_must_be_supported(cls, value: str) -> ExaSearchType:
+        stripped = value.strip()
+        if stripped not in _EXA_SEARCH_TYPES:
+            raise ValueError(
+                "job_discovery.search_type must be one of: "
+                + ", ".join(sorted(_EXA_SEARCH_TYPES))
+            )
+        return cast(ExaSearchType, stripped)
+
+    @field_validator("search_max_age_days")
+    @classmethod
+    def search_max_age_days_positive(
+        cls, value: int | None, info: ValidationInfo
+    ) -> int | None:
+        if value is not None and value < 1:
+            field = info.field_name or "field"
+            raise ValueError(
+                f"job_discovery.{field} must be at least 1 or omitted (null) to disable"
+            )
+        return value
+
+    @field_validator("url_liveness_timeout_seconds")
+    @classmethod
+    def url_liveness_timeout_positive(cls, value: float, info: ValidationInfo) -> float:
+        if value <= 0:
+            field = info.field_name or "field"
+            raise ValueError(f"job_discovery.{field} must be positive")
+        return value
 
     @field_validator("result_top_k")
     @classmethod
@@ -94,14 +135,6 @@ class JobDiscoveryConfig(BaseModel):
         if value < 1:
             field = info.field_name or "field"
             raise ValueError(f"job_discovery.{field} must be at least 1")
-        return value
-
-    @field_validator("search_min_score")
-    @classmethod
-    def search_min_score_in_range(cls, value: float, info: ValidationInfo) -> float:
-        if value < 0.0 or value > 1.0:
-            field = info.field_name or "field"
-            raise ValueError(f"job_discovery.{field} must be between 0 and 1")
         return value
 
 

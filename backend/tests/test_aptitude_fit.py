@@ -96,6 +96,25 @@ def test_rank_and_filter_found_jobs_orders_by_fit(
     assert len(ranked) >= 1
 
 
+def test_score_job_aptitude_fit_rejects_unaligned_data_scientist_title(
+    stage1_fixture: dict[str, object],
+    role_family_plan_fixture: dict[str, object],
+) -> None:
+    job = {
+        "title": "Data Scientist",
+        "company": "Analytics Co",
+        "url": "https://example.com/jobs/data-scientist",
+        "snippet": "Mission-driven lean team; stakeholder interviews; end-to-end ownership",
+    }
+    score, signals = score_job_aptitude_fit(
+        job,
+        stage1_fixture,
+        role_family_plan=role_family_plan_fixture,
+    )
+    assert score < 0
+    assert "penalty:no_role_family_alignment" in signals
+
+
 def test_score_job_aptitude_fit_rewards_culture_preferences(
     stage1_fixture: dict[str, object],
 ) -> None:

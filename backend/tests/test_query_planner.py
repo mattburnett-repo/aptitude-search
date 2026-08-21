@@ -152,3 +152,51 @@ def test_build_discovery_queries_uses_interests_when_no_roles_or_domains() -> No
     assert any("climate" in q.lower() for q in queries)
     assert not any("Python" in q for q in queries)
     assert not any("mission-driven" in q.lower() for q in queries)
+
+
+def test_build_discovery_queries_prefers_high_onet_aligned_families(
+    stage1_fixture: dict[str, object],
+) -> None:
+    plan: dict[str, object] = {
+        "recommended_role_families": [
+            {
+                "role_family": "Data Science",
+                "fit_reason": "Weak path.",
+                "supporting_signals": ["Python"],
+                "work_modes": ["modeling"],
+                "search_terms": ["data scientist", "machine learning engineer"],
+                "avoid_terms": ["quota"],
+            },
+            {
+                "role_family": "Product Engineering",
+                "fit_reason": "Strong path.",
+                "supporting_signals": ["TypeScript"],
+                "work_modes": ["customer-facing tools"],
+                "search_terms": [
+                    "product engineer",
+                    "full stack engineer",
+                    "software engineer",
+                ],
+                "avoid_terms": ["data scientist"],
+            },
+        ],
+        "rationale": ["Prefer product engineering."],
+    }
+    occupation_matches: list[dict[str, object]] = [
+        {"title": "Software Developers", "score": 0.82, "onetsoc_code": "15-1252.00"},
+        {"title": "Web Developers", "score": 0.71, "onetsoc_code": "15-1254.00"},
+        {"title": "Data Scientists", "score": 0.51, "onetsoc_code": "15-2051.00"},
+    ]
+    queries = build_discovery_queries(
+        stage1_fixture,
+        Constraints(),
+        role_family_plan=plan,
+        occupation_matches=occupation_matches,
+        max_queries=3,
+    )
+
+    assert len(queries) == 3
+    assert any("product engineer" in q.lower() for q in queries)
+    assert any("full stack engineer" in q.lower() for q in queries)
+    assert not any("data scientist" in q.lower() for q in queries)
+    assert not any("machine learning" in q.lower() for q in queries)

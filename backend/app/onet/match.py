@@ -56,11 +56,20 @@ def format_matches_for_prompt(matches: list[OccupationMatch]) -> str:
     if not matches:
         return ""
     lines = [
-        "O*NET vector matches (primary grounding for role_family and search_terms):",
+        "O*NET vector matches (primary grounding for role_family and search_terms).",
+        "Prefer high/medium for families and search_terms; use low only when the "
+        "aptitude profile explicitly supports that occupation:",
     ]
     for index, match in enumerate(matches, start=1):
+        if match.score >= 0.70:
+            band = "high"
+        elif match.score >= 0.65:
+            band = "medium"
+        else:
+            band = "low"
         lines.append(
-            f"{index}. {match.title} ({match.onetsoc_code}) — similarity {match.score:.3f}"
+            f"{index}. [{band}] {match.title} ({match.onetsoc_code}) — "
+            f"similarity {match.score:.3f}"
         )
         lines.append(f"   {_truncate(match.occupation_profile)}")
     return "\n".join(lines)

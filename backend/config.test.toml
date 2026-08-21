@@ -56,10 +56,12 @@ min_similarity = 0.0
 [job_discovery]
 url_filters_file = "url-filters.toml"
 discovery_query_max = 6
-tavily_api_key = "test-tavily-key"
+exa_api_key = "test-exa-key"
+search_type = "auto"
+search_max_age_days = 30
+url_liveness_check = false  # offline unit tests; enable in config.toml for live runs
+url_liveness_timeout_seconds = 5.0
 result_top_k = 25
-search_depth = "basic"
-search_min_score = 0.0
 
 [prompts]
 stage1_file = "01-resume-to-aptitude-profile.md"

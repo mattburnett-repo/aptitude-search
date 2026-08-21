@@ -23,7 +23,7 @@ plan_queries
   → synthesize
 ```
 
-- **N** parallel workers from spike-local engines (not `job_discovery.search_backends`; production uses Tavily).
+- **N** parallel workers from spike-local engines (not `job_discovery.search_backends`; production uses Exa).
 - Each worker runs discovery queries against **one** DDGS engine via `search.search_queries_on_backend`.
 - `max_concurrency` defaults to `N` so all engines can run together.
 - Downstream filter / fit / synthesize still import helpers from `app.job_discovery` (read-only).

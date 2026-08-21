@@ -22,6 +22,14 @@ def test_load_url_filters_reads_configured_toml():
     assert isinstance(filters, UrlFilters)
     assert "medium.com" in filters.skip_domains
     assert "example.com" in filters.skip_domains
+    assert "suspended-domain.net" in filters.skip_domains
     assert filters.include_domains == frozenset()
-    assert filters.skip_domain_suffixes == ()
+    assert "totalh.net" in filters.skip_domain_suffixes
+    assert "zya.me" in filters.skip_domain_suffixes
     assert filters.skip_title_phrases
+    assert filters.closed_listing_phrases
+    assert "no longer available" in filters.closed_listing_phrases
+    assert "domain suspended" in filters.closed_listing_phrases
+    assert filters.parking_gate_markers
+    assert filters.error_page_markers
+    assert filters.challenge_page_markers

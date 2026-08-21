@@ -84,6 +84,10 @@ def _family_string_list(
     return values
 
 
+def _job_title(job: FoundJob) -> str:
+    return str(job.get("title") or job.get("role") or "").lower()
+
+
 def _job_text(job: FoundJob) -> str:
     parts = [
         str(job.get("title") or job.get("role") or ""),
@@ -109,49 +113,58 @@ def score_job_aptitude_fit(
         if avoid and avoid in text:
             return (-999, [f"avoid:{avoid}"])
 
+    title = _job_title(job)
+    search_terms = _family_string_list(
+        role_family_plan, "search_terms", lowercase=True
+    )
+
     score = 0
     signals: list[str] = []
+    role_aligned = False
+
+    for term in search_terms:
+        if term in title or _phrase_hits(title, term):
+            score += 5
+            signals.append(f"role_family_search_title:{term}")
+            role_aligned = True
+        elif term in text or _phrase_hits(text, term):
+            score += 2
+            signals.append(f"role_family_search:{term}")
+            role_aligned = True
+
+    for label in profile_labels(aptitude_profile.get("adjacent_roles")):
+        if _phrase_hits(title, label):
+            score += 5
+            signals.append(f"adjacent_role_title:{label}")
+            role_aligned = True
+        elif _phrase_hits(text, label):
+            score += 4
+            signals.append(f"adjacent_role:{label}")
+            role_aligned = True
+
+    if search_terms and not role_aligned:
+        # Hard-reject: plan had hiring titles but this posting matches none.
+        return (-1, ["penalty:no_role_family_alignment"])
 
     for label in profile_labels(aptitude_profile.get("strengths")):
         if _phrase_hits(text, label):
-            score += 3
+            score += 1
             signals.append(f"strength:{label}")
 
     for label in profile_labels(aptitude_profile.get("working_style_signals")):
         if _phrase_hits(text, label):
-            score += 3
+            score += 1
             signals.append(f"working_style:{label}")
 
     for label in profile_labels(aptitude_profile.get("culture_preferences")):
         if _phrase_hits(text, label):
-            score += 3
+            score += 1
             signals.append(f"culture_preference:{label}")
-
-    for label in profile_labels(aptitude_profile.get("adjacent_roles")):
-        if _phrase_hits(text, label):
-            score += 4
-            signals.append(f"adjacent_role:{label}")
-
-    search_terms = _family_string_list(
-        role_family_plan, "search_terms", lowercase=True
-    )
-    for term in search_terms:
-        if term in text:
-            score += 2
-            signals.append(f"role_family_search:{term}")
 
     for mode in _family_string_list(role_family_plan, "work_modes"):
         if _phrase_hits(text, mode):
             score += 2
             signals.append(f"work_mode:{mode}")
-
-    if (
-        score == 0
-        and search_terms
-        and not any(term in text or _phrase_hits(text, term) for term in search_terms)
-    ):
-        # Hard-reject: role family plan had search terms but none aligned.
-        return (-1, ["penalty:no_role_family_alignment"])
 
     return score, signals
 

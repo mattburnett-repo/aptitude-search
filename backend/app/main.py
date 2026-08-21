@@ -81,5 +81,6 @@ def stage3(body: Stage3Request):
             body.aptitude_profile,
             body.constraints,
             role_family_plan=body.role_family_plan,
+            occupation_matches=body.occupation_matches,
         )
     }

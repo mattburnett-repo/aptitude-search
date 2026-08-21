@@ -105,8 +105,10 @@ def run_stage2(
         onet_block = (
             "\n\n<onet_occupation_matches>\n"
             f"{format_matches_for_prompt(list(occupation_matches))}\n"
-            "Ground recommended_role_families and search_terms in these matches "
-            "where they fit the aptitude profile.\n"
+            "Ground recommended_role_families and search_terms in high/medium matches "
+            "where they fit the aptitude profile. Do not invent families or search_terms "
+            "for low-similarity occupations unless adjacent_roles/strengths explicitly "
+            "support that path (shared tools alone are not enough).\n"
             "</onet_occupation_matches>"
         )
     user = (
@@ -135,6 +137,7 @@ def run_stage3(
     constraints: Constraints | None = None,
     *,  # keyword-only: pass role_family_plan=... / on_progress=..., not positionally
     role_family_plan: RoleFamilyPlan | None = None,
+    occupation_matches: list[OccupationMatchJson] | None = None,
     on_progress: ProgressCallback | None = None,
 ) -> VerifiedMatches:
     """Stage 3: profile (+ optional plan) → verified job matches.
@@ -153,6 +156,7 @@ def run_stage3(
         aptitude_profile,
         c,
         role_family_plan=role_family_plan,
+        occupation_matches=occupation_matches,
         on_progress=on_progress,
     )
     if found_jobs:
@@ -210,6 +214,7 @@ def run_pipeline(
         aptitude_profile,
         constraints,
         role_family_plan=role_family_plan,
+        occupation_matches=occupation_matches,
         on_progress=on_progress,
     )
     emit_progress("Pipeline complete.", on_progress=on_progress)

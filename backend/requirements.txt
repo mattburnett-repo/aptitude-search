@@ -1,8 +1,10 @@
-# Spike (`notebooks/`) still uses ddgs until ported to Tavily; production tools use tavily-python.
+# Spike (`notebooks/`) still uses ddgs; production Stage 3 discovery uses exa-py.
 ddgs>=9.0.0
 # Pinned spaCy model for Presidio (input_safety.py); install at build — no runtime download.
 en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
+exa-py>=2.14.0
 fastapi>=0.115.0
+httpx>=0.27.0
 huggingface_hub>=0.33.0
 jsonschema>=4.23.0
 langsmith>=0.2.0
@@ -17,5 +19,4 @@ pypdf>=5.1.0
 python-multipart>=0.0.9
 sentry-sdk[fastapi]>=2.0.0
 spacy>=3.8.0
-tavily-python>=0.5.0
 uvicorn[standard]>=0.32.0

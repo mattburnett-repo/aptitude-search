@@ -27,11 +27,11 @@ pii_entities = ["EMAIL_ADDRESS", "PHONE_NUMBER", "PERSON", "LOCATION", "US_SSN"]
 
 [llm.job_discovery]
 model_key = ""  # required: Hugging Face key for Stage 3 synthesis
-model = ""  # Stage 3: found_jobs → verified_matches JSON (match explanations)
+model = ""  # e.g. meta-llama/Llama-3.1-8B-Instruct (synthesis; keep Stage 1 on a larger model)
 temperature = 0.0  # synthesis JSON temperature
-max_tokens = 8192  # Stage 3 synthesis JSON output cap; raise if responses truncate
-search_max_results = 10  # Tavily search results per query
-search_snippet_max_chars = 300  # max chars per Tavily result snippet on found_jobs
+max_tokens = 4096  # Stage 3 synthesis JSON output cap; raise if responses truncate
+search_max_results = 10  # Exa search results per query
+search_snippet_max_chars = 300  # max chars per Exa highlight snippet on found_jobs
 search_rate_limit = 1.0  # min seconds between searches; omit or set null to disable
 
 [embedding]
@@ -56,10 +56,12 @@ min_similarity = 0.0  # required
 [job_discovery]
 url_filters_file = "url-filters.toml"  # SERP/found_jobs skip lists (app/job_discovery/)
 discovery_query_max = 6  # max search_job_postings calls per pipeline run
-tavily_api_key = ""  # required: Tavily API key for Stage 3 search
+exa_api_key = ""  # required: Exa API key for Stage 3 search
+search_type = "auto"  # Exa search type: auto | neural | fast | instant | deep | deep-lite | deep-reasoning
+search_max_age_days = 30  # Exa date cutoff (published + crawl); omit or null to disable
+url_liveness_check = true  # probe result URLs; drop 404/410 and closed-listing phrases
+url_liveness_timeout_seconds = 5.0
 result_top_k = 25  # max ranked jobs passed to synthesis after aptitude fit
-search_depth = "basic"  # Tavily: basic | advanced | fast | ultra-fast
-search_min_score = 0.0  # drop Tavily hits below this score (0–1); 0 keeps all
 
 [prompts]
 stage1_file = "01-resume-to-aptitude-profile.md"

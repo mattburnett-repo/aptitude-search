@@ -81,6 +81,28 @@ def test_should_skip_job_title_rejects_article_headlines():
 def test_url_filters_allow_empty_optional_lists():
     load_url_filters.cache_clear()
     filters = load_url_filters()
-    assert filters.skip_domain_suffixes == ()
     assert filters.skip_listing_path_markers == ()
+
+
+def test_should_skip_search_result_filters_suspended_and_totalh_hosts():
+    load_url_filters.cache_clear()
+    assert (
+        should_skip_search_result(
+            "https://suspended-domain.net/index.php?host=taskworks.totalh.net"
+        )
+        is True
+    )
+    assert (
+        should_skip_search_result(
+            "https://taskworks.totalh.net/remote-jobs/principal-ai-engineer-8"
+        )
+        is True
+    )
+    assert (
+        should_skip_search_result(
+            "https://suspended-domain.net/index.php?host=flexgen.zya.me"
+        )
+        is True
+    )
+    assert should_skip_search_result("https://flexgen.zya.me/jobs/1") is True
 

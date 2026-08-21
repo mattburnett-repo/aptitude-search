@@ -1,4 +1,4 @@
-"""Load job-discovery URL filter lists from external TOML."""
+"""Load listing-rejection criteria from external TOML (single source of truth)."""
 
 from __future__ import annotations
 
@@ -22,6 +22,10 @@ class UrlFilters:
     skip_listing_path_markers: tuple[str, ...]
     skip_listing_path_markers_case_sensitive: tuple[str, ...]
     skip_title_phrases: tuple[str, ...]
+    closed_listing_phrases: tuple[str, ...]
+    parking_gate_markers: tuple[str, ...]
+    error_page_markers: tuple[str, ...]
+    challenge_page_markers: tuple[str, ...]
 
 
 def _as_str_list(raw: object, *, field: str, allow_empty: bool = False) -> list[str]:
@@ -81,5 +85,33 @@ def load_url_filters() -> UrlFilters:
         ),
         skip_title_phrases=tuple(
             _as_str_list(data.get("skip_title_phrases"), field="skip_title_phrases")
+        ),
+        closed_listing_phrases=tuple(
+            _as_str_list(
+                data.get("closed_listing_phrases"),
+                field="closed_listing_phrases",
+                allow_empty=True,
+            )
+        ),
+        parking_gate_markers=tuple(
+            _as_str_list(
+                data.get("parking_gate_markers"),
+                field="parking_gate_markers",
+                allow_empty=True,
+            )
+        ),
+        error_page_markers=tuple(
+            _as_str_list(
+                data.get("error_page_markers"),
+                field="error_page_markers",
+                allow_empty=True,
+            )
+        ),
+        challenge_page_markers=tuple(
+            _as_str_list(
+                data.get("challenge_page_markers"),
+                field="challenge_page_markers",
+                allow_empty=True,
+            )
         ),
     )

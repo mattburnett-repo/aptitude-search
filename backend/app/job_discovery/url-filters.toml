@@ -1,9 +1,10 @@
-# SERP junk filters for Stage 3 job discovery.
-# Edit lists here; loaded via config.toml [job_discovery].url_filters_file (relative to this package).
+# Listing rejection criteria for Stage 3 discovery (single source of truth).
+# Loaded via config.toml [job_discovery].url_filters_file (relative to this package).
+# Applied by listing_gate.py: Exa search kwargs + post-SERP accept/filter.
 #
-# skip_domains: exact hostname match (after stripping www.), e.g. medium.com blocks www.medium.com only.
-# skip_domain_suffixes: hostname equals entry or ends with ".entry" (optional; may be empty).
-# include_domains: optional Tavily allowlist; empty = no include filter (search the open web).
+# skip_domains: exact hostname match (after stripping www.).
+# skip_domain_suffixes: hostname equals entry or ends with ".entry".
+# include_domains: optional Exa allowlist; empty = no include filter.
 
 skip_domains = [
   "baeldung.com",
@@ -23,6 +24,7 @@ skip_domains = [
   "reddit.com",
   "stackoverflow.com",
   "substack.com",
+  "suspended-domain.net",
   "toptal.com",
   "tutorialspoint.com",
   "typescriptlang.org",
@@ -34,7 +36,12 @@ skip_domains = [
 
 include_domains = []
 
-skip_domain_suffixes = []
+skip_domain_suffixes = [
+  "10001mb.com",
+  "2kool4u.net",
+  "totalh.net",
+  "zya.me",
+]
 
 skip_path_markers = [
   "/docs/",
@@ -48,7 +55,6 @@ skip_path_markers = [
   "/blog/",
 ]
 
-# Optional; empty = do not skip board list/search URLs (higher recall).
 skip_listing_path_markers = []
 
 skip_listing_path_markers_case_sensitive = []
@@ -71,4 +77,54 @@ skip_title_phrases = [
   "top ",
   "salary guide",
   "career path",
+]
+
+# Case-insensitive; SERP highlights + live page body.
+closed_listing_phrases = [
+  "no longer available",
+  "no longer open",
+  "job is no longer open",
+  "this job is no longer open",
+  "looks like this job is no longer",
+  "this job has been filled",
+  "this position has been filled",
+  "position has been filled",
+  "sorry, this position has been filled",
+  "job is no longer",
+  "this posting has expired",
+  "this job is closed",
+  "job posting is closed",
+  "this position is no longer",
+  "sorry, this job is no longer",
+  "domain suspended",
+  "this domain has been suspended",
+  "account has been suspended",
+]
+
+# Free-host parking gates (HTTP 200 + JS; browser ends on suspended-domain).
+parking_gate_markers = [
+  'src="/aes.js"',
+  "src='/aes.js'",
+  "suspended-domain.net",
+  "function tonumber(d)",
+  "domain suspended",
+]
+
+# Broken ATS / server-error HTML shells.
+error_page_markers = [
+  "object reference not set to an instance of an object",
+  "server error in '/' application",
+  "runtime error",
+  "http error 500",
+  "internal server error",
+]
+
+# Bot-challenge interstitial pages (often Cloudflare).
+challenge_page_markers = [
+  "just a moment",
+  "cf-browser-verification",
+  "cloudflare",
+  "attention required",
+  "enable javascript and cookies",
+  "checking your browser",
 ]

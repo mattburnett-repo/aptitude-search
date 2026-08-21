@@ -6,7 +6,7 @@
 - **Stage 3 is job search.** The API runs job-type-driven web discovery, ranks found postings by work-pattern fit, then a synthesis LLM call, and returns currently open postings in **`verified_matches`**.
 - **Primary path:** API + UI (or Swagger). Prompt text lives under `prompts/` (see Stages table); filenames are wired in `backend/config.toml`.
 - **Testing:** Swagger UI at `/docs` on the running API (see [backend/README.md](../backend/README.md)).
-- **Implementation (not user-facing):** Stage 3 is three phases: (1) **discovery** — Python builds search queries from Stage 2 job types to try `search_terms` (fallback: `adjacent_roles`, `domains`, `interests`, skills), plus constraints, then runs `search_job_postings`; (2) **aptitude fit** — rank/`top_k` filter on `found_jobs` (including `culture_preferences`); (3) **synthesis** — chat completion maps ranked `found_jobs` into schema-strict JSON with match explanations. The API jsonschema-validates `verified_matches` against `job-discovery-results.schema.json`.
+- **Implementation (not user-facing):** Stage 3 is three phases: (1) **discovery** — Python builds search queries from Stage 2 job types to try `search_terms` (fallback: `adjacent_roles`, `domains`, `interests`, skills), plus constraints, then runs `search_job_postings` (Exa via listing gate; SERP rows only); (2) **aptitude fit** — rank/`top_k` filter on `found_jobs` (role-term alignment, `culture_preferences`); (3) **synthesis** — chat completion maps ranked `found_jobs` into schema-strict JSON with match explanations. The API jsonschema-validates `verified_matches` against `job-discovery-results.schema.json`.
 
 ---
 
@@ -42,7 +42,8 @@ Related settings in `backend/config.toml`:
 
 - **`[job_discovery].discovery_query_max`** — max `search_job_postings` calls per pipeline run (default `6`).
 - **`[job_discovery].result_top_k`** — max ranked jobs passed to synthesis after aptitude fit (default `25`).
-- **`[llm.job_discovery]`** — synthesis model/temperature and search limits (`search_max_results`, `search_rate_limit`). Spike-only scrape knobs have defaults.
+- **`[job_discovery].exa_api_key` / `search_type` / `search_max_age_days` / `url_liveness_*`** — Exa provider and listing-gate knobs (see [`docs/v0.9.0/exa-search-migration.md`](v0.9.0/exa-search-migration.md)).
+- **`[llm.job_discovery]`** — synthesis model/temperature/`max_tokens` and search limits (`search_max_results`, `search_rate_limit`).
 
 ## API validation
 

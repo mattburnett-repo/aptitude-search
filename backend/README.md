@@ -116,5 +116,5 @@ curl -s -X POST http://localhost:3001/v1/pipeline \
 - **Stage 3 discovery:** `app/job_discovery/discovery.py` — profile-driven queries + `search_job_postings` (see [PROMPT-CONTRACT](../docs/PROMPT-CONTRACT.md)).
 - Stage 3 synthesis: `prompts/03-job-discovery-synthesis.md` (chat JSON → `verified_matches`).
 - Filenames are configured in `config.toml` under `[prompts]`.
-- **URL filters (Stage 3):** junk denylist for SERP rows lives in `app/job_discovery/url-filters.toml` (filename set by `[job_discovery].url_filters_file` in `config.toml`, resolved relative to `app/job_discovery/`). Edit `skip_domains`, `skip_path_markers`, `skip_title_phrases`; restart the API to pick up changes.
+- **Listing gate (Stage 3):** rejection criteria in `app/job_discovery/url-filters.toml` (filename via `[job_discovery].url_filters_file`); behavior in `listing_gate.py` (Exa kwargs + post-SERP accept/liveness). Edit skip domains/paths/titles, closed phrases, parking/error/challenge markers; restart the API to pick up TOML changes. See [`docs/v0.9.0/exa-search-migration.md`](../docs/v0.9.0/exa-search-migration.md).
 - CORS allows `http://localhost:5173` and `http://127.0.0.1:5173` for the Vite dev server.

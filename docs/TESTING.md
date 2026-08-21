@@ -84,7 +84,7 @@ Stage 3 should reflect current postings from web search (`search_job_postings`),
 ## Models and config
 
 - **Stage 1 + Stage 3 synthesis:** `[llm.aptitude].model` and `[llm.aptitude].model_key`
-- **Discovery tools + synthesis temperature:** `[llm.job_discovery]` (search/scrape limits, `temperature`)
+- **Discovery tools + synthesis temperature:** `[llm.job_discovery]` (search limits, `temperature`) and `[job_discovery]` (Exa / listing gate)
 - **Query budget:** `[job_discovery].discovery_query_max`
 
 Use capable models for reliable Stage 1 JSON.

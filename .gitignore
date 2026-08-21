@@ -38,3 +38,4 @@ data/onet-load.log
 data/**/*.dump
 db/*
 docs/lighthouse-reports/
+exa_test.sh

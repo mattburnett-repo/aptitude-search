@@ -47,7 +47,7 @@ from tool_observed_urls import (  # pyright: ignore[reportImplicitRelativeImport
     filter_results_to_tool_observed_urls,
 )
 
-# Spike-local DDGS engines only (production Stage 3 uses Tavily; not in config).
+# Spike-local DDGS engines only (production Stage 3 uses Exa; not in config).
 _SPIKE_SEARCH_BACKENDS = ("brave", "yahoo", "yandex")
 
 logger = logging.getLogger(__name__)
